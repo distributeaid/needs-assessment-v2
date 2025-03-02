@@ -5,7 +5,10 @@ import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 
 const prisma = new PrismaClient();
 
-export async function GET(request: Request, context: { params: { surveyId: string } }) {
+export async function GET(
+  request: Request,
+  context: { params: { surveyId: string } },
+) {
   try {
     const params = await context.params;
     const surveyId = parseInt(params.surveyId, 10);
@@ -22,7 +25,10 @@ export async function GET(request: Request, context: { params: { surveyId: strin
     });
 
     if (!user || !user.siteId) {
-      return NextResponse.json({ message: "User site not found" }, { status: 404 });
+      return NextResponse.json(
+        { message: "User site not found" },
+        { status: 404 },
+      );
     }
 
     // Fetch the siteSurvey for the user's site and the requested survey
@@ -43,7 +49,10 @@ export async function GET(request: Request, context: { params: { surveyId: strin
     });
 
     if (!siteSurvey) {
-      return NextResponse.json({ message: "SiteSurvey not found" }, { status: 404 });
+      return NextResponse.json(
+        { message: "SiteSurvey not found" },
+        { status: 404 },
+      );
     }
 
     // Fetch the survey with pages
@@ -57,22 +66,28 @@ export async function GET(request: Request, context: { params: { surveyId: strin
     });
 
     if (!survey) {
-      return NextResponse.json({ message: "Survey not found" }, { status: 404 });
+      return NextResponse.json(
+        { message: "Survey not found" },
+        { status: 404 },
+      );
     }
 
     // Map sitePages progress to survey pages
     const pagesWithProgress = survey.pages.map((page) => {
-      const sitePage = siteSurvey.sitePages.find(sp => sp.pageId === page.id);
+      const sitePage = siteSurvey.sitePages.find((sp) => sp.pageId === page.id);
       return {
         id: page.id,
         title: page.title,
-        progress: sitePage ? sitePage.progress : 'UNSTARTEDREQUIRED',  // Default if no progress found
+        progress: sitePage ? sitePage.progress : "UNSTARTEDREQUIRED", // Default if no progress found
       };
     });
 
     return NextResponse.json({ ...survey, pages: pagesWithProgress });
   } catch (error) {
     console.error("Error fetching survey:", error);
-    return NextResponse.json({ message: "Internal Server Error" }, { status: 500 });
+    return NextResponse.json(
+      { message: "Internal Server Error" },
+      { status: 500 },
+    );
   }
 }

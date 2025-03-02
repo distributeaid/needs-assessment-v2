@@ -11,7 +11,8 @@ function getMostRecentSurvey(surveys: { year: number; season: string }[]) {
     if (
       current.year > latest.year ||
       (current.year === latest.year &&
-        seasonOrder.indexOf(current.season) > seasonOrder.indexOf(latest.season))
+        seasonOrder.indexOf(current.season) >
+          seasonOrder.indexOf(latest.season))
     ) {
       return current;
     }
@@ -27,10 +28,10 @@ export async function GET() {
       include: {
         pages: {
           include: {
-            questions: true
-          }
-        }
-      }
+            questions: true,
+          },
+        },
+      },
     });
 
     if (!surveys || surveys.length === 0) {
@@ -43,7 +44,10 @@ export async function GET() {
     return NextResponse.json([latestSurvey]); // Return as an array for consistency
   } catch (error) {
     console.error("Error fetching surveys:", error);
-    return NextResponse.json({ error: "Failed to fetch surveys" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Failed to fetch surveys" },
+      { status: 500 },
+    );
   } finally {
     await prisma.$disconnect();
   }

@@ -1,10 +1,10 @@
 import "./globals.css";
-import { Inter } from "next/font/google";
+import { Yantramanav } from "next/font/google";
 import { Providers } from "./providers";
 import Navbar from "@/components/Navbar";
+import "@radix-ui/themes/styles.css";
 
-
-const inter = Inter({ subsets: ["latin"] });
+const yantramanav = Yantramanav({ weight: ["400", "700"] });
 
 export const metadata = {
   title: "Needs Assessment",
@@ -18,12 +18,12 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={inter.className}>
-
+      <body className={yantramanav.className}>
         <Providers>
           <Navbar />
           {children}
-        </Providers>  {/* Wrap children with Providers */}
+        </Providers>{" "}
+        {/* Wrap children with Providers */}
       </body>
     </html>
   );

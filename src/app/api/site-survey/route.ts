@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
-import { initializeSiteSurvey } from "./initialize";  // Import the initialization function
+import { initializeSiteSurvey } from "./initialize"; // Import the initialization function
 
 export async function GET() {
   const session = await getServerSession(authOptions);
@@ -17,6 +17,9 @@ export async function GET() {
     return NextResponse.json(siteSurveyData);
   } catch (error) {
     console.error("Error in Site Survey API:", error);
-    return NextResponse.json({ error: "Failed to retrieve site survey." }, { status: 500 });
+    return NextResponse.json(
+      { error: "Failed to retrieve site survey." },
+      { status: 500 },
+    );
   }
 }

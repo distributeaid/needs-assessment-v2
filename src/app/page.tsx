@@ -10,7 +10,7 @@ export default function Home() {
   const router = useRouter();
 
   useEffect(() => {
-    if (! session) {
+    if (!session) {
       router.push("/about");
     } else {
       router.push("/dashboard"); // Redirect to dashboard if logged in

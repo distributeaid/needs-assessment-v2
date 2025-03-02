@@ -2,22 +2,19 @@ import { GET } from "@/app/api/site-survey/route";
 import { getServerSession } from "next-auth/next";
 import { initializeSiteSurvey } from "@/app/api/site-survey/initialize";
 
-
 jest.mock("next-auth", () => ({
-    default: jest.fn(),
-    NextAuth: jest.fn(),
+  default: jest.fn(),
+  NextAuth: jest.fn(),
 }));
 
-
 jest.mock("next-auth/next", () => ({
-getServerSession: jest.fn(),
+  getServerSession: jest.fn(),
 }));
 
 jest.mock("@/app/api/auth/[...nextauth]/route", () => ({
-GET: jest.fn(),
-POST: jest.fn(),
+  GET: jest.fn(),
+  POST: jest.fn(),
 }));
-
 
 jest.mock("@/app/api/site-survey/initialize", () => ({
   initializeSiteSurvey: jest.fn(),
@@ -59,7 +56,9 @@ describe("GET /api/site-survey", () => {
       user: { email: "test@example.com" },
     });
 
-    (initializeSiteSurvey as jest.Mock).mockRejectedValue(new Error("DB Error"));
+    (initializeSiteSurvey as jest.Mock).mockRejectedValue(
+      new Error("DB Error"),
+    );
 
     const response = await GET();
     expect(response.status).toBe(500);

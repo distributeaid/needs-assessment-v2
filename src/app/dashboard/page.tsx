@@ -4,6 +4,14 @@ import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { SiteSurvey, Survey } from "@/types/models";
 import LoadingSpinner from "@/components/LoadingSpinner";
+import { pages } from "next/dist/build/templates/app-page";
+import {
+  Text,
+  Box,
+  Container,
+  Separator,
+  Flex,
+} from "@radix-ui/themes";
 
 export default function Dashboard() {
   const { data: session, status } = useSession();
@@ -44,28 +52,47 @@ export default function Dashboard() {
   if (error) return <div>Error: {error}</div>;
 
   return (
-    <div className="max-w-4xl mx-auto p-8">
-      <h1 className="text-3xl font-bold mb-6">
-        {siteSurvey.survey.season} {siteSurvey.survey.year} Survey Dashboard
-      </h1>
-      <ul className="space-y-4">
-        {siteSurvey.survey.pages.map((page) => (
-          <li
-            key={page.id}
-            className="p-4 border rounded-lg shadow-sm flex justify-between items-center"
+    <Container className="w-full h-screen bg-gray-100 p-8">
+      <Flex direction="column" align="center" justify="center" gap="4">
+        <Box align="center" justify="center" className="w-full">
+          <h1 className="text-4xl text-[var(--primary)] ">DASHBOARD</h1>
+          <Separator className="border-t-2 border-black m-10" />
+          <Text as="p" className="text-xl font-bold text-blue-900 mt-20">
+            Choose a category to fill up.
+          </Text>
+          <Flex
+            direction={{ initial: "column", md: "row" }}
+            align="center"
+            justify="center"
+            className="gap-6 mt-6"
           >
-            <span className="text-lg font-medium">{page.title}</span>
-            <button
-              className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-              onClick={() =>
-                router.push(`/survey/${siteSurvey.survey.id}/page/${page.id}`)
-              }
-            >
-              View
-            </button>
-          </li>
-        ))}
-      </ul>
-    </div>
+            {siteSurvey.survey.pages.slice(0, 2).map((page) => (
+              <Box
+                key={page.id}
+                align="center"
+                width="350px"
+                height="200px"
+                className="bg-[var(--secondary)] border rounded-lg shadow-sm justify-center items-center text-center"
+              >
+                <h1 className="text-4xl font-bold text-blue-900 p-6">
+                  {page.title}
+                </h1>
+
+                <button
+                  className="text-white text-lg bg-[var(--primary)] rounded-md hover:bg-green-300 px-5 py-4 my-4"
+                  onClick={() =>
+                    router.push(
+                      `/survey/${siteSurvey.survey.id}/page/${page.id}`,
+                    )
+                  }
+                >
+                  COMPLETE
+                </button>
+              </Box>
+            ))}
+          </Flex>
+        </Box>
+      </Flex>
+    </Container>
   );
 }

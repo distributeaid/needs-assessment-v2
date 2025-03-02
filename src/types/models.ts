@@ -1,10 +1,23 @@
 // src/types/models.ts
 
-export type ProgressStatus = 'LOCKED' | 'UNSTARTEDREQUIRED' | 'STARTEDREQUIRED' | 'UNSTARTEDOPTIONAL' | 'STARTEDOPTIONAL' | 'COMPLETE';
+export type ProgressStatus =
+  | "LOCKED"
+  | "UNSTARTEDREQUIRED"
+  | "STARTEDREQUIRED"
+  | "UNSTARTEDOPTIONAL"
+  | "STARTEDOPTIONAL"
+  | "COMPLETE";
 
 export interface Question {
   id: number;
-  type: "Numeric" | "Dropdown" | "MultiSelect" | "Short Response" | "Long Response" | "SizingGrid" | "YesNo";
+  type:
+    | "Numeric"
+    | "Dropdown"
+    | "MultiSelect"
+    | "Short Response"
+    | "Long Response"
+    | "SizingGrid"
+    | "YesNo";
   pageId: number;
   text: string;
   defaultValue: string;
@@ -66,7 +79,7 @@ export interface SidebarProps {
 }
 
 export interface User {
-  id: string;  // Remember, NextAuth expects id as string
+  id: string; // Remember, NextAuth expects id as string
   email: string;
   siteId: number;
   site: Site;

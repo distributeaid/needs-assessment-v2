@@ -21,15 +21,22 @@ const getDefaultDistribution = (): Distribution =>
   categories.reduce((acc, category) => {
     acc[category] = {
       percentage: 0,
-      sizes: sizeOptions.reduce((sAcc, size) => {
-        sAcc[size] = 0;
-        return sAcc;
-      }, {} as { [size: string]: number }),
+      sizes: sizeOptions.reduce(
+        (sAcc, size) => {
+          sAcc[size] = 0;
+          return sAcc;
+        },
+        {} as { [size: string]: number },
+      ),
     };
     return acc;
   }, {} as Distribution);
 
-const SizingGridInput: React.FC<InputProps> = ({ question, value, onChange }) => {
+const SizingGridInput: React.FC<InputProps> = ({
+  question,
+  value,
+  onChange,
+}) => {
   // Parse initial value or fall back to default
   const [distribution, setDistribution] = useState<Distribution>(() => {
     if (value) {
@@ -71,7 +78,7 @@ const SizingGridInput: React.FC<InputProps> = ({ question, value, onChange }) =>
 
   const totalPercentage = categories.reduce(
     (sum, cat) => sum + distribution[cat].percentage,
-    0
+    0,
   );
   const isValid = totalPercentage === 100;
 
@@ -126,7 +133,8 @@ const SizingGridInput: React.FC<InputProps> = ({ question, value, onChange }) =>
           ))}
           {!isValid && (
             <p className="text-red-500 font-semibold">
-              Total percentage must equal 100%. Current total: {totalPercentage}%
+              Total percentage must equal 100%. Current total: {totalPercentage}
+              %
             </p>
           )}
         </div>
