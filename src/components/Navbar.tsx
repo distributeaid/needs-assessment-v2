@@ -1,34 +1,40 @@
 "use client";
-
-import Link from "next/link";
+import LogoMark from "../../public/LogoMark";
+import { Flex, Text, Button } from "@radix-ui/themes";
+import "@radix-ui/themes/styles.css";
 import { useSession, signIn, signOut } from "next-auth/react";
 
 const Navbar = () => {
   const { data: session } = useSession();
 
   return (
-    <nav className="w-full bg-blue-600 p-4 flex justify-between items-center">
-      <Link href="/" className="text-white text-lg font-bold">
-        Distribute Aid
-      </Link>
-      <div>
+    <Flex
+      className="bg-[#082B76]"
+      width="100%"
+      p="9"
+      align="center"
+      justify="between"
+    >
+      <Flex
+        className="tracking-[0.5em] space-x-5"
+        direction="row"
+        mx="auto"
+        align="center"
+      >
+        <LogoMark width="50" height="65"></LogoMark>
+        <Text className="text-white">NEEDS ASSESSMENT</Text>
+      </Flex>
+
+      <Flex className="bg-white text-black px-4 py-2 rounded translate-x-[-1rem]">
         {session ? (
-          <button
-            onClick={() => signOut({ callbackUrl: "/about" })}
-            className="bg-red-500 text-white px-4 py-2 rounded"
-          >
-            Logout
-          </button>
+          <Button onClick={() => signOut({ callbackUrl: "/about" })}>
+            LOG OUT
+          </Button>
         ) : (
-          <button
-            onClick={() => signIn()}
-            className="bg-green-500 text-white px-4 py-2 rounded"
-          >
-            Login
-          </button>
+          <Button onClick={() => signIn()}>LOG IN</Button>
         )}
-      </div>
-    </nav>
+      </Flex>
+    </Flex>
   );
 };
 

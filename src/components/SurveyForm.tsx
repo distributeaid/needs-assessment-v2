@@ -41,7 +41,11 @@ const DropdownInput: React.FC<InputProps> = ({ question, value, onChange }) => (
   </select>
 );
 
-const MultiSelectInput: React.FC<InputProps> = ({ question, value, onChange }) => {
+const MultiSelectInput: React.FC<InputProps> = ({
+  question,
+  value,
+  onChange,
+}) => {
   // Convert value to array; if empty string, use an empty array.
   const selectedValues = value ? value.split(",") : [];
 
@@ -51,7 +55,10 @@ const MultiSelectInput: React.FC<InputProps> = ({ question, value, onChange }) =
       className="mt-1 p-2 border text-gray-900 rounded w-full"
       value={selectedValues}
       onChange={(e) => {
-        const newValues = Array.from(e.target.selectedOptions, option => option.value);
+        const newValues = Array.from(
+          e.target.selectedOptions,
+          (option) => option.value,
+        );
         onChange(question.id, newValues.join(","));
       }}
     >
@@ -64,8 +71,11 @@ const MultiSelectInput: React.FC<InputProps> = ({ question, value, onChange }) =
   );
 };
 
-
-const ShortResponseInput: React.FC<InputProps> = ({ question, value, onChange }) => (
+const ShortResponseInput: React.FC<InputProps> = ({
+  question,
+  value,
+  onChange,
+}) => (
   <input
     type="text"
     className="mt-1 p-2 border text-gray-900 rounded w-full"
@@ -74,7 +84,11 @@ const ShortResponseInput: React.FC<InputProps> = ({ question, value, onChange })
   />
 );
 
-const LongResponseInput: React.FC<InputProps> = ({ question, value, onChange }) => (
+const LongResponseInput: React.FC<InputProps> = ({
+  question,
+  value,
+  onChange,
+}) => (
   <textarea
     className="mt-1 p-2 border text-gray-900 rounded w-full"
     value={value}
@@ -93,19 +107,61 @@ const SurveyForm: React.FC<SurveyFormProps> = ({
     const value = responses[question.id] || "";
     switch (question.type) {
       case "Numeric":
-        return <NumericInput question={question} value={value} onChange={onInputChange} />;
+        return (
+          <NumericInput
+            question={question}
+            value={value}
+            onChange={onInputChange}
+          />
+        );
       case "Dropdown":
-        return <DropdownInput question={question} value={value} onChange={onInputChange} />;
+        return (
+          <DropdownInput
+            question={question}
+            value={value}
+            onChange={onInputChange}
+          />
+        );
       case "MultiSelect":
-        return <MultiSelectInput question={question} value={value} onChange={onInputChange} />;
+        return (
+          <MultiSelectInput
+            question={question}
+            value={value}
+            onChange={onInputChange}
+          />
+        );
       case "Short Response":
-        return <ShortResponseInput question={question} value={value} onChange={onInputChange} />;
+        return (
+          <ShortResponseInput
+            question={question}
+            value={value}
+            onChange={onInputChange}
+          />
+        );
       case "Long Response":
-        return <LongResponseInput question={question} value={value} onChange={onInputChange} />;
+        return (
+          <LongResponseInput
+            question={question}
+            value={value}
+            onChange={onInputChange}
+          />
+        );
       case "SizingGrid":
-        return <SizingGridInput question={question} value={value} onChange={onInputChange} />;
+        return (
+          <SizingGridInput
+            question={question}
+            value={value}
+            onChange={onInputChange}
+          />
+        );
       default:
-        return <input type="text" value={value} onChange={(e) => onInputChange(question.id, e.target.value)} />;
+        return (
+          <input
+            type="text"
+            value={value}
+            onChange={(e) => onInputChange(question.id, e.target.value)}
+          />
+        );
     }
   };
 

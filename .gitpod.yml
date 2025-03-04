@@ -7,7 +7,7 @@
 image: gitpod/workspace-postgres
 
 tasks:
-  - before: cp .env.example .env 
+  - before: cp .env.example .env
 
   - name: bash
     command: bash
