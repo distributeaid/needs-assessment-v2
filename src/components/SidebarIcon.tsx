@@ -4,8 +4,8 @@ import { Flex, Box, Text } from "@radix-ui/themes";
 import { Tooltip } from "radix-ui";
 interface SidebarIconProps {
   progress: SidebarProps["sitePages"][0]["progress"];
-  prevPage?: String;
-  isLast?: Boolean;
+  prevPage?: string;
+  isLast?: boolean;
 }
 
 const SidebarIcon: React.FC<SidebarIconProps> = ({

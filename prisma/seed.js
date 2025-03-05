@@ -54,10 +54,21 @@ async function main() {
             title: "Basic Information",
             questions: {
               create: [
-
-                { text: "Organization Name", type: "Short Response", defaultValue: "" },
-                { text: "What region do you operate in?", type: "Short Response", defaultValue: "" },
-                { text: "Would you like to tell us more about the area that you operate in? ", type: "Long Response", defaultValue: "" },
+                {
+                  text: "Organization Name",
+                  type: "Short Response",
+                  defaultValue: "",
+                },
+                {
+                  text: "What region do you operate in?",
+                  type: "Short Response",
+                  defaultValue: "",
+                },
+                {
+                  text: "Would you like to tell us more about the area that you operate in? ",
+                  type: "Long Response",
+                  defaultValue: "",
+                },
               ],
             },
           },
@@ -65,14 +76,33 @@ async function main() {
             title: "Demographics",
             questions: {
               create: [
-                { text: "How many people total are there in your region who may access aid services?", type: "Numeric", defaultValue: "" },
-                { text: "How many unique people does your organisation support in one month?", type: "Numeric", defaultValue: "" },
+                {
+                  text: "How many people total are there in your region who may access aid services?",
+                  type: "Numeric",
+                  defaultValue: "",
+                },
+                {
+                  text: "How many unique people does your organisation support in one month?",
+                  type: "Numeric",
+                  defaultValue: "",
+                },
                 { text: "Men Served", type: "Numeric", defaultValue: "" },
                 { text: "Women Served", type: "Numeric", defaultValue: "" },
                 { text: "Boys Served", type: "Numeric", defaultValue: "" },
                 { text: "Girls Served", type: "Numeric", defaultValue: "" },
                 { text: "Infants Served", type: "Numeric", defaultValue: "" },
-                { text: "Needs Served", type: "MultiSelect", defaultValue: "", options: ["Hygiene", "Shelter", "Food", "Clothing", "Medical/Health"] },
+                {
+                  text: "Needs Served",
+                  type: "MultiSelect",
+                  defaultValue: "",
+                  options: [
+                    "Hygiene",
+                    "Shelter",
+                    "Food",
+                    "Clothing",
+                    "Medical/Health",
+                  ],
+                },
               ],
             },
           },
@@ -80,8 +110,22 @@ async function main() {
             title: "Warehouse",
             questions: {
               create: [
-                { text: "Are you interested in participating in a network of US aid warehouses (hubs) for sending / receiving shipments and storing aid?", type: "YesNo", defaultValue: "" },
-                { text: "What kind of vehicles do you have access to?", type: "Dropdown", defaultValue: "", options: ["Pickup Truck", "Cargo Van", "Box Truck with Tail Lift", "Box Truck without Tail Lift"] },
+                {
+                  text: "Are you interested in participating in a network of US aid warehouses (hubs) for sending / receiving shipments and storing aid?",
+                  type: "YesNo",
+                  defaultValue: "",
+                },
+                {
+                  text: "What kind of vehicles do you have access to?",
+                  type: "Dropdown",
+                  defaultValue: "",
+                  options: [
+                    "Pickup Truck",
+                    "Cargo Van",
+                    "Box Truck with Tail Lift",
+                    "Box Truck without Tail Lift",
+                  ],
+                },
               ],
             },
           },
@@ -89,8 +133,17 @@ async function main() {
             title: "Hygiene",
             questions: {
               create: [
-                { text: "How many hygiene kits are distributed monthly?", type: "Numeric", defaultValue: "" },
-                { text: "Are hygiene products gender-specific?", type: "Dropdown", defaultValue: "", options: ["Yes", "No"] },
+                {
+                  text: "How many hygiene kits are distributed monthly?",
+                  type: "Numeric",
+                  defaultValue: "",
+                },
+                {
+                  text: "Are hygiene products gender-specific?",
+                  type: "Dropdown",
+                  defaultValue: "",
+                  options: ["Yes", "No"],
+                },
               ],
             },
           },
@@ -98,8 +151,16 @@ async function main() {
             title: "Shelter",
             questions: {
               create: [
-                { text: "Number of temporary shelters available?", type: "Numeric", defaultValue: "" },
-                { text: "Average length of stay in shelters?", type: "Numeric", defaultValue: "" },
+                {
+                  text: "Number of temporary shelters available?",
+                  type: "Numeric",
+                  defaultValue: "",
+                },
+                {
+                  text: "Average length of stay in shelters?",
+                  type: "Numeric",
+                  defaultValue: "",
+                },
               ],
             },
           },
@@ -107,8 +168,17 @@ async function main() {
             title: "Food",
             questions: {
               create: [
-                { text: "Meals provided per day?", type: "Numeric", defaultValue: "" },
-                { text: "Are special dietary needs accommodated?", type: "Dropdown", defaultValue: "", options: ["Yes", "No"] },
+                {
+                  text: "Meals provided per day?",
+                  type: "Numeric",
+                  defaultValue: "",
+                },
+                {
+                  text: "Are special dietary needs accommodated?",
+                  type: "Dropdown",
+                  defaultValue: "",
+                  options: ["Yes", "No"],
+                },
               ],
             },
           },
@@ -116,9 +186,22 @@ async function main() {
             title: "Clothing",
             questions: {
               create: [
-                { text: "If you'd like, you can give us a sense of the overall sizes of your population", type: "SizingGrid", defaultValue: "" },
-                { text: "Number of clothing items distributed monthly?", type: "Numeric", defaultValue: "" },
-                { text: "Are seasonal clothes provided?", type: "Dropdown", defaultValue: "", options: ["Yes", "No"] },
+                {
+                  text: "If you'd like, you can give us a sense of the overall sizes of your population",
+                  type: "SizingGrid",
+                  defaultValue: "",
+                },
+                {
+                  text: "Number of clothing items distributed monthly?",
+                  type: "Numeric",
+                  defaultValue: "",
+                },
+                {
+                  text: "Are seasonal clothes provided?",
+                  type: "Dropdown",
+                  defaultValue: "",
+                  options: ["Yes", "No"],
+                },
               ],
             },
           },
@@ -126,17 +209,25 @@ async function main() {
             title: "Additional Information",
             questions: {
               create: [
-                { text: "Is there anything you do NOT need more of that you would like to make us aware of?", type: "Long Response", defaultValue: "" },
+                {
+                  text: "Is there anything you do NOT need more of that you would like to make us aware of?",
+                  type: "Long Response",
+                  defaultValue: "",
+                },
               ],
             },
-          }
+          },
         ],
       },
     },
   });
 
-  await prisma.siteSurvey.create({ data: { siteId: site1.id, surveyId: survey.id } });
-  await prisma.siteSurvey.create({ data: { siteId: site2.id, surveyId: survey.id } });
+  await prisma.siteSurvey.create({
+    data: { siteId: site1.id, surveyId: survey.id },
+  });
+  await prisma.siteSurvey.create({
+    data: { siteId: site2.id, surveyId: survey.id },
+  });
 
   console.log("Database seeded successfully.");
 }
