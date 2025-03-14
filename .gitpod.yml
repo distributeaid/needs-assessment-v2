@@ -7,18 +7,20 @@
 image: gitpod/workspace-postgres
 
 tasks:
-  - before: cp .env.example .env 
+  - before: cp .env.example .env
 
   - name: bash
     command: bash
 
   - name: Dev Server
     init: npm install && yes | npx prisma migrate reset --force
+    command: python backend/app.py
     command: npm run dev
 
 ports:
   - port: 3000
     name: nextjs
     onOpen: open-preview
-  - port: 5432
+  - port: 5000
     name: postgres
+    onOpen: open-browser
