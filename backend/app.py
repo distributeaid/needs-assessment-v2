@@ -1,6 +1,7 @@
 from flask import Flask
 from backend.models import db
 from backend.routes import api_bp
+from backend.seed import seed_database_from_csv
 
 app = Flask(__name__)
 
@@ -16,6 +17,7 @@ app.register_blueprint(api_bp)
 
 with app.app_context():
     db.create_all()
+    seed_database_from_csv()
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)

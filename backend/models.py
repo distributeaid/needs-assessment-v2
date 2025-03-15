@@ -21,6 +21,7 @@ class Assessment(db.Model):  # Template
 
 class Page(db.Model):
     id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(255), nullable=False)
     assessment_id = db.Column(db.Integer, db.ForeignKey('assessment.id'), nullable=False)
     questions = db.relationship('Question', backref='page', lazy=True)
 
@@ -28,6 +29,11 @@ class Question(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     page_id = db.Column(db.Integer, db.ForeignKey('page.id'), nullable=False)
     text = db.Column(db.String(255), nullable=False)
+    subtext = db.Column(db.String(255), nullable=True)
+    mandatory = db.Column(db.Boolean, default=False)
+    question_type = db.Column(db.String(50), nullable=False)
+    response_options = db.Column(db.Text, nullable=True)
+    order = db.Column(db.Integer, nullable=False)
 
 class SiteAssessment(db.Model):  # Instance for a Site
     id = db.Column(db.Integer, primary_key=True)

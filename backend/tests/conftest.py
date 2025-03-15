@@ -3,6 +3,7 @@ from datetime import datetime
 
 from backend.app import app
 from backend.models import db, User, Site, Assessment
+from backend.seed import seed_database_from_csv
 
 @pytest.fixture
 def client():
@@ -22,14 +23,7 @@ def client():
             db.session.add(user)
             db.session.commit()
 
-            # Seed an assessment template for the current year & season
-            current_year = datetime.utcnow().year
-            current_season = "Spring" if datetime.utcnow().month < 7 else "Fall"
-
-            assessment = Assessment(year=current_year, season=current_season)
-            db.session.add(assessment)
-            db.session.commit()
-            # Debug: Print all assessments
+            seed_database_from_csv()
 
         yield client
         with app.app_context():

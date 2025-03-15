@@ -1,6 +1,9 @@
-from flask import Blueprint, request, jsonify
-from backend.models import db, User, SiteAssessment, Assessment
 from datetime import datetime
+
+from flask import Blueprint, request, jsonify
+
+from backend.models import db, User, SiteAssessment, Assessment, Page
+from backend.consts import STANDARD_ITEMS
 
 api_bp = Blueprint("api", __name__)
 
@@ -50,3 +53,35 @@ def login():
         db.session.commit()
 
     return jsonify({"message": "Login successful"}), 200
+
+
+@api_bp.route("/api/standard-items/<page>", methods=["GET"])
+def get_standard_items(page):
+    """Return standard items for a given page (e.g., Clothing -> Pants, Shirts)."""
+    items = STANDARD_ITEMS.get(page, [])
+    return jsonify({"page": page, "items": items})
+
+@api_bp.route("/api/pages", methods=["GET"])
+def get_pages():
+    """Return all pages with their associated questions."""
+    pages = Page.query.all()
+    response = []
+
+    for page in pages:
+        response.append({
+            "page": page.name,
+            "questions": [
+                {
+                    "id": q.id,
+                    "text": q.text,
+                    "subtext": q.subtext,
+                    "mandatory": q.mandatory,
+                    "question_type": q.question_type,
+                    "response_options": q.response_options.split(", ") if q.response_options else [],
+                    "order": q.order,
+                }
+                for q in page.questions
+            ]
+        })
+
+    return jsonify(response)
