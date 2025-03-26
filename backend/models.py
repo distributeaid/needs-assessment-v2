@@ -45,7 +45,10 @@ class SiteAssessment(db.Model):  # Instance for a Site
 class SitePage(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     site_assessment_id = db.Column(db.Integer, db.ForeignKey('site_assessment.id'), nullable=False)
+    page_id = db.Column(db.Integer, db.ForeignKey("page.id"), nullable=False)
     state = db.Column(db.String(10), default='required')
+    required = db.Column(db.Boolean, default=False)
+    progress = db.Column(db.String(20), default="Locked") # 'Locked', 'Unstarted', 'In Progress', 'Complete'
 
 class QuestionResponse(db.Model):
     id = db.Column(db.Integer, primary_key=True)

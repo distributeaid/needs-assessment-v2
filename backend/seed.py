@@ -1,7 +1,7 @@
 import csv
 from datetime import datetime
 from backend.models import db, Page, Question, Assessment
-from backend.consts import QUESTION_TYPES
+from backend.consts import QUESTION_TYPES, REQUIRED_PAGES
 
 def seed_database_from_csv(filepath="backend/data/questions.csv"):
     """Reads a CSV file and seeds the database with Assessments, Pages, and Questions."""

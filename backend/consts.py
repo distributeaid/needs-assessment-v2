@@ -1,4 +1,5 @@
-# Question Types as a selector (Enum-like structure)
+REQUIRED_PAGES = {"Basic Info", "Demographics", "Infrastructure"}
+
 QUESTION_TYPES = {
     "age_gender_grid": "Age/Gender Grid",
     "multiselect_with_other": "MultiselectWithOther",
@@ -64,3 +65,4 @@ STANDARD_ITEMS = {
         "Raincoats", "Boots", "Sneakers", "Sandals", "Flip-Flops"
     ]
 }
+
