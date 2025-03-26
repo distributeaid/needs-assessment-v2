@@ -46,6 +46,10 @@ def login():
     user = User.query.filter_by(username=username).first()
 
     if not user:
+        # query by email
+        user = User.query.filter_by(email=username).first()
+
+    if not user:
         return jsonify({"error": "User not found"}), 404
     ensure_assessment_exists(user.site_id)
 

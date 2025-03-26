@@ -1,9 +1,5 @@
 import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
-import { PrismaClient } from "@prisma/client";
-import bcrypt from "bcryptjs";
-
-const prisma = new PrismaClient();
 
 export const authOptions = {
   providers: [
@@ -13,27 +9,32 @@ export const authOptions = {
         email: { label: "Email", type: "email" },
         password: { label: "Password", type: "password" },
       },
-
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) {
           return null;
         }
-
-        const user = await prisma.user.findUnique({
-          where: { email: credentials.email },
-        });
-
-        if (user && await bcrypt.compare(credentials.password, user.password)) {
-          // Convert id to string to match NextAuth's expected type
-          return { id: user.id.toString(), email: user.email };
+        const res = await fetch(
+          `${process.env.FLASK_API_URL || "http://localhost:5000"}/api/login`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              username: credentials.email,
+              password: credentials.password,
+            }),
+          }
+        );
+        const data = await res.json();
+        if (res.ok && data.user) {
+          // Return the user object from Flask
+          return { id: data.user.id.toString(), email: data.user.email };
         }
-
         return null;
-      }
+      },
     }),
   ],
   session: {
-    strategy: "jwt" as const,
+    strategy: "jwt",
   },
   pages: {
     signIn: "/login",
