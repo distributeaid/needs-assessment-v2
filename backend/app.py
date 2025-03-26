@@ -1,4 +1,6 @@
 from flask import Flask
+from flask_migrate import Migrate
+
 from backend.models import db
 from backend.routes import api_bp
 from backend.seed import seed_database_from_csv
@@ -11,6 +13,7 @@ app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 # Initialize Database with Flask app
 db.init_app(app)
+Migrate(app, db)
 
 # Register Routes
 app.register_blueprint(api_bp)

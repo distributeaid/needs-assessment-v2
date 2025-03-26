@@ -16,19 +16,13 @@ def status():
     return jsonify({"status": "API is running"}), 200
 
 
-@api_bp.route("/api/login", methods=["POST"])
-def login():
-    """Handle user login and ensure a SiteAssessment exists for their site."""
-    data = request.get_json()
-    username = data.get("username")
 
-    user = User.query.filter_by(username=username).first()
-    if not user:
-        return jsonify({"error": "User not found"}), 404
 
+def ensure_assessment_exists(site_id):
+    """Ensure a SiteAssessment exists for the user's site."""
     # Get current year & season
     current_year = datetime.utcnow().year
-    current_season = "Spring" if datetime.utcnow().month < 7 else "Fall"
+    current_season = get_current_season()
 
     # Find the corresponding Assessment
     assessment = Assessment.query.filter_by(year=current_year, season=current_season).first()
@@ -36,9 +30,47 @@ def login():
         return jsonify({"error": "No assessment template found"}), 400
 
     # Find or create a SiteAssessment
-    site_assessment = SiteAssessment.query.filter_by(site_id=user.site_id, assessment_id=assessment.id).first()
+    site_assessment = SiteAssessment.query.filter_by(site_id=site_id, assessment_id=assessment.id).first()
     if not site_assessment:
-        site_assessment = create_site_assessment(user.site_id, assessment.id)
+        site_assessment = create_site_assessment(site_id, assessment.id)
+
+    return site_assessment
+
+
+@api_bp.route("/api/login", methods=["POST"])
+def login():
+    """Handle ensure a SiteAssessment exists for the user's site."""
+    data = request.get_json()
+    username = data.get("username")
+
+    user = User.query.filter_by(username=username).first()
+
+    if not user:
+        return jsonify({"error": "User not found"}), 404
+    ensure_assessment_exists(user.site_id)
+
+    return jsonify({
+        "message": "Login successful",
+        "user": {
+            "id": user.id,
+            "username": user.username,
+            "email": user.email,
+        },
+    })
+
+@api_bp.route("/api/current_assessment", methods=["GET"])
+def current_assessment():
+    """Handle ensure a SiteAssessment exists for the user's site."""
+    data = request.get_json()
+    username = data.get("username")
+
+    user = User.query.filter_by(username=username).first()
+    if not user:
+        return jsonify({"error": "User not found"}), 404
+
+    site_assessment = ensure_assessment_exists(user.site_id)
+    if not site_assessment:
+        return jsonify({"error": "No assessment template found"}), 400
 
     return jsonify({
         "message": "Login successful",
