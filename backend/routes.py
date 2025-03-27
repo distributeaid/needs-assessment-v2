@@ -5,7 +5,7 @@ from flask import Blueprint, request, jsonify
 from backend.models import db, User, SiteAssessment, Assessment, Page, SitePage
 from backend.consts import STANDARD_ITEMS
 from backend.validation import validate_responses
-from backend.utils import create_site_assessment, get_current_user, get_current_season
+from backend.utils import create_site_assessment, get_current_season, serialize_user
 
 
 api_bp = Blueprint("api", __name__)
@@ -53,11 +53,7 @@ def login():
 
     return jsonify({
         "message": "Login successful",
-        "user": {
-            "id": user.id,
-            "username": user.username,
-            "email": user.email,
-        },
+        "user": serialize_user(user)
     })
 
 @api_bp.route("/api/current-assessment", methods=["GET"])
@@ -94,14 +90,14 @@ def get_pages():
 
     for page in pages:
         response.append({
-            "page": page.name,
+            "page": page.title,
             "questions": [
                 {
                     "id": q.id,
                     "text": q.text,
                     "subtext": q.subtext,
                     "mandatory": q.mandatory,
-                    "question_type": q.question_type,
+                    "type": q.type,
                     "response_options": q.response_options.split(", ") if q.response_options else [],
                     "order": q.order,
                 }
@@ -134,7 +130,7 @@ def get_site_assessment():
         "pages": [
             {
                 "page_id": sp.page_id,
-                "name": db.session.get(Page, sp.page_id).name,
+                "name": db.session.get(Page, sp.page_id).title,
                 "required": sp.required,
                 "progress": sp.progress
             }
@@ -180,7 +176,7 @@ def complete_site_page(site_page_id):
         return jsonify({"errors": validation_errors}), 400
 
     # Mark as "Complete"
-    site_page.progress = "Complete"
+    site_page.progress = "COMPLETE"
     db.session.commit()
 
     # Check if all Required SitePages are completed, unlock remaining pages
@@ -195,8 +191,8 @@ def unlock_remaining_pages(site_assessment_id):
     required_pages = [sp for sp in site_pages if sp.required]
 
     # If all required pages are complete, unlock remaining pages
-    if all(sp.progress == "Complete" for sp in required_pages):
+    if all(sp.progress == "COMPLETE" for sp in required_pages):
         for sp in site_pages:
-            if not sp.required and sp.progress == "Locked":
-                sp.progress = "Unstarted"
+            if not sp.required and sp.progress == "LOCKED":
+                sp.progress = "UNSTARTED"
         db.session.commit()

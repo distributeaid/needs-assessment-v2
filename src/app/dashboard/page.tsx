@@ -48,7 +48,7 @@ export default function Dashboard() {
             key={page.id}
             className="p-4 border rounded-lg shadow-sm flex justify-between items-center"
           >
-            <span className="text-lg font-medium">{page.name}</span>
+            <span className="text-lg font-medium">{page.page.title}</span>
             <button
               className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
               onClick={() =>

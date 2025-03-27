@@ -23,7 +23,7 @@ class Assessment(db.Model):  # Template
 
 class Page(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(255), nullable=False)
+    title = db.Column(db.String(255), nullable=False)
     assessment_id = db.Column(db.Integer, db.ForeignKey('assessment.id'), nullable=False)
     questions = db.relationship('Question', backref='page', lazy=True)
 
@@ -33,7 +33,7 @@ class Question(db.Model):
     text = db.Column(db.String(255), nullable=False)
     subtext = db.Column(db.String(255), nullable=True)
     mandatory = db.Column(db.Boolean, default=False)
-    question_type = db.Column(db.String(50), nullable=False)
+    type = db.Column(db.String(50), nullable=False)
     response_options = db.Column(db.Text, nullable=True)
     order = db.Column(db.Integer, nullable=False)
 
@@ -50,10 +50,10 @@ class SitePage(db.Model):
     page_id = db.Column(db.Integer, db.ForeignKey("page.id"), nullable=False)
     state = db.Column(db.String(10), default='required')
     required = db.Column(db.Boolean, default=False)
-    progress = db.Column(db.String(20), default="Locked") # 'Locked', 'Unstarted', 'In Progress', 'Complete'
+    progress = db.Column(db.String(20), default="LOCKED") # 'Locked', 'Unstarted', 'In Progress', 'Complete'
 
 class QuestionResponse(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     site_page_id = db.Column(db.Integer, db.ForeignKey('site_page.id'), nullable=False)
     question_id = db.Column(db.Integer, db.ForeignKey('question.id'), nullable=False)
-    response = db.Column(db.String(255), nullable=True)
+    value = db.Column(db.String(255), nullable=True)

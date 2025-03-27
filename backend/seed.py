@@ -4,7 +4,7 @@ from datetime import datetime
 import bcrypt
 
 from backend.models import db, Page, Question, Assessment, User, Site
-from backend.consts import QUESTION_TYPES, REQUIRED_PAGES
+from backend.consts import QUESTION_TYPES
 
 def seed_database_from_csv(filepath="backend/data/questions.csv"):
     """Reads a CSV file and seeds the database with Assessments, Pages, and Questions."""
@@ -25,9 +25,9 @@ def seed_database_from_csv(filepath="backend/data/questions.csv"):
         reader = csv.DictReader(file)
         for row in reader:
             # Fetch or create page within the current assessment
-            page = Page.query.filter_by(name=row["Page"], assessment_id=assessment.id).first()
+            page = Page.query.filter_by(title=row["Page"], assessment_id=assessment.id).first()
             if not page:
-                page = Page(name=row["Page"], assessment_id=assessment.id)
+                page = Page(title=row["Page"], assessment_id=assessment.id)
                 db.session.add(page)
                 db.session.commit()
 
@@ -37,7 +37,7 @@ def seed_database_from_csv(filepath="backend/data/questions.csv"):
                 text=row["ItemText"],
                 subtext=row["Item Subtext"] if row["Item Subtext"] else None,
                 mandatory=True if row["Mandatory in Section"] == "Y" else False,
-                question_type=QUESTION_TYPES.get(row["Type"].strip().lower(), "Short Answer"),
+                type=QUESTION_TYPES.get(row["Type"].strip().lower(), "Short Answer"),
                 response_options=row["Response Options"] if row["Response Options"] else None,
                 order=int(row["QuestionOrder"])
             )

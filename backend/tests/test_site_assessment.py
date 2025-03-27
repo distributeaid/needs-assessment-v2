@@ -25,7 +25,6 @@ def setup_site_assessment(client):
 def test_get_site_assessment(client, setup_site_assessment):
     """Test fetching a SiteAssessment and its associated SitePages."""
     response = client.get(f"/api/site-assessment?email=user1@example.com")
-    print(response)
     assert response.status_code == 200
     data = response.json
 
@@ -36,9 +35,9 @@ def test_get_site_assessment(client, setup_site_assessment):
     # Verify required pages are Unstarted, others are Locked
     for page in data["pages"]:
         if page["required"]:
-            assert page["progress"] == "Unstarted"
+            assert page["progress"] == "UNSTARTED"
         else:
-            assert page["progress"] == "Locked"
+            assert page["progress"] == "LOCKED"
 
 
 def test_save_site_page(client, setup_site_assessment):
@@ -70,11 +69,11 @@ def test_complete_site_page(client, setup_site_assessment):
         # Verify all required pages are marked Complete
         for page in required_pages:
             refreshed = db.session.get(SitePage, page.id)
-            assert refreshed.progress == "Complete"
+            assert refreshed.progress == "COMPLETE"
 
         # Check that non-required pages are now Unstarted
         non_required_pages = SitePage.query.filter_by(site_assessment_id=setup_site_assessment.id, required=False).all()
         for page in non_required_pages:
             refreshed = db.session.get(SitePage, page.id)
-            assert refreshed.progress == "Unstarted"
+            assert refreshed.progress == "UNSTARTED"
 

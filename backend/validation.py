@@ -15,11 +15,11 @@ def validate_responses(responses, require_all=False):
             errors.append(f"Missing answer for required question: {question.text}")
 
         # Numeric validation
-        if question.question_type == "Numeric" and not isinstance(response.get("answer"), (int, float)):
+        if question.type == "Numeric" and not isinstance(response.get("answer"), (int, float)):
             errors.append(f"Invalid numeric response for question: {question.text}")
 
         # MultiSelect validation
-        if question.question_type in ["MultiSelect", "MultiselectWithOther"]:
+        if question.type in ["MultiSelect", "MultiselectWithOther"]:
             if not isinstance(response.get("answer"), list):
                 errors.append(f"MultiSelect responses must be a list for question: {question.text}")
 

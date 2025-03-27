@@ -36,7 +36,6 @@ export interface SitePage {
   id: number;
   siteAssessmentId: number;
   progress: ProgressStatus;
-  name: string;
   page: {
     id: number;
     title: string;
@@ -55,8 +54,8 @@ export interface SiteAssessment {
 
 export interface Site {
   id: number;
-  address: string;
   users: User[];
+  name: string;
   siteAssessments: SiteAssessment[];
 }
 

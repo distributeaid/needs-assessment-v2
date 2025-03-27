@@ -14,12 +14,12 @@ def create_site_assessment(site_id, assessment_id):
     # Create SitePages for the assessment
     pages = Page.query.filter_by(assessment_id=assessment_id).all()
     for page in pages:
-        is_required = page.name in REQUIRED_PAGES
+        is_required = page.title in REQUIRED_PAGES
         site_page = SitePage(
             site_assessment_id=site_assessment.id,
             page_id=page.id,
             required=is_required,
-            progress="Unstarted" if is_required else "Locked"
+            progress="UNSTARTED" if is_required else "LOCKED"
         )
         db.session.add(site_page)
 
@@ -37,3 +37,11 @@ def get_current_season():
     """Determine the current season based on the month."""
     month = datetime.utcnow().month
     return "Spring" if month < 7 else "Fall"
+
+
+def serialize_user(user: User) -> dict:
+    return {
+        "id": str(user.id),
+        "email": user.email,
+        "siteId": user.site_id,
+    }
