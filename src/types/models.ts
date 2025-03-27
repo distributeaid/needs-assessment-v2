@@ -14,11 +14,11 @@ export interface Question {
 export interface Page {
   id: number;
   title: string;
-  surveyId: number;
+  assessmentId: number;
   questions: Question[];
 }
 
-export interface Survey {
+export interface Assessment {
   id: number;
   year: number;
   season: string;
@@ -34,8 +34,9 @@ export interface QuestionResponse {
 
 export interface SitePage {
   id: number;
-  siteSurveyId: number;
+  siteAssessmentId: number;
   progress: ProgressStatus;
+  name: string;
   page: {
     id: number;
     title: string;
@@ -44,23 +45,23 @@ export interface SitePage {
   responses: QuestionResponse[];
 }
 
-export interface SiteSurvey {
+export interface SiteAssessment {
   id: number;
   siteId: number;
-  surveyId: number;
+  assessmentId: number;
   sitePages: SitePage[];
-  survey: Survey;
+  assessment: Assessment;
 }
 
 export interface Site {
   id: number;
   address: string;
   users: User[];
-  siteSurveys: SiteSurvey[];
+  siteAssessments: SiteAssessment[];
 }
 
 export interface SidebarProps {
-  surveyId: string;
+  assessmentId: string;
   sitePages: { id: number; title: string; progress: ProgressStatus }[];
   currentPageId: string;
 }

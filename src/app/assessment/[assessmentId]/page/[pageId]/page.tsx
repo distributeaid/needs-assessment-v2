@@ -3,16 +3,16 @@
 import { useEffect, useState, useMemo, useCallback } from "react";
 import { useRouter, useParams } from "next/navigation";
 import Sidebar from "@/components/Sidebar";
-import SurveyForm from "@/components/SurveyForm";
+import AssessmentForm from "@/components/AssessmentForm";
 import { Question, SidebarProps, ProgressStatus } from "@/types/models";
 import LoadingSpinner from "@/components/LoadingSpinner";
 
-export default function SurveyPage() {
+export default function AssessmentPage() {
   const params = useParams();
-  const surveyId = useMemo(() => {
-    if (!params.surveyId) return "";
-    return Array.isArray(params.surveyId) ? params.surveyId[0] : params.surveyId;
-  }, [params.surveyId]);
+  const assessmentId = useMemo(() => {
+    if (!params.assessmentId) return "";
+    return Array.isArray(params.assessmentId) ? params.assessmentId[0] : params.assessmentId;
+  }, [params.assessmentId]);
   const pageId = useMemo(() => {
     if (!params.pageId) return "";
     return Array.isArray(params.pageId) ? params.pageId[0] : params.pageId;
@@ -21,14 +21,14 @@ export default function SurveyPage() {
 
   const [page, setPage] = useState<{ title: string; questions: Question[] } | null>(null);
   const [responses, setResponses] = useState<{ [key: number]: string }>({});
-  const [surveyPages, setSurveyPages] = useState<SidebarProps["sitePages"]>([]);
+  const [assessmentPages, setAssessmentPages] = useState<SidebarProps["sitePages"]>([]);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!surveyId || !pageId) return;
+    if (!assessmentId || !pageId) return;
     const fetchPage = async () => {
       try {
-        const res = await fetch(`/api/survey/${surveyId}/page/${pageId}`);
+        const res = await fetch(`/api/assessment/${assessmentId}/page/${pageId}`);
         if (!res.ok) throw new Error(`API Error: ${res.status}`);
         const data = await res.json();
         setPage(data);
@@ -58,12 +58,12 @@ export default function SurveyPage() {
       }
     };
     fetchPage();
-  }, [surveyId, pageId]);
+  }, [assessmentId, pageId]);
 
 
   useEffect(() => {
-    if (!surveyId) return;
-    fetch(`/api/survey/${surveyId}`)
+    if (!assessmentId) return;
+    fetch(`/api/Assessment/${assessmentId}`)
       .then((res) => {
         if (!res.ok) throw new Error(`API Error: ${res.status}`);
         return res.json();
@@ -74,10 +74,10 @@ export default function SurveyPage() {
           title: page.title,
           progress: page.progress,
         }));
-        setSurveyPages(pagesWithProgress);
+        setAssessmentPages(pagesWithProgress);
       })
-      .catch((err) => console.error("Survey fetch error:", err));
-  }, [surveyId]);
+      .catch((err) => console.error("Assessment fetch error:", err));
+  }, [assessmentId]);
 
   const handleInputChange = useCallback(
     (questionId: number, value: string) => {
@@ -88,7 +88,7 @@ export default function SurveyPage() {
 
   const handleSubmit = async (confirm = false) => {
     const payload = {
-      surveyId,
+      assessmentId,
       pageId,
       responses: Object.entries(responses).map(([questionId, value]) => ({
         questionId: parseInt(questionId),
@@ -97,7 +97,7 @@ export default function SurveyPage() {
       confirmed: confirm,
     };
 
-    const res = await fetch(`/api/survey/${surveyId}/page/${pageId}/response`, {
+    const res = await fetch(`/api/assessment/${assessmentId}/page/${pageId}/response`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
@@ -108,10 +108,10 @@ export default function SurveyPage() {
       console.error("Error Response:", errorData);
       setError(errorData.error || "Failed to save responses.");
     } else {
-      const currentIndex = surveyPages.findIndex(page => page.id === Number(pageId));
-      if (currentIndex !== -1 && currentIndex < surveyPages.length - 1) {
-        const nextPageId = surveyPages[currentIndex + 1].id;
-        router.push(`/survey/${surveyId}/page/${nextPageId}`);
+      const currentIndex = assessmentPages.findIndex(page => page.id === Number(pageId));
+      if (currentIndex !== -1 && currentIndex < assessmentPages.length - 1) {
+        const nextPageId = assessmentPages[currentIndex + 1].id;
+        router.push(`/assessment/${assessmentId}/page/${nextPageId}`);
       } else {
         router.push("/dashboard");
       }
@@ -123,10 +123,10 @@ export default function SurveyPage() {
 
   return (
     <div className="flex">
-      {surveyId && pageId && (
-        <Sidebar surveyId={surveyId as string} sitePages={surveyPages} currentPageId={pageId as string} />
+      {assessmentId && pageId && (
+        <Sidebar assessmentId={assessmentId as string} sitePages={assessmentPages} currentPageId={pageId as string} />
       )}
-      <SurveyForm
+      <AssessmentForm
         title={page.title}
         questions={page.questions}
         responses={responses}

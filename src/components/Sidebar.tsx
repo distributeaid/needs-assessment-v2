@@ -22,7 +22,7 @@ const getStatusIcon = (progress: SidebarProps["sitePages"][0]["progress"]) => {
   }
 };
 
-const Sidebar: React.FC<SidebarProps> = ({ surveyId, sitePages, currentPageId }) => {
+const Sidebar: React.FC<SidebarProps> = ({ assessmentId, sitePages, currentPageId }) => {
   return (
     <aside className="w-64 p-4 border-r h-full">
       <h2 className="text-xl font-bold mb-4">Progress</h2>
@@ -35,7 +35,7 @@ const Sidebar: React.FC<SidebarProps> = ({ surveyId, sitePages, currentPageId })
             }`}
           >
             {getStatusIcon(page.progress)}
-            <Link href={`/survey/${surveyId}/page/${page.id}`} className="flex-1">
+            <Link href={`/assessment/${assessmentId}/page/${page.id}`} className="flex-1">
               {page.title}
             </Link>
           </li>

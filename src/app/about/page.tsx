@@ -8,7 +8,7 @@ const AboutPage = () => {
             Welcome to Distribute Aid Needs Assessment!
           </h1>
           <p className="text-gray-700 text-lg leading-relaxed mb-6">
-          The results from this survey will allow <b><a href='https://distributeaid.org/'>Distribute Aid</a></b> to understand your region’s and organisation’s needs over the next six months so
+          The results from this assessment will allow <b><a href='https://distributeaid.org/'>Distribute Aid</a></b> to understand your region’s and organisation’s needs over the next six months so
           we can advise collection groups on what to collect,
           figure out which targeted campaigns to run,
            and decide who to reach out to for in-kind donations.

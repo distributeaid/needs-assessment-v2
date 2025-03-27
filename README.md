@@ -1,6 +1,6 @@
 # Needs Assessment Project
 
-This project is a Next.js application with a Prisma/Postgres backend designed to facilitate the management and completion of needs assessment surveys.
+This project is a Next.js application with a Prisma/Postgres backend designed to facilitate the management and completion of needs assessment Assessments.
 
 ## 🚀 Getting started with Gitpod
 
@@ -119,9 +119,9 @@ needs-assessment/
 #### **Frontend Improvements (Next.js/React):**
 0. **Implement critical features:**
    - Incorporate a real authentication system (waiting on updates)
-   - Update survey to reflect the actual questions we want
+   - Update Assessment to reflect the actual questions we want
    - Store all responses in a queryable way (e.g. Baserow?)
-   - Get initial survey questions from Strapi (waiting on strapi deploy)
+   - Get initial Assessment questions from Strapi (waiting on strapi deploy)
 
 1. **Enhance Form Components:**
    - Create reusable components for different question types (`Numeric`, `Dropdown`, `MultiSelect`, etc.).
@@ -132,7 +132,7 @@ needs-assessment/
    - Add animations/transitions using **Framer Motion** for smoother interactions.
    - Implement responsive design improvements using **TailwindCSS**.
 
-3. **Survey Summary Page:**
+3. **Assessment Summary Page:**
    - Build a summary page that displays a user's completed responses before final submission.
 
 4. **Loading and Error States:**
@@ -142,14 +142,14 @@ needs-assessment/
 #### **Backend Enhancements (Prisma/Postgres):**
 
 1. **Add Role-Based Access Control (RBAC):**
-   - Implement roles (Admin, Contributor, Viewer) with different permissions for surveys and responses.
+   - Implement roles (Admin, Contributor, Viewer) with different permissions for Assessments and responses.
 
 2. **Optimize Database Queries:**
    - Review and optimize Prisma queries to reduce response times.
-   - Add indexes to frequently queried fields (e.g., `siteId`, `surveyId`).
+   - Add indexes to frequently queried fields (e.g., `siteId`, `AssessmentId`).
 
 3. **Audit Logging:**
-   - Track changes to surveys and responses in an audit log for accountability.
+   - Track changes to Assessments and responses in an audit log for accountability.
 
 #### **Testing & QA:**
 
@@ -158,7 +158,7 @@ needs-assessment/
    - Add tests for form validation and submission.
 
 2. **End-to-End Testing:**
-   - Set up **Cypress** for end-to-end testing of the survey flow.
+   - Set up **Cypress** for end-to-end testing of the Assessment flow.
 
 #### **DevOps & Documentation:**
 
@@ -172,14 +172,14 @@ needs-assessment/
 
 #### **Feature Requests:**
 
-1. **Survey Versioning:**
-   - Implement a system to track different versions of surveys over time.
+1. **Assessment Versioning:**
+   - Implement a system to track different versions of Assessments over time.
 
 2. **Data Visualization Dashboard:**
-   - Build a dashboard to visualize survey responses using **Chart.js** or **Recharts**.
+   - Build a dashboard to visualize Assessment responses using **Chart.js** or **Recharts**.
 
-3. **Import/Export Surveys:**
-   - Add functionality to import/export surveys and responses as CSV or JSON.
+3. **Import/Export Assessments:**
+   - Add functionality to import/export Assessments and responses as CSV or JSON.
 
 ---
 
