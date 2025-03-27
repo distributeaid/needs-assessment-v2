@@ -1,8 +1,9 @@
 from datetime import datetime
 
 from flask import session, request
+from flask import jsonify
 
-from backend.models import db, SiteAssessment, SitePage, Page, User
+from backend.models import db, SiteAssessment, SitePage, Page, User, Assessment
 from backend.consts import REQUIRED_PAGES
 
 def create_site_assessment(site_id, assessment_id):
@@ -39,9 +40,21 @@ def get_current_season():
     return "Spring" if month < 7 else "Fall"
 
 
-def serialize_user(user: User) -> dict:
-    return {
-        "id": str(user.id),
-        "email": user.email,
-        "siteId": user.site_id,
-    }
+def ensure_assessment_exists(site_id):
+    """Ensure a SiteAssessment exists for the user's site."""
+    # Get current year & season
+    current_year = datetime.utcnow().year
+    current_season = get_current_season()
+
+    # Find the corresponding Assessment
+    assessment = Assessment.query.filter_by(year=current_year, season=current_season).first()
+    if not assessment:
+        return jsonify({"error": "No assessment template found"}), 400
+
+    # Find or create a SiteAssessment
+    site_assessment = SiteAssessment.query.filter_by(site_id=site_id, assessment_id=assessment.id).first()
+    if not site_assessment:
+        site_assessment = create_site_assessment(site_id, assessment.id)
+
+    return site_assessment
+

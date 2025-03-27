@@ -51,6 +51,8 @@ class SitePage(db.Model):
     state = db.Column(db.String(10), default='required')
     required = db.Column(db.Boolean, default=False)
     progress = db.Column(db.String(20), default="LOCKED") # 'Locked', 'Unstarted', 'In Progress', 'Complete'
+    responses = db.relationship('QuestionResponse', backref='site_page', lazy=True)
+
 
 class QuestionResponse(db.Model):
     id = db.Column(db.Integer, primary_key=True)

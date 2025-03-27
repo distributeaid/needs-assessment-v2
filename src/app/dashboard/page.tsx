@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import LoadingSpinner from "@/components/LoadingSpinner";
@@ -7,32 +7,29 @@ import { SiteAssessment } from "@/types/models";
 
 export default function Dashboard() {
   const { data: session, status } = useSession();
+  const router = useRouter();
   const [siteAssessment, setSiteAssessment] = useState<SiteAssessment | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const router = useRouter();
+  const API_URL = useMemo(() => process.env.NEXT_PUBLIC_API_URL || "", []);
 
   useEffect(() => {
-    if (status === "loading") return; // Wait until session is loaded
-
-    if (!session) {
+    if (status === "loading") return;
+    if (!session || !session.user) {
       router.push("/about");
       return;
     }
 
-    const API_URL = process.env.NEXT_PUBLIC_API_URL || "";
-    // Call the Flask API directly
     fetch(`${API_URL}/api/site-assessment?email=${session.user.email}`)
       .then((res) => {
         if (!res.ok) throw new Error(`API Error: ${res.status}`);
         return res.json();
       })
       .then((data) => {
-        console.log("Full API response:", data);
         setSiteAssessment(data);
       })
       .catch((err) => setError(err.message));
 
-  }, [session, status, router]);
+  }, [API_URL, session, status, router]);
 
   if (status === "loading" || !siteAssessment) return <LoadingSpinner />;
   if (error) return <div>Error: {error}</div>;

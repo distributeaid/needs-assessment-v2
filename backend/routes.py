@@ -1,12 +1,13 @@
 from datetime import datetime
 
 from flask import Blueprint, request, jsonify
+from sqlalchemy.orm import joinedload
 
-from backend.models import db, User, SiteAssessment, Assessment, Page, SitePage
+from backend.models import db, User, SiteAssessment, Page, SitePage
 from backend.consts import STANDARD_ITEMS
 from backend.validation import validate_responses
-from backend.utils import create_site_assessment, get_current_season, serialize_user
-
+from backend.utils import ensure_assessment_exists
+from backend.serialize.serialize import serialize_question, serialize_question_response, serialize_user
 
 api_bp = Blueprint("api", __name__)
 
@@ -16,37 +17,14 @@ def status():
     return jsonify({"status": "API is running"}), 200
 
 
-def ensure_assessment_exists(site_id):
-    """Ensure a SiteAssessment exists for the user's site."""
-    # Get current year & season
-    current_year = datetime.utcnow().year
-    current_season = get_current_season()
-
-    # Find the corresponding Assessment
-    assessment = Assessment.query.filter_by(year=current_year, season=current_season).first()
-    if not assessment:
-        return jsonify({"error": "No assessment template found"}), 400
-
-    # Find or create a SiteAssessment
-    site_assessment = SiteAssessment.query.filter_by(site_id=site_id, assessment_id=assessment.id).first()
-    if not site_assessment:
-        site_assessment = create_site_assessment(site_id, assessment.id)
-
-    return site_assessment
-
-
 @api_bp.route("/api/login", methods=["POST"])
 def login():
     """Handle ensure a SiteAssessment exists for the user's site."""
     data = request.get_json()
     username = data.get("username")
-
     user = User.query.filter_by(username=username).first()
-
     if not user:
-        # query by email
         user = User.query.filter_by(email=username).first()
-
     if not user:
         return jsonify({"error": "User not found"}), 404
     ensure_assessment_exists(user.site_id)
@@ -125,14 +103,18 @@ def get_site_assessment():
 
     site_pages = SitePage.query.filter_by(site_assessment_id=site_assessment.id).all()
     response = {
-        "assessment_id": site_assessment.id,
+        "assessment": {
+            'id': site_assessment.id,
+            },
         "site_id": site_assessment.site_id,
-        "pages": [
+        "sitePages": [
             {
-                "page_id": sp.page_id,
-                "name": db.session.get(Page, sp.page_id).title,
+                "id": sp.page_id,
+                "page": {
+                    'title': db.session.get(Page, sp.page_id).title
+                },
                 "required": sp.required,
-                "progress": sp.progress
+                "progress": sp.progress,
             }
             for sp in site_pages
         ]
@@ -196,3 +178,40 @@ def unlock_remaining_pages(site_assessment_id):
             if not sp.required and sp.progress == "LOCKED":
                 sp.progress = "UNSTARTED"
         db.session.commit()
+
+
+@api_bp.route("/api/assessment/<int:assessment_id>/page/<int:page_id>", methods=["GET"])
+def get_assessment_page(assessment_id, page_id):
+    # Get user email from query parameters
+    user_email = request.args.get("email")
+    if not user_email:
+        return jsonify({"error": "Email parameter is required"}), 400
+
+    # Look up the page with its questions
+    page = Page.query.options(joinedload(Page.questions)).filter_by(id=page_id).first()
+    if not page:
+        return jsonify({"error": "Page not found"}), 404
+
+    # Get the user
+    user = User.query.filter_by(email=user_email).first()
+    if not user:
+        return jsonify({"error": "User not found"}), 404
+
+    # Look up the SitePage for this page, given the assessment and the user's site.
+    site_page = SitePage.query.join(SiteAssessment).filter(
+        SitePage.page_id == page_id,
+        SiteAssessment.assessment_id == assessment_id,
+        SiteAssessment.site_id == user.site_id
+    ).first()
+
+    responses = []
+    if site_page:
+        responses = [serialize_question_response(r) for r in site_page.responses]
+
+    questions = [serialize_question(q) for q in page.questions]
+
+    return jsonify({
+        "title": page.title,
+        "questions": questions,
+        "responses": responses
+    })

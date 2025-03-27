@@ -2,12 +2,15 @@
 
 import { useEffect, useState, useMemo, useCallback } from "react";
 import { useRouter, useParams } from "next/navigation";
+import { useSession } from "next-auth/react";
 import Sidebar from "@/components/Sidebar";
 import AssessmentForm from "@/components/AssessmentForm";
 import { Question, SidebarProps, ProgressStatus } from "@/types/models";
 import LoadingSpinner from "@/components/LoadingSpinner";
 
 export default function AssessmentPage() {
+  const API_URL = process.env.NEXT_PUBLIC_API_URL || "";
+  const { data: session, status } = useSession();
   const params = useParams();
   const assessmentId = useMemo(() => {
     if (!params.assessmentId) return "";
@@ -25,10 +28,17 @@ export default function AssessmentPage() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    if (status === "loading") return; // Wait until session is loaded
+
+    if (!session) {
+      router.push("/about");
+      return;
+    }
+
     if (!assessmentId || !pageId) return;
     const fetchPage = async () => {
       try {
-        const res = await fetch(`/api/assessment/${assessmentId}/page/${pageId}`);
+        const res = await fetch(`${API_URL}/api/site-assessment/${assessmentId}/page/${pageId}`);
         if (!res.ok) throw new Error(`API Error: ${res.status}`);
         const data = await res.json();
         setPage(data);
@@ -63,7 +73,7 @@ export default function AssessmentPage() {
 
   useEffect(() => {
     if (!assessmentId) return;
-    fetch(`/api/Assessment/${assessmentId}`)
+    fetch(`${API_URL}/api/site-assessment?email=${session.user.email}`)
       .then((res) => {
         if (!res.ok) throw new Error(`API Error: ${res.status}`);
         return res.json();
@@ -97,7 +107,7 @@ export default function AssessmentPage() {
       confirmed: confirm,
     };
 
-    const res = await fetch(`/api/assessment/${assessmentId}/page/${pageId}/response`, {
+    const res = await fetch(`${API_URL}/api/aite-assessment/${assessmentId}/page/${pageId}/response`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
