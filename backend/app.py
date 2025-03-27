@@ -1,5 +1,6 @@
 from flask import Flask
 from flask_migrate import Migrate
+from flask_cors import CORS
 
 from backend.models import db
 from backend.routes import api_bp
@@ -14,6 +15,7 @@ app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 # Initialize Database with Flask app
 db.init_app(app)
 Migrate(app, db)
+CORS(app)
 
 # Register Routes
 app.register_blueprint(api_bp)

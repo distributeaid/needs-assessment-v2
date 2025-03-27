@@ -24,10 +24,11 @@ def setup_site_assessment(client):
 
 def test_get_site_assessment(client, setup_site_assessment):
     """Test fetching a SiteAssessment and its associated SitePages."""
-    response = client.get(f"/api/site-assessment?username=testuser")
-
+    response = client.get(f"/api/site-assessment?email=user1@example.com")
+    print(response)
     assert response.status_code == 200
     data = response.json
+
     assert "assessment_id" in data
     assert "pages" in data
     assert len(data["pages"]) > 0, "SiteAssessment should contain pages"

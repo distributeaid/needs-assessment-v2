@@ -16,8 +16,6 @@ def status():
     return jsonify({"status": "API is running"}), 200
 
 
-
-
 def ensure_assessment_exists(site_id):
     """Ensure a SiteAssessment exists for the user's site."""
     # Get current year & season
@@ -62,7 +60,7 @@ def login():
         },
     })
 
-@api_bp.route("/api/current_assessment", methods=["GET"])
+@api_bp.route("/api/current-assessment", methods=["GET"])
 def current_assessment():
     """Handle ensure a SiteAssessment exists for the user's site."""
     data = request.get_json()
@@ -115,14 +113,19 @@ def get_pages():
 
 @api_bp.route("/api/site-assessment", methods=["GET"])
 def get_site_assessment():
-    """Fetch the current user's SiteAssessment and associated SitePages."""
-    user = get_current_user()
+    """Fetch the current user's SiteAssessment and associated SitePages using the email provided in the query string."""
+    user_email = request.args.get("email")
+    if not user_email:
+        return jsonify({"error": "Email parameter is required"}), 400
+
+    user = User.query.filter_by(email=user_email).first()
     if not user:
         return jsonify({"error": "User not found"}), 404
 
     site_assessment = SiteAssessment.query.filter_by(site_id=user.site_id).first()
     if not site_assessment:
-        return jsonify({"error": "No SiteAssessment found"}), 404
+        ensure_assessment_exists(user.site_id)
+        site_assessment = SiteAssessment.query.filter_by(site_id=user.site_id).first()
 
     site_pages = SitePage.query.filter_by(site_assessment_id=site_assessment.id).all()
     response = {
