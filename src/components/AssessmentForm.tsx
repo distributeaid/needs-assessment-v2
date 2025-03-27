@@ -4,7 +4,7 @@ import React from "react";
 import { Question } from "@/types/models";
 import SizingGridInput from "@/components/questions/SizingGridInput";
 
-interface SurveyFormProps {
+interface AssessmentFormProps {
   title: string;
   questions: Question[];
   responses: { [key: number]: string };
@@ -82,7 +82,7 @@ const LongResponseInput: React.FC<InputProps> = ({ question, value, onChange }) 
   />
 );
 
-const SurveyForm: React.FC<SurveyFormProps> = ({
+const AssessmentForm: React.FC<AssessmentFormProps> = ({
   title,
   questions,
   responses,
@@ -140,4 +140,4 @@ const SurveyForm: React.FC<SurveyFormProps> = ({
   );
 };
 
-export default SurveyForm;
+export default AssessmentForm;
