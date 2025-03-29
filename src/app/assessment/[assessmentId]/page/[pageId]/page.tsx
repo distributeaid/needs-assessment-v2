@@ -41,6 +41,10 @@ export default function AssessmentPage() {
     if (!assessmentId || !pageId) return;
 
     const fetchPage = async () => {
+      if (!session) {
+        router.push("/about");
+        return;
+      }
       try {
         const res = await fetch(
           `${API_URL}/api/site-assessment/${assessmentId}/page/${pageId}`,
@@ -84,6 +88,7 @@ export default function AssessmentPage() {
   // Fetch overall site assessment and site pages using the JWT instead of email
   useEffect(() => {
     if (!assessmentId || status === "loading") return;
+    if (!session) {router.push("/about"); return;}
     fetch(`${API_URL}/api/site-assessment`, {
       headers: {
         "Authorization": `Bearer ${session.user.accessToken}`,
@@ -105,7 +110,7 @@ export default function AssessmentPage() {
         setAssessmentPages(pagesWithProgress);
       })
       .catch((err) => console.error("Assessment fetch error:", err));
-  }, [assessmentId, session, status, API_URL]);
+  }, [assessmentId, session, status, API_URL, router]);
 
   const handleInputChange = useCallback(
     (questionId: number, value: string) => {
@@ -124,7 +129,10 @@ export default function AssessmentPage() {
       })),
       confirmed: confirm,
     };
-
+    if (!session) {
+      router.push("/about");
+      return;
+    }
     const res = await fetch(
       `${API_URL}/api/aite-assessment/${assessmentId}/page/${pageId}/response`,
       {
