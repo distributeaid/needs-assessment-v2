@@ -30,7 +30,8 @@
     "**/*.tsx",
     ".next/types/**/*.ts",
     "prisma/**/*.ts",
-    "src/**/*.ts"
+    "src/**/*.ts",
+    "types/**/*.d.ts",
   ],
   "exclude": ["node_modules"]
 }

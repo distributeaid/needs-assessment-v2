@@ -1,7 +1,9 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from flask import Blueprint, request, jsonify
 from sqlalchemy.orm import joinedload
+import jwt
+
 
 from backend.models import db, User, SiteAssessment, Page, SitePage
 from backend.consts import STANDARD_ITEMS
@@ -11,6 +13,10 @@ from backend.serialize.serialize import serialize_question, serialize_question_r
 
 api_bp = Blueprint("api", __name__)
 
+JWT_SECRET = "your-secret-key"
+JWT_ALGORITHM = "HS256"
+JWT_EXP_DELTA_SECONDS = 3600 # 1 hour
+
 
 @api_bp.route("/api/status", methods=["GET"])
 def status():
@@ -19,19 +25,26 @@ def status():
 
 @api_bp.route("/api/login", methods=["POST"])
 def login():
-    """Handle ensure a SiteAssessment exists for the user's site."""
     data = request.get_json()
-    username = data.get("username")
-    user = User.query.filter_by(username=username).first()
-    if not user:
-        user = User.query.filter_by(email=username).first()
+    print(f"Data: {data}")
+
+    email = data.get("email")
+    user = User.query.filter_by(email=email).first()
     if not user:
         return jsonify({"error": "User not found"}), 404
-    ensure_assessment_exists(user.site_id)
+
+    # TODO: Verify the password here
+
+    payload = {
+        "user_id": user.id,
+        "exp": datetime.utcnow() + timedelta(seconds=JWT_EXP_DELTA_SECONDS)
+    }
+    token = jwt.encode(payload, JWT_SECRET, algorithm=JWT_ALGORITHM)
 
     return jsonify({
         "message": "Login successful",
-        "user": serialize_user(user)
+        "user": serialize_user(user),
+        "accessToken": token
     })
 
 @api_bp.route("/api/current-assessment", methods=["GET"])
@@ -49,7 +62,7 @@ def current_assessment():
         return jsonify({"error": "No assessment template found"}), 400
 
     return jsonify({
-        "message": "Login successful",
+        "message": "Assessment found",
         "site_assessment_id": site_assessment.id
     })
 

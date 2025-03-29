@@ -1,7 +1,8 @@
-import NextAuth from "next-auth";
+import NextAuth, { NextAuthOptions, DefaultSession, DefaultUser } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
+import type { JWT } from "next-auth/jwt";
 
-export const authOptions = {
+export const authOptions: NextAuthOptions = {
   providers: [
     CredentialsProvider({
       name: "Credentials",
@@ -10,34 +11,44 @@ export const authOptions = {
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
-        if (!credentials?.email || !credentials?.password) {
-          return null;
-        }
-        const res = await fetch(
-          `${process.env.FLASK_API_URL || "http://localhost:5000"}/api/login`,
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              username: credentials.email,
-              password: credentials.password,
-            }),
-          }
-        );
+        if (!credentials?.email || !credentials?.password) return null;
+        const res = await fetch(`${process.env.FLASK_API_URL}/api/login`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            email: credentials.email,
+            password: credentials.password,
+          }),
+        });
         const data = await res.json();
-        if (res.ok && data.user) {
-          // Return the user object from Flask
-          return { id: data.user.id.toString(), email: data.user.email };
+        if (res.ok && data.user && data.accessToken) {
+          return {
+            id: data.user.id.toString(),
+            email: data.user.email,
+            accessToken: data.accessToken,
+          } as DefaultUser & { accessToken?: string };
         }
         return null;
       },
     }),
   ],
   session: {
-    strategy: "jwt",
+    strategy: "jwt" as const,
+  },
+  callbacks: {
+    async jwt({ token, user }: { token: JWT; user?: DefaultUser & { accessToken?: string } | null }) {
+      if (user) {
+        token.accessToken = user.accessToken;
+      }
+      return token;
+    },
+    async session({ session, token }: { session: DefaultSession; token: JWT }) {
+      session.user = { ...session.user, accessToken: token.accessToken } as DefaultSession["user"] & { accessToken?: string };
+      return session;
+    },
   },
   pages: {
-    signIn: "/login",
+    signIn: `/login`,
   },
   secret: process.env.NEXTAUTH_SECRET,
 };

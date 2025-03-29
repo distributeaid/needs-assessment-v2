@@ -14,31 +14,33 @@ export default function Dashboard() {
 
   useEffect(() => {
     if (status === "loading") return;
-    if (!session || !session.user) {
+    if (!session || !session.user.accessToken) {
       router.push("/about");
       return;
     }
 
-    fetch(`${API_URL}/api/site-assessment?email=${session.user.email}`)
+    fetch(`${API_URL}/api/site-assessment`, {
+      headers: {
+        "Authorization": `Bearer ${session.user.accessToken}`,
+      },
+    })
       .then((res) => {
         if (!res.ok) throw new Error(`API Error: ${res.status}`);
         return res.json();
       })
       .then((data) => {
+        console.log("Full API response:", data);
         setSiteAssessment(data);
       })
       .catch((err) => setError(err.message));
-
-  }, [API_URL, session, status, router]);
+  }, [session, status, router, API_URL]);
 
   if (status === "loading" || !siteAssessment) return <LoadingSpinner />;
   if (error) return <div>Error: {error}</div>;
 
   return (
     <div className="max-w-4xl mx-auto p-8">
-      <h1 className="text-3xl font-bold mb-6">
-        Assessment Dashboard
-      </h1>
+      <h1 className="text-3xl font-bold mb-6">Assessment Dashboard</h1>
       <ul className="space-y-4">
         {siteAssessment.sitePages.map((page) => (
           <li
