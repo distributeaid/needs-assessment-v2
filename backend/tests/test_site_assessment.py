@@ -1,6 +1,6 @@
 from backend.app import app
 from backend.models import db, Site, Assessment, SiteAssessment, SitePage
-from backend.utils import create_site_assessment
+from backend.utils.utils import create_site_assessment
 import pytest
 
 @pytest.fixture

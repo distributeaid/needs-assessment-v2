@@ -2,21 +2,15 @@ from datetime import datetime, timedelta
 
 from flask import Blueprint, request, jsonify
 from sqlalchemy.orm import joinedload
-import jwt
-
 
 from backend.models import db, User, SiteAssessment, Page, SitePage
 from backend.consts import STANDARD_ITEMS
 from backend.validation import validate_responses
-from backend.utils import ensure_assessment_exists
+from backend.utils.utils import ensure_assessment_exists
 from backend.serialize.serialize import serialize_question, serialize_question_response, serialize_user
+from backend.utils.jwt_utils import generate_jwt_payload, get_current_user, JWTError
 
 api_bp = Blueprint("api", __name__)
-
-JWT_SECRET = "your-secret-key"
-JWT_ALGORITHM = "HS256"
-JWT_EXP_DELTA_SECONDS = 3600 # 1 hour
-
 
 @api_bp.route("/api/status", methods=["GET"])
 def status():
@@ -35,35 +29,12 @@ def login():
 
     # TODO: Verify the password here
 
-    payload = {
-        "user_id": user.id,
-        "exp": datetime.utcnow() + timedelta(seconds=JWT_EXP_DELTA_SECONDS)
-    }
-    token = jwt.encode(payload, JWT_SECRET, algorithm=JWT_ALGORITHM)
+    token = generate_jwt_payload(user)
 
     return jsonify({
         "message": "Login successful",
         "user": serialize_user(user),
         "accessToken": token
-    })
-
-@api_bp.route("/api/current-assessment", methods=["GET"])
-def current_assessment():
-    """Handle ensure a SiteAssessment exists for the user's site."""
-    data = request.get_json()
-    username = data.get("username")
-
-    user = User.query.filter_by(username=username).first()
-    if not user:
-        return jsonify({"error": "User not found"}), 404
-
-    site_assessment = ensure_assessment_exists(user.site_id)
-    if not site_assessment:
-        return jsonify({"error": "No assessment template found"}), 400
-
-    return jsonify({
-        "message": "Assessment found",
-        "site_assessment_id": site_assessment.id
     })
 
 
@@ -100,14 +71,11 @@ def get_pages():
 
 @api_bp.route("/api/site-assessment", methods=["GET"])
 def get_site_assessment():
-    """Fetch the current user's SiteAssessment and associated SitePages using the email provided in the query string."""
-    user_email = request.args.get("email")
-    if not user_email:
-        return jsonify({"error": "Email parameter is required"}), 400
-
-    user = User.query.filter_by(email=user_email).first()
-    if not user:
-        return jsonify({"error": "User not found"}), 404
+    try:
+        user = get_current_user()
+    except JWTError as e:
+        print(f"JWT Error: {e}")
+        return jsonify({"error": str(e)}), 401
 
     site_assessment = SiteAssessment.query.filter_by(site_id=user.site_id).first()
     if not site_assessment:
@@ -116,16 +84,12 @@ def get_site_assessment():
 
     site_pages = SitePage.query.filter_by(site_assessment_id=site_assessment.id).all()
     response = {
-        "assessment": {
-            'id': site_assessment.id,
-            },
+        "assessment": {'id': site_assessment.id},
         "site_id": site_assessment.site_id,
         "sitePages": [
             {
                 "id": sp.page_id,
-                "page": {
-                    'title': db.session.get(Page, sp.page_id).title
-                },
+                "page": {'title': db.session.get(Page, sp.page_id).title},
                 "required": sp.required,
                 "progress": sp.progress,
             }

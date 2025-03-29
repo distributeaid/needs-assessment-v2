@@ -14,7 +14,9 @@ export default function AssessmentPage() {
   const params = useParams();
   const assessmentId = useMemo(() => {
     if (!params.assessmentId) return "";
-    return Array.isArray(params.assessmentId) ? params.assessmentId[0] : params.assessmentId;
+    return Array.isArray(params.assessmentId)
+      ? params.assessmentId[0]
+      : params.assessmentId;
   }, [params.assessmentId]);
   const pageId = useMemo(() => {
     if (!params.pageId) return "";
@@ -27,6 +29,7 @@ export default function AssessmentPage() {
   const [assessmentPages, setAssessmentPages] = useState<SidebarProps["sitePages"]>([]);
   const [error, setError] = useState<string | null>(null);
 
+  // Fetch the specific page (with questions & responses)
   useEffect(() => {
     if (status === "loading") return; // Wait until session is loaded
 
@@ -36,9 +39,17 @@ export default function AssessmentPage() {
     }
 
     if (!assessmentId || !pageId) return;
+
     const fetchPage = async () => {
       try {
-        const res = await fetch(`${API_URL}/api/site-assessment/${assessmentId}/page/${pageId}`);
+        const res = await fetch(
+          `${API_URL}/api/site-assessment/${assessmentId}/page/${pageId}`,
+          {
+            headers: {
+              "Authorization": `Bearer ${session.user.accessToken}`,
+            },
+          }
+        );
         if (!res.ok) throw new Error(`API Error: ${res.status}`);
         const data = await res.json();
         setPage(data);
@@ -68,26 +79,33 @@ export default function AssessmentPage() {
       }
     };
     fetchPage();
-  }, [assessmentId, pageId]);
+  }, [assessmentId, pageId, session, status, router, API_URL]);
 
-
+  // Fetch overall site assessment and site pages using the JWT instead of email
   useEffect(() => {
-    if (!assessmentId) return;
-    fetch(`${API_URL}/api/site-assessment?email=${session.user.email}`)
+    if (!assessmentId || status === "loading") return;
+    fetch(`${API_URL}/api/site-assessment`, {
+      headers: {
+        "Authorization": `Bearer ${session.user.accessToken}`,
+      },
+    })
       .then((res) => {
         if (!res.ok) throw new Error(`API Error: ${res.status}`);
         return res.json();
       })
       .then((data) => {
-        const pagesWithProgress = data.pages.map((page: { id: number; title: string; progress: ProgressStatus }) => ({
-          id: page.id,
-          title: page.title,
-          progress: page.progress,
-        }));
+        // Map sitePages from the response (adjust keys as needed)
+        const pagesWithProgress = data.sitePages.map(
+          (page: { id: number; page: { title: string }; progress: ProgressStatus }) => ({
+            id: page.id,
+            title: page.page.title,
+            progress: page.progress,
+          })
+        );
         setAssessmentPages(pagesWithProgress);
       })
       .catch((err) => console.error("Assessment fetch error:", err));
-  }, [assessmentId]);
+  }, [assessmentId, session, status, API_URL]);
 
   const handleInputChange = useCallback(
     (questionId: number, value: string) => {
@@ -107,18 +125,26 @@ export default function AssessmentPage() {
       confirmed: confirm,
     };
 
-    const res = await fetch(`${API_URL}/api/aite-assessment/${assessmentId}/page/${pageId}/response`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    });
+    const res = await fetch(
+      `${API_URL}/api/aite-assessment/${assessmentId}/page/${pageId}/response`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${session.user.accessToken}`,
+        },
+        body: JSON.stringify(payload),
+      }
+    );
 
     if (!res.ok) {
       const errorData = await res.json();
       console.error("Error Response:", errorData);
       setError(errorData.error || "Failed to save responses.");
     } else {
-      const currentIndex = assessmentPages.findIndex(page => page.id === Number(pageId));
+      const currentIndex = assessmentPages.findIndex(
+        (page) => page.id === Number(pageId)
+      );
       if (currentIndex !== -1 && currentIndex < assessmentPages.length - 1) {
         const nextPageId = assessmentPages[currentIndex + 1].id;
         router.push(`/assessment/${assessmentId}/page/${nextPageId}`);
@@ -134,7 +160,11 @@ export default function AssessmentPage() {
   return (
     <div className="flex">
       {assessmentId && pageId && (
-        <Sidebar assessmentId={assessmentId as string} sitePages={assessmentPages} currentPageId={pageId as string} />
+        <Sidebar
+          assessmentId={assessmentId as string}
+          sitePages={assessmentPages}
+          currentPageId={pageId as string}
+        />
       )}
       <AssessmentForm
         title={page.title}

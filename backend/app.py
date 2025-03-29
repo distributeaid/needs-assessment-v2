@@ -11,6 +11,9 @@ app = Flask(__name__)
 # Configure Database
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///database.db"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+app.config["JWT_SECRET"] = "your-very-secret-key"
+app.config["JWT_ALGORITHM"] = "HS256"
+app.config["JWT_EXP_DELTA_SECONDS"] = 3600  # 1 hour
 
 # Initialize Database with Flask app
 db.init_app(app)
