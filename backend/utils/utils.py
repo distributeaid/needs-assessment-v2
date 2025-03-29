@@ -58,3 +58,14 @@ def ensure_assessment_exists(site_id):
 
     return site_assessment
 
+def unlock_remaining_pages(site_assessment_id):
+    """Unlock non-required SitePages once all required SitePages are complete."""
+    site_pages = SitePage.query.filter_by(site_assessment_id=site_assessment_id).all()
+    required_pages = [sp for sp in site_pages if sp.required]
+
+    # If all required pages are complete, unlock remaining pages
+    if all(sp.progress == "COMPLETE" for sp in required_pages):
+        for sp in site_pages:
+            if not sp.required and sp.progress == "LOCKED":
+                sp.progress = "UNSTARTED"
+        db.session.commit()

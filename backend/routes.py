@@ -6,7 +6,7 @@ from sqlalchemy.orm import joinedload
 from backend.models import db, User, SiteAssessment, Page, SitePage
 from backend.consts import STANDARD_ITEMS
 from backend.validation import validate_responses
-from backend.utils.utils import ensure_assessment_exists
+from backend.utils.utils import ensure_assessment_exists, unlock_remaining_pages
 from backend.serialize.serialize import serialize_question, serialize_question_response, serialize_user
 from backend.utils.jwt_utils import generate_jwt_payload, get_current_user, JWTError
 
@@ -20,7 +20,6 @@ def status():
 @api_bp.route("/api/login", methods=["POST"])
 def login():
     data = request.get_json()
-    print(f"Data: {data}")
 
     email = data.get("email")
     user = User.query.filter_by(email=email).first()
@@ -144,35 +143,18 @@ def complete_site_page(site_page_id):
     return jsonify({"message": "SitePage completed successfully"})
 
 
-def unlock_remaining_pages(site_assessment_id):
-    """Unlock non-required SitePages once all required SitePages are complete."""
-    site_pages = SitePage.query.filter_by(site_assessment_id=site_assessment_id).all()
-    required_pages = [sp for sp in site_pages if sp.required]
-
-    # If all required pages are complete, unlock remaining pages
-    if all(sp.progress == "COMPLETE" for sp in required_pages):
-        for sp in site_pages:
-            if not sp.required and sp.progress == "LOCKED":
-                sp.progress = "UNSTARTED"
-        db.session.commit()
-
-
-@api_bp.route("/api/assessment/<int:assessment_id>/page/<int:page_id>", methods=["GET"])
+@api_bp.route("/api/site-assessment/<int:assessment_id>/page/<int:page_id>", methods=["GET"])
 def get_assessment_page(assessment_id, page_id):
-    # Get user email from query parameters
-    user_email = request.args.get("email")
-    if not user_email:
-        return jsonify({"error": "Email parameter is required"}), 400
+    try:
+        user = get_current_user()
+    except JWTError as e:
+        print(f"JWT Error: {e}")
+        return jsonify({"error": str(e)}), 401
 
     # Look up the page with its questions
     page = Page.query.options(joinedload(Page.questions)).filter_by(id=page_id).first()
     if not page:
         return jsonify({"error": "Page not found"}), 404
-
-    # Get the user
-    user = User.query.filter_by(email=user_email).first()
-    if not user:
-        return jsonify({"error": "User not found"}), 404
 
     # Look up the SitePage for this page, given the assessment and the user's site.
     site_page = SitePage.query.join(SiteAssessment).filter(
