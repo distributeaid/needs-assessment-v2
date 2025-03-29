@@ -8,7 +8,6 @@ from backend.consts import QUESTION_TYPES
 
 def seed_database_from_csv(filepath="backend/data/questions.csv"):
     """Reads a CSV file and seeds the database with Assessments, Pages, and Questions."""
-
     # Get current Year & Season
     current_year = datetime.utcnow().year
     current_season = "Spring" if datetime.utcnow().month < 7 else "Fall"
@@ -24,6 +23,8 @@ def seed_database_from_csv(filepath="backend/data/questions.csv"):
     with open(filepath, mode="r", encoding="utf-8", errors="replace") as file:
         reader = csv.DictReader(file)
         for row in reader:
+            if row["Page"] == "Preamble":
+                continue
             # Fetch or create page within the current assessment
             page = Page.query.filter_by(title=row["Page"], assessment_id=assessment.id).first()
             if not page:
@@ -31,7 +32,15 @@ def seed_database_from_csv(filepath="backend/data/questions.csv"):
                 db.session.add(page)
                 db.session.commit()
 
-            # Create question
+            # Check if question already exists for this page
+            existing_question = Question.query.filter_by(
+                page_id=page.id,
+                text=row["ItemText"]
+            ).first()
+            if existing_question:
+                continue  # Skip this question if it already exists
+
+            # Create question since it doesn't exist yet
             question = Question(
                 page_id=page.id,
                 text=row["ItemText"],
