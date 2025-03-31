@@ -1,15 +1,25 @@
-init: |
-  # Copy .env.example to .env if not exists
-  if [ ! -f .env ]; then cp .env.example .env; fi
-  pip install -r requirements.txt
-  npm install
+
 
 tasks:
-  - command: flask run --debug
-  - command: npm run dev
+
+  - before: if [ ! -f .env ]; then cp .env.example .env; fi
+
+  - name: bash
+    command: bash
+
+  - name: flask
+    init: pip install -r requirements.txt && yes
+    command: flask run --debug
+
+  - name: nextjs
+    init: npm install && yes
+    command: npm run dev
+
 
 ports:
-  - port: 5000
-    onOpen: open-preview
   - port: 3000
+    name: nextjs
+    onOpen: open-preview
+  - port: 5000
+    name: flask
     onOpen: open-preview
