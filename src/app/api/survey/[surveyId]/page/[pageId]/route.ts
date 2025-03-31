@@ -7,7 +7,7 @@ const prisma = new PrismaClient();
 
 export async function GET(
   request: Request,
-  context: { params: { surveyId: string; pageId: string } }
+  context: { params: { surveyId: string; pageId: string } },
 ) {
   const params = await context.params;
   const surveyId = parseInt(params.surveyId, 10);

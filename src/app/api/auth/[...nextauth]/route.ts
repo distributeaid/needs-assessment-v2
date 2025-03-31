@@ -23,13 +23,16 @@ export const authOptions = {
           where: { email: credentials.email },
         });
 
-        if (user && await bcrypt.compare(credentials.password, user.password)) {
+        if (
+          user &&
+          (await bcrypt.compare(credentials.password, user.password))
+        ) {
           // Convert id to string to match NextAuth's expected type
           return { id: user.id.toString(), email: user.email };
         }
 
         return null;
-      }
+      },
     }),
   ],
   session: {

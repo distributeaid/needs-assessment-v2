@@ -7,7 +7,7 @@ const prisma = new PrismaClient();
 
 export async function POST(
   request: Request,
-  { params }: { params: { surveyId: string; pageId: string } }
+  { params }: { params: { surveyId: string; pageId: string } },
 ) {
   const { surveyId, pageId } = params;
 
@@ -44,7 +44,10 @@ export async function POST(
     const { responses, confirmed } = await request.json();
 
     if (!responses || responses.length === 0) {
-      return NextResponse.json({ error: "No responses provided" }, { status: 400 });
+      return NextResponse.json(
+        { error: "No responses provided" },
+        { status: 400 },
+      );
     }
     let responsesChanged = false;
 
@@ -80,7 +83,11 @@ export async function POST(
         },
       });
     }
-    const newStatus = confirmed ? 'COMPLETE' : responsesChanged ? 'STARTEDOPTIONAL' : sitePage.progress;
+    const newStatus = confirmed
+      ? "COMPLETE"
+      : responsesChanged
+        ? "STARTEDOPTIONAL"
+        : sitePage.progress;
 
     // Update confirmation status on the site page
     await prisma.sitePage.update({
@@ -94,6 +101,9 @@ export async function POST(
     return NextResponse.json({ message: "Responses saved successfully!" });
   } catch (error) {
     console.error("Error saving responses:", error);
-    return NextResponse.json({ error: "Failed to save responses." }, { status: 500 });
+    return NextResponse.json(
+      { error: "Failed to save responses." },
+      { status: 500 },
+    );
   }
 }
