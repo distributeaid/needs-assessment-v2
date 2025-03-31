@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import React from "react";
+
 import { SidebarProps } from "@/types/models";
 import { Box, Flex, Heading } from "@radix-ui/themes";
 import SidebarIcon from "./SidebarIcon";

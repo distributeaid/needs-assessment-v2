@@ -4,6 +4,13 @@ import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import { SiteAssessment } from "@/types/models";
+import {
+  Text,
+  Box,
+  Container,
+  Separator,
+  Flex,
+} from "@radix-ui/themes";
 
 export default function Dashboard() {
   const { data: session, status } = useSession();
@@ -39,26 +46,45 @@ export default function Dashboard() {
   if (error) return <div>Error: {error}</div>;
 
   return (
-    <div className="max-w-4xl mx-auto p-8">
-      <h1 className="text-3xl font-bold mb-6">Assessment Dashboard</h1>
-      <ul className="space-y-4">
-        {siteAssessment.sitePages.map((page) => (
-          <li
-            key={page.id}
-            className="p-4 border rounded-lg shadow-sm flex justify-between items-center"
+    <Container className="w-full h-screen bg-gray-100 p-8">
+      <Flex direction="column" align="center" justify="center" gap="4">
+        <Box className="w-full flex justify-center items-center">
+          <h1 className="text-4xl text-[var(--primary)] ">DASHBOARD</h1>
+          <Separator className="border-t-2 border-black m-10" />
+          <Text as="p" className="text-xl font-bold text-blue-900 mt-20">
+            Select a category to begin your assessment.
+          </Text>
+          <Flex
+            direction={{ initial: "column", md: "row" }}
+            className="gap-6 mt-6 flex justify-center items-center"
+            justify="center"
           >
-            <span className="text-lg font-medium">{page.page.title}</span>
-            <button
-              className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-              onClick={() =>
-                router.push(`/assessment/${siteAssessment.siteAssessmentId}/page/${page.id}`)
-              }
-            >
-              View
-            </button>
-          </li>
-        ))}
-      </ul>
-    </div>
+            {siteAssessment.sitePages.map((page) => (
+              <Box
+                key={page.id}
+                className="flex justify-center items-center bg-[var(--secondary)] border rounded-lg shadow-sm justify-centertext-center"
+                width="350px"
+                height="200px"
+              >
+                <h1 className="text-4xl font-bold text-blue-900 p-6">
+                  {page.page.title}
+                </h1>
+
+                <button
+                  className="text-white text-lg bg-[var(--primary)] rounded-md hover:bg-green-300 px-5 py-4 my-4"
+                  onClick={() =>
+                    router.push(
+                      `/assessment/${page.siteAssessmentId}/page/${page.id}`
+                    )
+                  }
+                >
+                  View
+                </button>
+              </Box>
+            ))}
+          </Flex>
+        </Box>
+      </Flex>
+    </Container>
   );
 }
