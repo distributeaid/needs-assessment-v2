@@ -98,11 +98,12 @@ def get_site_assessment():
     return jsonify(response)
 
 
-@api_bp.route("/api/site-page/<int:site_page_id>/save", methods=["POST"])
+@api_bp.route("/api/site-assessment/<int:site_assessment_id>/site-page/<int:site_page_id>/save", methods=["POST"])
 def save_site_page(site_page_id):
     """Save a SitePage with validation, but do not require mandatory questions."""
     data = request.get_json()
     site_page = db.session.get(SitePage, site_page_id)
+    site_assessment_id = data.get("site_assessment_id")
 
     if not site_page:
         return jsonify({"error": "SitePage not found"}), 404
@@ -112,8 +113,12 @@ def save_site_page(site_page_id):
     if validation_errors:
         return jsonify({"errors": validation_errors}), 400
 
-    # Mark as "In Progress"
-    site_page.progress = "In Progress"
+
+    if data.get("confirmed"):
+        site_page.progress = "COMPLETE"
+        unlock_remaining_pages(site_assessment_id)
+    else:
+        site_page.progress = "IN_PROGRESS"
     db.session.commit()
 
     return jsonify({"message": "SitePage saved successfully"})

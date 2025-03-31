@@ -7,7 +7,6 @@ from backend.models import User
 def generate_jwt_payload(user):
     payload = {
         "user_id": user.id,
-        "exp": datetime.utcnow() + timedelta(seconds=current_app.config["JWT_EXP_DELTA_SECONDS"]),
     }
     token = jwt.encode(payload, current_app.config["JWT_SECRET"], algorithm=current_app.config["JWT_ALGORITHM"])
     return token

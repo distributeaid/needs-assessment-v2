@@ -7,6 +7,7 @@ import Sidebar from "@/components/Sidebar";
 import AssessmentForm from "@/components/AssessmentForm";
 import { Question, SidebarProps, ProgressStatus } from "@/types/models";
 import LoadingSpinner from "@/components/LoadingSpinner";
+import { signOut } from "next-auth/react";
 
 export default function AssessmentPage() {
   const API_URL = process.env.NEXT_PUBLIC_API_URL || "";
@@ -95,8 +96,14 @@ export default function AssessmentPage() {
       },
     })
       .then((res) => {
-        if (!res.ok) throw new Error(`API Error: ${res.status}`);
-        return res.json();
+        if (res.status === 401) {
+            // Token has expired – sign out and redirect to login
+            signOut();
+            router.push("/login");
+            throw new Error("Token has expired");
+         }
+          if (!res.ok) throw new Error(`API Error: ${res.status}`);
+          return res.json();
       })
       .then((data) => {
         // Map sitePages from the response (adjust keys as needed)
@@ -134,7 +141,7 @@ export default function AssessmentPage() {
       return;
     }
     const res = await fetch(
-      `${API_URL}/api/aite-assessment/${assessmentId}/page/${pageId}/response`,
+      `${API_URL}/api/site-assessment/${assessmentId}/site-page/${pageId}/save`,
       {
         method: "POST",
         headers: {
