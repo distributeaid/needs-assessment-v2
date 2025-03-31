@@ -9,7 +9,7 @@ import LoadingSpinner from "@/components/LoadingSpinner";
 import { Question, SidebarProps, ProgressStatus } from "@/types/models";
 
 export default function AssessmentPage() {
-  const API_URL = process.env.NEXT_PUBLIC_API_URL || "";
+  const API_URL = process.env.FLASK_API_URL || "";
   const { data: session, status } = useSession();
   const router = useRouter();
   const params = useParams();

@@ -17,7 +17,7 @@ export default function Dashboard() {
   const router = useRouter();
   const [siteAssessment, setSiteAssessment] = useState<SiteAssessment | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const API_URL = useMemo(() => process.env.NEXT_PUBLIC_API_URL || "", []);
+  const API_URL = useMemo(() => process.env.FLASK_API_URL || "", []);
 
   useEffect(() => {
     if (status === "loading") return;

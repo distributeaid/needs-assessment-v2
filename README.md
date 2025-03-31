@@ -50,7 +50,6 @@ cp .env.example .env
 Ensure the following environment variables are correctly set in `.env`:
 
 ```env
-DATABASE_URL="postgresql://postgres:password@localhost:5432/needs_assessment"
 NEXTAUTH_URL=http://localhost:3000
 NEXTAUTH_SECRET=your-secret-key
 ```
