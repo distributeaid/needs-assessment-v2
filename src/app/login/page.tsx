@@ -17,7 +17,7 @@ export default function LoginPage() {
     });
 
     if (res?.ok) {
-      router.push("/dashboard");  // Redirect to dashboard after successful login
+      router.push("/dashboard"); // Redirect to dashboard after successful login
     } else {
       alert("Invalid email or password");
     }
@@ -25,7 +25,10 @@ export default function LoginPage() {
 
   return (
     <div className="flex justify-center items-center h-screen bg-gray-100">
-      <form onSubmit={handleSubmit} className="bg-white p-8 rounded-lg shadow-md w-96">
+      <form
+        onSubmit={handleSubmit}
+        className="bg-white p-8 rounded-lg shadow-md w-96"
+      >
         <h2 className="text-2xl font-bold mb-6 text-center">Login</h2>
         <div className="mb-4">
           <label className="block text-gray-700">Email</label>
