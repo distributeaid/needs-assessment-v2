@@ -10,8 +10,9 @@ async function main() {
   await prisma.siteSurvey.deleteMany();
   await prisma.page.deleteMany();
   await prisma.survey.deleteMany();
-  await prisma.site.deleteMany();
   await prisma.user.deleteMany();
+  await prisma.site.deleteMany();
+
 
   console.log("Existing surveys, pages, and questions deleted.");
 
