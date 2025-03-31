@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import LoadingSpinner from "@/components/LoadingSpinner";
@@ -17,8 +17,6 @@ export default function Dashboard() {
   const router = useRouter();
   const [siteAssessment, setSiteAssessment] = useState<SiteAssessment | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const API_URL = useMemo(() => process.env.FLASK_API_URL || "", []);
-
   useEffect(() => {
     if (status === "loading") return;
     if (!session || !session.user.accessToken) {
@@ -26,7 +24,7 @@ export default function Dashboard() {
       return;
     }
 
-    fetch(`${API_URL}/api/site-assessment`, {
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/site-assessment`, {
       headers: {
         "Authorization": `Bearer ${session.user.accessToken}`,
       },
@@ -40,7 +38,7 @@ export default function Dashboard() {
         setSiteAssessment(data);
       })
       .catch((err) => setError(err.message));
-  }, [session, status, router, API_URL]);
+  }, [session, status, router]);
 
   if (status === "loading" || !siteAssessment) return <LoadingSpinner />;
   if (error) return <div>Error: {error}</div>;

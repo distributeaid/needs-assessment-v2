@@ -9,7 +9,6 @@ import LoadingSpinner from "@/components/LoadingSpinner";
 import { Question, SidebarProps, ProgressStatus } from "@/types/models";
 
 export default function AssessmentPage() {
-  const API_URL = process.env.FLASK_API_URL || "";
   const { data: session, status } = useSession();
   const router = useRouter();
   const params = useParams();
@@ -42,7 +41,7 @@ export default function AssessmentPage() {
       router.push("/about");
       return;
     }
-    fetch(`${API_URL}/api/site-assessment`, {
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/site-assessment`, {
       headers: {
         "Authorization": `Bearer ${session.user.accessToken}`,
       },
@@ -70,7 +69,7 @@ export default function AssessmentPage() {
         setAssessmentPages(pagesWithProgress);
       })
       .catch((err) => console.error("Assessment fetch error:", err));
-  }, [session, status, API_URL, router]);
+  }, [session, status, router]);
 
   // Fetch details for the specific page (its questions and any existing responses)
   useEffect(() => {
@@ -81,7 +80,7 @@ export default function AssessmentPage() {
     const fetchPage = async () => {
       try {
         const res = await fetch(
-          `${API_URL}/api/site-assessment/${siteAssessment.id}/site-page/${pageId}`,
+          `${process.env.NEXT_PUBLIC_API_URL}/api/site-assessment/${siteAssessment.id}/site-page/${pageId}`,
           {
             headers: {
               "Authorization": `Bearer ${session.user.accessToken}`,
@@ -117,7 +116,7 @@ export default function AssessmentPage() {
       }
     };
     fetchPage();
-  }, [siteAssessment, pageId, session, status, API_URL, router]);
+  }, [siteAssessment, pageId, session, status, router]);
 
   const handleInputChange = useCallback(
     (questionId: number, value: string) => {
@@ -139,7 +138,7 @@ export default function AssessmentPage() {
       return;
     }
     const res = await fetch(
-      `${API_URL}/api/site-assessment/${siteAssessment.id}/site-page/${pageId}/save`,
+      `${process.env.NEXT_PUBLIC_API_URL}/api/site-assessment/${siteAssessment.id}/site-page/${pageId}/save`,
       {
         method: "POST",
         headers: {

@@ -8,18 +8,19 @@ tasks:
     command: bash
 
   - name: flask
-    init: pip install -r requirements.txt && yes
+    init: pip install -r backend/requirements.txt 
     command: flask run --debug
 
   - name: nextjs
-    init: npm install && yes
+    init: npm install 
     command: npm run dev
 
-
 ports:
+
   - port: 3000
     name: nextjs
     onOpen: open-preview
+
   - port: 5000
     name: flask
-    onOpen: open-preview
+    onOpen: ignore

@@ -12,7 +12,7 @@ export const authOptions: NextAuthOptions = {
       },
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) return null;
-        const res = await fetch(`${process.env.FLASK_API_URL}/api/login`, {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/login`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
