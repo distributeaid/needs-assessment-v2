@@ -69,30 +69,11 @@ Start the PostgreSQL container:
 docker-compose up -d
 ```
 
-### 5. Run Migrations and Seed Database
-
-Apply Prisma migrations and seed the database with initial data:
+### 5. Update the database
 
 ```bash
-npx prisma migrate dev --name init
-npx prisma db seed
+npx prisma migrate reset --force
 ```
-
-To reset the database and reseed:
-
-```bash
-npx prisma migrate reset
-```
-
-### 6. Open Prisma Studio (Optional)
-
-Use Prisma Studio to visually inspect and manage the database:
-
-```bash
-npx prisma studio
-```
-
----
 
 ## Running the App
 
