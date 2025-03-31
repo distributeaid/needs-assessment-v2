@@ -5,17 +5,25 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  --primary: #082b76; /* Deep Blue */
+  --secondary: #8b9fc8; /* Soft Blue */
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
     --background: #0a0a0a;
     --foreground: #ededed;
+    --primary: #1a3d92; /* Adjusted Blue for Dark Mode */
+    --secondary: #a0b2d4; /* Softer Blue */
   }
 }
 
 body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+  h1 {
+    font-weight: 700; /* Apply 700 weight to h1 */
+  }
+
+  p {
+    font-weight: 400; /* Apply 400 weight to p */
+  }
 }
