@@ -1,7 +1,7 @@
 import jwt
 from datetime import datetime, timedelta
 from flask import request, current_app
-from backend.models import User
+from backend.models import User, db
 
 
 def generate_jwt_payload(user):
@@ -39,7 +39,7 @@ def get_current_user():
     if not user_id:
         raise JWTError("Invalid token payload: missing user_id")
 
-    user = User.query.get(user_id)
+    user = db.session.get(User, user_id)
     if not user:
         raise JWTError("User not found")
     return user

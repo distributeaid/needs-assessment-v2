@@ -1,10 +1,8 @@
 import pytest
-from datetime import datetime
-from flask_migrate import Migrate
-
 from backend.app import app
-from backend.models import db, User, Site, Assessment
+from backend.models import db, User
 from backend.seed import seed_database
+from backend.utils.jwt_utils import generate_jwt_payload
 
 @pytest.fixture
 def client():
@@ -13,10 +11,18 @@ def client():
 
     with app.test_client() as client:
         with app.app_context():
-            Migrate(app, db)
             db.create_all()
             seed_database()
-
         yield client
         with app.app_context():
-            db.drop_all()  # Cleanup after tests
+            db.drop_all()
+
+@pytest.fixture
+def auth_header():
+    """Fixture to generate an Authorization header with a valid JWT token."""
+    with app.app_context():
+        user = User.query.first()
+        if not user:
+            pytest.skip("No user exists for testing JWT")
+        token = generate_jwt_payload(user)
+        return {"Authorization": f"Bearer {token}"}

@@ -22,18 +22,19 @@ def setup_site_assessment(client):
         return db.session.get(SiteAssessment, site_assessment.id)
 
 
-def test_get_site_assessment(client, setup_site_assessment):
+def test_get_site_assessment(client, setup_site_assessment, auth_header):
     """Test fetching a SiteAssessment and its associated SitePages."""
-    response = client.get(f"/api/site-assessment?email=user1@example.com")
+    response = client.get("/api/site-assessment", headers=auth_header)
     assert response.status_code == 200
     data = response.json
 
-    assert "assessment_id" in data
-    assert "pages" in data
-    assert len(data["pages"]) > 0, "SiteAssessment should contain pages"
+    assert "assessment" in data
+    assert "id" in data["assessment"]
+    assert "sitePages" in data
+    assert len(data["sitePages"]) > 0, "SiteAssessment should contain pages"
 
     # Verify required pages are Unstarted, others are Locked
-    for page in data["pages"]:
+    for page in data["sitePages"]:
         if page["required"]:
             assert page["progress"] == "UNSTARTED"
         else:
@@ -41,18 +42,19 @@ def test_get_site_assessment(client, setup_site_assessment):
 
 
 def test_save_site_page(client, setup_site_assessment):
-    """Test saving a SitePage (sets progress to In Progress)."""
+    """Test saving a SitePage (sets progress to STARTEDREQUIRED)."""
     with app.app_context():
         site_page = SitePage.query.filter_by(site_assessment_id=setup_site_assessment.id).first()
         assert site_page is not None, "SitePage should exist"
 
-        response = client.post(f"/api/site-page/{site_page.id}/save", json={"responses": []})
+        response = client.post(f"/api/site-assessment/{site_page.site_assessment_id}/site-page/{site_page.id}/save",
+                                    json={"responses": []})
         assert response.status_code == 200
         assert response.json["message"] == "SitePage saved successfully"
 
-        # Verify the SitePage progress is now "In Progress"
+        # Verify the SitePage progress is now "STARTEDREQUIRED"
         updated_page = db.session.get(SitePage, site_page.id)
-        assert updated_page.progress == "In Progress"
+        assert updated_page.progress == "STARTEDREQUIRED"
 
 
 
@@ -62,7 +64,9 @@ def test_complete_site_page(client, setup_site_assessment):
         # Complete all required pages
         required_pages = SitePage.query.filter_by(site_assessment_id=setup_site_assessment.id, required=True).all()
         for page in required_pages:
-            response = client.post(f"/api/site-page/{page.id}/complete", json={"responses": []})
+            response = client.post(f"/api/site-assessment/{page.site_assessment_id}/site-page/{page.id}/save",
+                                    json={"responses": [],
+                                    "confirmed": True})
             assert response.status_code == 200
             assert response.json["message"] == "SitePage completed successfully"
 

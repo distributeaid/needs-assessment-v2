@@ -3,7 +3,7 @@ from datetime import datetime, timedelta
 from flask import Blueprint, request, jsonify
 from sqlalchemy.orm import joinedload
 
-from backend.models import db, User, SiteAssessment, Page, SitePage, QuestionResponse
+from backend.models import db, User, SiteAssessment, Page, SitePage, QuestionResponse, Site
 from backend.consts import STANDARD_ITEMS
 from backend.validation import validate_responses
 from backend.utils.utils import ensure_assessment_exists, unlock_remaining_pages
@@ -20,12 +20,13 @@ def status():
 @api_bp.route("/api/login", methods=["POST"])
 def login():
     data = request.get_json()
-
     email = data.get("email")
     user = User.query.filter_by(email=email).first()
     if not user:
         return jsonify({"error": "User not found"}), 404
-
+    # create assessment on user creation
+    ensure_assessment_exists(user.site_id)
+    # get the users site and print any site assessments
     # TODO: Verify the password here
 
     token = generate_jwt_payload(user)
@@ -119,7 +120,8 @@ def save_site_page(assessment_id, site_page_id):
         site_page.progress = "COMPLETE"
         unlock_remaining_pages(assessment_id)
     else:
-        site_page.progress = "IN_PROGRESS"
+        # todo update for optional
+        site_page.progress = "STARTEDREQUIRED"
 
     # Process each response
     responses_data = data.get("responses", [])
@@ -146,9 +148,9 @@ def save_site_page(assessment_id, site_page_id):
 
     db.session.commit()
     if data.get("confirmed"):
-        return jsonify({"message": "SitePage saved successfully"})
+        return jsonify({"message": "SitePage completed successfully"})
     else:
-        return jsonify({"message": "SitePage saved successfully, but not confirmed"})
+        return jsonify({"message": "SitePage saved successfully"})
 
 
 
