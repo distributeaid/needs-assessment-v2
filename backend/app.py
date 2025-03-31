@@ -6,6 +6,11 @@ from backend.models import db
 from backend.routes import api_bp
 from backend.seed import seed_database
 
+import logging
+logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger(__name__)
+
+
 app = Flask(__name__)
 
 # Configure Database
@@ -14,6 +19,7 @@ app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 app.config["JWT_SECRET"] = "your-very-secret-key"
 app.config["JWT_ALGORITHM"] = "HS256"
 app.config["JWT_EXP_DELTA_SECONDS"] = 3600  # 1 hour
+app.config["DEBUG"] = True
 
 # Initialize Database with Flask app
 db.init_app(app)

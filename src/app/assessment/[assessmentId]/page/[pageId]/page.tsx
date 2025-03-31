@@ -2,53 +2,86 @@
 
 import { useEffect, useState, useMemo, useCallback } from "react";
 import { useRouter, useParams } from "next/navigation";
-import { useSession } from "next-auth/react";
+import { useSession, signOut } from "next-auth/react";
 import Sidebar from "@/components/Sidebar";
 import AssessmentForm from "@/components/AssessmentForm";
-import { Question, SidebarProps, ProgressStatus } from "@/types/models";
 import LoadingSpinner from "@/components/LoadingSpinner";
-import { signOut } from "next-auth/react";
+import { Question, SidebarProps, ProgressStatus } from "@/types/models";
 
 export default function AssessmentPage() {
   const API_URL = process.env.NEXT_PUBLIC_API_URL || "";
   const { data: session, status } = useSession();
+  const router = useRouter();
   const params = useParams();
-  const assessmentId = useMemo(() => {
-    if (!params.assessmentId) return "";
-    return Array.isArray(params.assessmentId)
-      ? params.assessmentId[0]
-      : params.assessmentId;
-  }, [params.assessmentId]);
+
+  // We only need the pageId from the URL now.
   const pageId = useMemo(() => {
     if (!params.pageId) return "";
     return Array.isArray(params.pageId) ? params.pageId[0] : params.pageId;
   }, [params.pageId]);
-  const router = useRouter();
 
+  // State to hold the siteAssessment instance returned from the backend.
+  const [siteAssessment, setSiteAssessment] = useState<{ id: number } | null>(null);
   const [page, setPage] = useState<{ title: string; questions: Question[] } | null>(null);
   const [responses, setResponses] = useState<{ [key: number]: string }>({});
   const [assessmentPages, setAssessmentPages] = useState<SidebarProps["sitePages"]>([]);
   const [error, setError] = useState<string | null>(null);
 
-  // Fetch the specific page (with questions & responses)
+  // Redirect if there's no valid session.
   useEffect(() => {
-    if (status === "loading") return; // Wait until session is loaded
+    if (status === "loading") return;
+    if (!session?.user?.accessToken) {
+      router.push("/about");
+    }
+  }, [session, status, router]);
 
+  // Fetch overall site assessment data (includes siteAssessmentId and sitePages).
+  useEffect(() => {
+    if (status === "loading") return;
     if (!session) {
       router.push("/about");
       return;
     }
+    fetch(`${API_URL}/api/site-assessment`, {
+      headers: {
+        "Authorization": `Bearer ${session.user.accessToken}`,
+      },
+    })
+      .then((res) => {
+        if (res.status === 401) {
+          signOut();
+          router.push("/login");
+          throw new Error("Token has expired");
+        }
+        if (!res.ok) throw new Error(`API Error: ${res.status}`);
+        return res.json();
+      })
+      .then((data) => {
+        // Save the siteAssessment instance.
+        setSiteAssessment({ id: data.siteAssessmentId });
+        // Map sitePages to our UI format.
+        const pagesWithProgress = data.sitePages.map(
+          (page: { id: number; page: { title: string }; progress: ProgressStatus }) => ({
+            id: page.id,
+            title: page.page.title,
+            progress: page.progress,
+          })
+        );
+        setAssessmentPages(pagesWithProgress);
+      })
+      .catch((err) => console.error("Assessment fetch error:", err));
+  }, [session, status, API_URL, router]);
 
-    if (!assessmentId || !pageId) return;
+  // Fetch details for the specific page (its questions and any existing responses)
+  useEffect(() => {
+    if (status === "loading") return;
+    if (!session?.user?.accessToken) return;
+    if (!siteAssessment || !pageId) return;
 
     const fetchPage = async () => {
-      if (!session) {
-        router.push("/about");
-        return;
-      }
       try {
         const res = await fetch(
-          `${API_URL}/api/site-assessment/${assessmentId}/page/${pageId}`,
+          `${API_URL}/api/site-assessment/${siteAssessment.id}/site-page/${pageId}`,
           {
             headers: {
               "Authorization": `Bearer ${session.user.accessToken}`,
@@ -84,40 +117,7 @@ export default function AssessmentPage() {
       }
     };
     fetchPage();
-  }, [assessmentId, pageId, session, status, router, API_URL]);
-
-  // Fetch overall site assessment and site pages using the JWT instead of email
-  useEffect(() => {
-    if (!assessmentId || status === "loading") return;
-    if (!session) {router.push("/about"); return;}
-    fetch(`${API_URL}/api/site-assessment`, {
-      headers: {
-        "Authorization": `Bearer ${session.user.accessToken}`,
-      },
-    })
-      .then((res) => {
-        if (res.status === 401) {
-            // Token has expired – sign out and redirect to login
-            signOut();
-            router.push("/login");
-            throw new Error("Token has expired");
-         }
-          if (!res.ok) throw new Error(`API Error: ${res.status}`);
-          return res.json();
-      })
-      .then((data) => {
-        // Map sitePages from the response (adjust keys as needed)
-        const pagesWithProgress = data.sitePages.map(
-          (page: { id: number; page: { title: string }; progress: ProgressStatus }) => ({
-            id: page.id,
-            title: page.page.title,
-            progress: page.progress,
-          })
-        );
-        setAssessmentPages(pagesWithProgress);
-      })
-      .catch((err) => console.error("Assessment fetch error:", err));
-  }, [assessmentId, session, status, API_URL, router]);
+  }, [siteAssessment, pageId, session, status, API_URL, router]);
 
   const handleInputChange = useCallback(
     (questionId: number, value: string) => {
@@ -134,12 +134,12 @@ export default function AssessmentPage() {
       })),
       confirmed: confirm,
     };
-    if (!session) {
+    if (!session || !siteAssessment) {
       router.push("/about");
       return;
     }
     const res = await fetch(
-      `${API_URL}/api/site-assessment/${assessmentId}/site-page/${pageId}/save`,
+      `${API_URL}/api/site-assessment/${siteAssessment.id}/site-page/${pageId}/save`,
       {
         method: "POST",
         headers: {
@@ -149,18 +149,17 @@ export default function AssessmentPage() {
         body: JSON.stringify(payload),
       }
     );
-
     if (!res.ok) {
       const errorData = await res.json();
       console.error("Error Response:", errorData);
       setError(errorData.error || "Failed to save responses.");
     } else {
       const currentIndex = assessmentPages.findIndex(
-        (page) => page.id === Number(pageId)
+        (p) => p.id === Number(pageId)
       );
       if (currentIndex !== -1 && currentIndex < assessmentPages.length - 1) {
         const nextPageId = assessmentPages[currentIndex + 1].id;
-        router.push(`/assessment/${assessmentId}/page/${nextPageId}`);
+        router.push(`/assessment/${siteAssessment.id}/page/${nextPageId}`);
       } else {
         router.push("/dashboard");
       }
@@ -168,17 +167,15 @@ export default function AssessmentPage() {
   };
 
   if (error) return <div>Error: {error}</div>;
-  if (!page) return <LoadingSpinner />;
+  if (!page || !siteAssessment) return <LoadingSpinner />;
 
   return (
     <div className="flex">
-      {assessmentId && pageId && (
-        <Sidebar
-          assessmentId={assessmentId as string}
-          sitePages={assessmentPages}
-          currentPageId={pageId as string}
-        />
-      )}
+      <Sidebar
+        siteAssessmentId={siteAssessment.id.toString()}
+        sitePages={assessmentPages}
+        currentPageId={pageId}
+      />
       <AssessmentForm
         title={page.title}
         questions={page.questions}

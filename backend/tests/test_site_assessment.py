@@ -28,8 +28,7 @@ def test_get_site_assessment(client, setup_site_assessment, auth_header):
     assert response.status_code == 200
     data = response.json
 
-    assert "assessment" in data
-    assert "id" in data["assessment"]
+    assert "siteAssessmentId" in data
     assert "sitePages" in data
     assert len(data["sitePages"]) > 0, "SiteAssessment should contain pages"
 

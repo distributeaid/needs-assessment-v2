@@ -7,7 +7,7 @@ import { Box, Flex, Heading } from "@radix-ui/themes";
 import SidebarIcon from "./SidebarIcon";
 
 const Sidebar: React.FC<SidebarProps> = ({
-  assessmentId,
+  siteAssessmentId,
   sitePages,
   currentPageId,
 }) => {
@@ -50,9 +50,9 @@ const Sidebar: React.FC<SidebarProps> = ({
                 </Box>
               ) : (
                 <Link
-                  href={`/site-assessment/${assessmentId}/site-page/${page.id}`}
+                  href={`/assessment/${siteAssessmentId}/page/${page.id}`}
                   className=" flex flex-col text-center text-sm uppercase items-center w-full"
-                >
+                  >
                   {page.title}
                   <SidebarIcon progress={page.progress} />
                 </Link>

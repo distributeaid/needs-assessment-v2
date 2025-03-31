@@ -51,7 +51,7 @@ export default function Dashboard() {
             <button
               className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
               onClick={() =>
-                router.push(`/assessment/${siteAssessment.assessment.id}/page/${page.id}`)
+                router.push(`/assessment/${siteAssessment.siteAssessmentId}/page/${page.id}`)
               }
             >
               View

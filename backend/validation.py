@@ -15,11 +15,13 @@ def validate_responses(responses, require_all=False):
         if not response.get("value"):
             continue
 
-        # Numeric validation
-        if question.type == "Numeric" and response['value'].isnumeric():
-            response["value"] = float(response["value"])
-        if question.type == "Numeric" and not isinstance(response.get("value"), (int, float)):
-            errors.append(f"Invalid numeric response for question: {question.text}: {response['value']}")
+        # Numeric validationx
+        if question.type == "Numeric":
+            try:
+                response["value"] = float(response["value"])
+            except ValueError:
+                errors.append(f"Invalid numeric response for question: {question.text}: {response['value']}")
+
 
         # MultiSelect validation
         if question.type in ["MultiSelect", "MultiselectWithOther"]:

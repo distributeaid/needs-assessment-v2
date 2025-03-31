@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+import logging
 
 from flask import Blueprint, request, jsonify
 from sqlalchemy.orm import joinedload
@@ -74,22 +74,24 @@ def get_site_assessment():
     try:
         user = get_current_user()
     except JWTError as e:
-        print(f"JWT Error: {e}")
+        logging.error(f"JWT Error: {e}")
         return jsonify({"error": str(e)}), 401
 
+    # Look up or create a SiteAssessment instance for the user's site.
     site_assessment = SiteAssessment.query.filter_by(site_id=user.site_id).first()
     if not site_assessment:
         ensure_assessment_exists(user.site_id)
         site_assessment = SiteAssessment.query.filter_by(site_id=user.site_id).first()
 
+    # Get the SitePages associated with this site assessment.
     site_pages = SitePage.query.filter_by(site_assessment_id=site_assessment.id).all()
     response = {
-        "assessment": {'id': site_assessment.id},
-        "site_id": site_assessment.site_id,
+        "siteAssessmentId": site_assessment.id,
+        "siteId": site_assessment.site_id,
         "sitePages": [
             {
                 "id": sp.page_id,
-                "page": {'title': db.session.get(Page, sp.page_id).title},
+                "page": {"title": db.session.get(Page, sp.page_id).title},
                 "required": sp.required,
                 "progress": sp.progress,
             }
@@ -99,26 +101,27 @@ def get_site_assessment():
     return jsonify(response)
 
 
-@api_bp.route("/api/site-assessment/<int:assessment_id>/site-page/<int:site_page_id>/save", methods=["POST"])
-def save_site_page(assessment_id, site_page_id):
+
+@api_bp.route("/api/site-assessment/<int:site_assessment_id>/site-page/<int:site_page_id>/save", methods=["POST"])
+def save_site_page(site_assessment_id, site_page_id):
     """Save a SitePage with validation, but do not require mandatory questions."""
-    print(request.get_json())
+    logging.info(f"Saving SitePage {site_page_id} for assessment {site_assessment_id}")
     data = request.get_json()
     site_page = db.session.get(SitePage, site_page_id)
     if not site_page:
+        logging.error(f"SitePage {site_page_id} not found")
         return jsonify({"error": "SitePage not found"}), 404
-    print(f"Saving SitePage {site_page_id} for assessment {assessment_id}")
 
     # Validate data (ensure proper types)
     validation_errors = validate_responses(data.get("responses", []))
     if validation_errors:
-        print(f"Validation errors: {validation_errors}")
+        logging.error(f"Validation errors: {validation_errors}")
         return jsonify({"errors": validation_errors}), 400
 
     # Update progress based on confirmation flag
     if data.get("confirmed"):
         site_page.progress = "COMPLETE"
-        unlock_remaining_pages(assessment_id)
+        unlock_remaining_pages(site_assessment_id)
     else:
         # todo update for optional
         site_page.progress = "STARTEDREQUIRED"
@@ -144,7 +147,7 @@ def save_site_page(assessment_id, site_page_id):
                 value=answer
             )
             db.session.add(new_response)
-        print(f"Processed response for question {question_id}: {answer}")
+        logging.info(f"Response saved: {question_id} -> {answer}")
 
     db.session.commit()
     if data.get("confirmed"):
@@ -154,23 +157,23 @@ def save_site_page(assessment_id, site_page_id):
 
 
 
-@api_bp.route("/api/site-assessment/<int:assessment_id>/page/<int:page_id>", methods=["GET"])
-def get_assessment_page(assessment_id, page_id):
+@api_bp.route("/api/site-assessment/<int:site_assessment_id>/site-page/<int:site_page_id>", methods=["GET"])
+def get_assessment_page(site_assessment_id, site_page_id):
     try:
         user = get_current_user()
     except JWTError as e:
-        print(f"JWT Error: {e}")
+        logging.error(f"JWT Error: {e}")
         return jsonify({"error": str(e)}), 401
 
     # Look up the page with its questions
-    page = Page.query.options(joinedload(Page.questions)).filter_by(id=page_id).first()
+    page = Page.query.options(joinedload(Page.questions)).filter_by(id=site_page_id).first()
     if not page:
         return jsonify({"error": "Page not found"}), 404
 
     # Look up the SitePage for this page, given the assessment and the user's site.
     site_page = SitePage.query.join(SiteAssessment).filter(
-        SitePage.page_id == page_id,
-        SiteAssessment.assessment_id == assessment_id,
+        SitePage.page_id == site_page_id,
+        SiteAssessment.id == site_assessment_id,
         SiteAssessment.site_id == user.site_id
     ).first()
 
