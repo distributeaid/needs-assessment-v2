@@ -128,8 +128,6 @@ export default function AssessmentPage() {
 
   const handleSubmit = async (confirm = false) => {
     const payload = {
-      assessmentId,
-      pageId,
       responses: Object.entries(responses).map(([questionId, value]) => ({
         questionId: parseInt(questionId),
         value,
@@ -141,7 +139,7 @@ export default function AssessmentPage() {
       return;
     }
     const res = await fetch(
-      `${API_URL}/api/site-assessment/site-page/save`,
+      `${API_URL}/api/site-assessment/${assessmentId}/site-page/${pageId}/save`,
       {
         method: "POST",
         headers: {

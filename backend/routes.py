@@ -3,7 +3,7 @@ from datetime import datetime, timedelta
 from flask import Blueprint, request, jsonify
 from sqlalchemy.orm import joinedload
 
-from backend.models import db, User, SiteAssessment, Page, SitePage
+from backend.models import db, User, SiteAssessment, Page, SitePage, QuestionResponse
 from backend.consts import STANDARD_ITEMS
 from backend.validation import validate_responses
 from backend.utils.utils import ensure_assessment_exists, unlock_remaining_pages
@@ -98,41 +98,51 @@ def get_site_assessment():
     return jsonify(response)
 
 
-@api_bp.route("/api/site-assessment/site-page/save", methods=["POST"])
-def save_site_page():
+@api_bp.route("/api/site-assessment/<int:assessment_id>/site-page/<int:site_page_id>/save", methods=["POST"])
+def save_site_page(assessment_id, site_page_id):
     """Save a SitePage with validation, but do not require mandatory questions."""
+    print(request.get_json())
     data = request.get_json()
-    site_assessment_id = data.get("assessmentId")
-    site_page_id = data.get("pageId")
-
     site_page = db.session.get(SitePage, site_page_id)
-
     if not site_page:
         return jsonify({"error": "SitePage not found"}), 404
-
-    print(data)
+    print(f"Saving SitePage {site_page_id} for assessment {assessment_id}")
 
     # Validate data (ensure proper types)
-    validation_errors = validate_responses(data["responses"])
+    validation_errors = validate_responses(data.get("responses", []))
     if validation_errors:
         print(f"Validation errors: {validation_errors}")
         return jsonify({"errors": validation_errors}), 400
 
+    # Update progress based on confirmation flag
     if data.get("confirmed"):
         site_page.progress = "COMPLETE"
-        unlock_remaining_pages(site_assessment_id)
+        unlock_remaining_pages(assessment_id)
     else:
         site_page.progress = "IN_PROGRESS"
-    # save the responses
-    site_page.responses = []
-    for response in data["responses"]:
-        question_id = response.get("question_id")
-        answer = response.get("answer")
-        if question_id and answer:
-            site_page.responses.append({
-                "question_id": question_id,
-                "answer": answer
-            })
+
+    # Process each response
+    responses_data = data.get("responses", [])
+    for response in responses_data:
+        question_id = response.get("questionId")
+        answer = response.get("value")
+        if not question_id:
+            continue  # Skip if questionId is missing
+        # Look for an existing response for this question on this site_page
+        question_response = QuestionResponse.query.filter_by(
+            site_page_id=site_page.id,
+            question_id=question_id
+        ).first()
+        if question_response:
+            question_response.value = answer
+        else:
+            new_response = QuestionResponse(
+                site_page_id=site_page.id,
+                question_id=question_id,
+                value=answer
+            )
+            db.session.add(new_response)
+        print(f"Processed response for question {question_id}: {answer}")
 
     db.session.commit()
     if data.get("confirmed"):
