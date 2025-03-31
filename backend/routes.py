@@ -98,54 +98,48 @@ def get_site_assessment():
     return jsonify(response)
 
 
-@api_bp.route("/api/site-assessment/<int:site_assessment_id>/site-page/<int:site_page_id>/save", methods=["POST"])
-def save_site_page(site_page_id):
+@api_bp.route("/api/site-assessment/site-page/save", methods=["POST"])
+def save_site_page():
     """Save a SitePage with validation, but do not require mandatory questions."""
     data = request.get_json()
+    site_assessment_id = data.get("assessmentId")
+    site_page_id = data.get("pageId")
+
     site_page = db.session.get(SitePage, site_page_id)
-    site_assessment_id = data.get("site_assessment_id")
 
     if not site_page:
         return jsonify({"error": "SitePage not found"}), 404
 
+    print(data)
+
     # Validate data (ensure proper types)
     validation_errors = validate_responses(data["responses"])
     if validation_errors:
+        print(f"Validation errors: {validation_errors}")
         return jsonify({"errors": validation_errors}), 400
-
 
     if data.get("confirmed"):
         site_page.progress = "COMPLETE"
         unlock_remaining_pages(site_assessment_id)
     else:
         site_page.progress = "IN_PROGRESS"
+    # save the responses
+    site_page.responses = []
+    for response in data["responses"]:
+        question_id = response.get("question_id")
+        answer = response.get("answer")
+        if question_id and answer:
+            site_page.responses.append({
+                "question_id": question_id,
+                "answer": answer
+            })
+
     db.session.commit()
+    if data.get("confirmed"):
+        return jsonify({"message": "SitePage saved successfully"})
+    else:
+        return jsonify({"message": "SitePage saved successfully, but not confirmed"})
 
-    return jsonify({"message": "SitePage saved successfully"})
-
-
-@api_bp.route("/api/site-page/<int:site_page_id>/complete", methods=["POST"])
-def complete_site_page(site_page_id):
-    """Complete a SitePage, ensuring all mandatory questions are answered."""
-    data = request.get_json()
-    site_page = db.session.get(SitePage, site_page_id)
-
-    if not site_page:
-        return jsonify({"error": "SitePage not found"}), 404
-
-    # Validate data (ensure required questions are answered)
-    validation_errors = validate_responses(data["responses"], require_all=True)
-    if validation_errors:
-        return jsonify({"errors": validation_errors}), 400
-
-    # Mark as "Complete"
-    site_page.progress = "COMPLETE"
-    db.session.commit()
-
-    # Check if all Required SitePages are completed, unlock remaining pages
-    unlock_remaining_pages(site_page.site_assessment_id)
-
-    return jsonify({"message": "SitePage completed successfully"})
 
 
 @api_bp.route("/api/site-assessment/<int:assessment_id>/page/<int:page_id>", methods=["GET"])

@@ -141,7 +141,7 @@ export default function AssessmentPage() {
       return;
     }
     const res = await fetch(
-      `${API_URL}/api/site-assessment/${assessmentId}/site-page/${pageId}/save`,
+      `${API_URL}/api/site-assessment/site-page/save`,
       {
         method: "POST",
         headers: {
