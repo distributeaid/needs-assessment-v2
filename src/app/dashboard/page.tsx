@@ -1,15 +1,18 @@
+// app/dashboard/page.tsx or wherever your Dashboard is
 "use client";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import LoadingSpinner from "@/components/LoadingSpinner";
+import SitePageCard from "@/components/SitePageCard";
 import { SiteAssessment } from "@/types/models";
+
 import {
   Text,
-  Box,
   Container,
   Separator,
   Flex,
+  Box,
 } from "@radix-ui/themes";
 
 export default function Dashboard() {
@@ -17,6 +20,7 @@ export default function Dashboard() {
   const router = useRouter();
   const [siteAssessment, setSiteAssessment] = useState<SiteAssessment | null>(null);
   const [error, setError] = useState<string | null>(null);
+
   useEffect(() => {
     if (status === "loading") return;
     if (!session || !session.user.accessToken) {
@@ -26,7 +30,7 @@ export default function Dashboard() {
 
     fetch(`/flask-api/api/site-assessment`, {
       headers: {
-        "Authorization": `Bearer ${session.user.accessToken}`,
+        Authorization: `Bearer ${session.user.accessToken}`,
       },
     })
       .then((res) => {
@@ -43,45 +47,61 @@ export default function Dashboard() {
   if (status === "loading" || !siteAssessment) return <LoadingSpinner />;
   if (error) return <div>Error: {error}</div>;
 
-  return (
-    <Container className="w-full h-screen bg-gray-100 p-8">
-      <Flex direction="column" align="center" justify="center" gap="4">
-        <Box className="w-full flex justify-center items-center">
-          <h1 className="text-4xl text-[var(--primary)] ">DASHBOARD</h1>
-          <Separator className="border-t-2 border-black m-10" />
-          <Text as="p" className="text-xl font-bold text-blue-900 mt-20">
-            Select a category to begin your assessment.
-          </Text>
-          <Flex
-            direction={{ initial: "column", md: "row" }}
-            className="gap-6 mt-6 flex justify-center items-center"
-            justify="center"
-          >
-            {siteAssessment.sitePages.map((page) => (
-              <Box
-                key={page.id}
-                className="flex justify-center items-center bg-[var(--secondary)] border rounded-lg shadow-sm justify-centertext-center"
-                width="350px"
-                height="200px"
-              >
-                <h1 className="text-4xl font-bold text-blue-900 p-6">
-                  {page.page.title}
-                </h1>
+  const unlockedPages = siteAssessment.sitePages.filter(
+    (page) => page.progress !== "LOCKED"
+  );
+  const lockedPages = siteAssessment.sitePages.filter(
+    (page) => page.progress === "LOCKED"
+  );
 
-                <button
-                  className="text-white text-lg bg-[var(--primary)] rounded-md hover:bg-green-300 px-5 py-4 my-4"
-                  onClick={() =>
-                    router.push(
-                      `/assessment/${page.siteAssessmentId}/page/${page.id}`
-                    )
-                  }
-                >
-                  View
-                </button>
-              </Box>
-            ))}
-          </Flex>
-        </Box>
+  return (
+
+    <Container className="w-full h-screen bg-gray-100 p-8">
+
+      <Text as="p" className="text-xl font-bold text-blue-900 mt-20">
+        Select a category to begin your assessment.
+      </Text>
+
+      {/* Unlocked Cards */}
+      <Flex
+        direction={{ initial: "column", md: "row" }}
+        className="gap-6 mt-6 flex justify-center items-center"
+        justify="center"
+        wrap="wrap"
+      >
+        {unlockedPages.map((page) => (
+          <SitePageCard
+            key={page.id}
+            pageId={page.id}
+            siteAssessmentId={page.siteAssessmentId}
+            title={page.page.title}
+            progress={page.progress}
+          />
+        ))}
+      </Flex>
+
+      <Box className="flex justify-center w-full my-10">
+        <Separator className="border-t-2 border-gray-500 w-full max-w-3xl" />
+      </Box>
+      {/* Locked Cards */}
+      <Text as="p" className="text-lg font-semibold text-gray-600 text-center mb-4">
+        Locked categories (complete required sections to unlock)
+      </Text>
+      <Flex
+        direction={{ initial: "column", md: "row" }}
+        className="gap-6 mt-2 flex justify-center items-center"
+        justify="center"
+        wrap="wrap"
+      >
+        {lockedPages.map((page) => (
+          <SitePageCard
+            key={page.id}
+            pageId={page.id}
+            siteAssessmentId={page.siteAssessmentId}
+            title={page.page.title}
+            progress={page.progress}
+          />
+        ))}
       </Flex>
     </Container>
   );
