@@ -51,7 +51,7 @@ export default function Dashboard() {
   return (
     <div className="flex h-screen">
       <Sidebar
-        siteAssessmentId={siteAssessment.id.toString()}
+        siteAssessmentId={siteAssessment.siteAssessmentId.toString()}
         sitePages={siteAssessment.sitePages.map((page) => ({
           id: page.id,
           title: page.page.title,
