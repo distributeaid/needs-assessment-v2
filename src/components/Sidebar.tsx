@@ -30,7 +30,7 @@ const Sidebar: React.FC<SidebarProps> = ({
           <li
             key={page.id}
             className={`p-2 rounded-lg cursor-pointer text-[#082B76] transition-colors ${
-              currentPageId === String(page.id)
+              currentPageId && currentPageId === String(page.id)
                 ? "bg-blue-600 font-semibold text-white"
                 : ""
             }`}
@@ -59,7 +59,6 @@ const Sidebar: React.FC<SidebarProps> = ({
                 </Link>
               )
             }
-
             {/* {getStatusIcon(page.progress)} */}
           </li>
         ))}

@@ -75,7 +75,7 @@ export interface Site {
 export interface SidebarProps {
   siteAssessmentId: string;
   sitePages: { id: number; title: string; progress: ProgressStatus }[];
-  currentPageId: string;
+  currentPageId?: string;
 }
 
 export interface User {
