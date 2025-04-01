@@ -20,10 +20,17 @@ export default function AssessmentPage() {
   }, [params.pageId]);
 
   // State to hold the siteAssessment instance returned from the backend.
-  const [siteAssessment, setSiteAssessment] = useState<{ id: number } | null>(null);
-  const [page, setPage] = useState<{ title: string; questions: Question[] } | null>(null);
+  const [siteAssessment, setSiteAssessment] = useState<{ id: number } | null>(
+    null,
+  );
+  const [page, setPage] = useState<{
+    title: string;
+    questions: Question[];
+  } | null>(null);
   const [responses, setResponses] = useState<{ [key: number]: string }>({});
-  const [assessmentPages, setAssessmentPages] = useState<SidebarProps["sitePages"]>([]);
+  const [assessmentPages, setAssessmentPages] = useState<
+    SidebarProps["sitePages"]
+  >([]);
   const [error, setError] = useState<string | null>(null);
 
   // Redirect if there's no valid session.
@@ -43,7 +50,7 @@ export default function AssessmentPage() {
     }
     fetch(`/flask-api/api/site-assessment`, {
       headers: {
-        "Authorization": `Bearer ${session.user.accessToken}`,
+        Authorization: `Bearer ${session.user.accessToken}`,
       },
     })
       .then((res) => {
@@ -60,11 +67,15 @@ export default function AssessmentPage() {
         setSiteAssessment({ id: data.siteAssessmentId });
         // Map sitePages to our UI format.
         const pagesWithProgress = data.sitePages.map(
-          (page: { id: number; page: { title: string }; progress: ProgressStatus }) => ({
+          (page: {
+            id: number;
+            page: { title: string };
+            progress: ProgressStatus;
+          }) => ({
             id: page.id,
             title: page.page.title,
             progress: page.progress,
-          })
+          }),
         );
         setAssessmentPages(pagesWithProgress);
       })
@@ -83,9 +94,9 @@ export default function AssessmentPage() {
           `/flask-api/api/site-assessment/${siteAssessment.id}/site-page/${pageId}`,
           {
             headers: {
-              "Authorization": `Bearer ${session.user.accessToken}`,
+              Authorization: `Bearer ${session.user.accessToken}`,
             },
-          }
+          },
         );
         if (!res.ok) throw new Error(`API Error: ${res.status}`);
         const data = await res.json();
@@ -94,7 +105,7 @@ export default function AssessmentPage() {
           (acc: { [key: number]: string }, question: Question) => {
             const existing = data.responses?.find(
               (resp: { questionId: number; value: string }) =>
-                resp.questionId === question.id
+                resp.questionId === question.id,
             );
             acc[question.id] =
               existing && existing.value !== ""
@@ -102,7 +113,7 @@ export default function AssessmentPage() {
                 : question.defaultValue || "";
             return acc;
           },
-          {}
+          {},
         );
         setResponses(initialResponses);
       } catch (err: unknown) {
@@ -118,12 +129,9 @@ export default function AssessmentPage() {
     fetchPage();
   }, [siteAssessment, pageId, session, status, router]);
 
-  const handleInputChange = useCallback(
-    (questionId: number, value: string) => {
-      setResponses((prev) => ({ ...prev, [questionId]: value }));
-    },
-    []
-  );
+  const handleInputChange = useCallback((questionId: number, value: string) => {
+    setResponses((prev) => ({ ...prev, [questionId]: value }));
+  }, []);
 
   const handleSubmit = async (confirm = false) => {
     const payload = {
@@ -143,10 +151,10 @@ export default function AssessmentPage() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${session.user.accessToken}`,
+          Authorization: `Bearer ${session.user.accessToken}`,
         },
         body: JSON.stringify(payload),
-      }
+      },
     );
     if (!res.ok) {
       const errorData = await res.json();
@@ -154,7 +162,7 @@ export default function AssessmentPage() {
       setError(errorData.error || "Failed to save responses.");
     } else {
       const currentIndex = assessmentPages.findIndex(
-        (p) => p.id === Number(pageId)
+        (p) => p.id === Number(pageId),
       );
       if (currentIndex !== -1 && currentIndex < assessmentPages.length - 1) {
         const nextPageId = assessmentPages[currentIndex + 1].id;

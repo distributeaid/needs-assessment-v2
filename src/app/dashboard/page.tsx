@@ -7,18 +7,14 @@ import LoadingSpinner from "@/components/LoadingSpinner";
 import SitePageCard from "@/components/SitePageCard";
 import { SiteAssessment } from "@/types/models";
 
-import {
-  Text,
-  Container,
-  Separator,
-  Flex,
-  Box,
-} from "@radix-ui/themes";
+import { Text, Container, Separator, Flex, Box } from "@radix-ui/themes";
 
 export default function Dashboard() {
   const { data: session, status } = useSession();
   const router = useRouter();
-  const [siteAssessment, setSiteAssessment] = useState<SiteAssessment | null>(null);
+  const [siteAssessment, setSiteAssessment] = useState<SiteAssessment | null>(
+    null,
+  );
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -48,16 +44,14 @@ export default function Dashboard() {
   if (error) return <div>Error: {error}</div>;
 
   const unlockedPages = siteAssessment.sitePages.filter(
-    (page) => page.progress !== "LOCKED"
+    (page) => page.progress !== "LOCKED",
   );
   const lockedPages = siteAssessment.sitePages.filter(
-    (page) => page.progress === "LOCKED"
+    (page) => page.progress === "LOCKED",
   );
 
   return (
-
     <Container className="w-full h-screen bg-gray-100 p-8">
-
       <Text as="p" className="text-xl font-bold text-blue-900 mt-20">
         Select a category to begin your assessment.
       </Text>
@@ -84,7 +78,10 @@ export default function Dashboard() {
         <Separator className="border-t-2 border-gray-500 w-full max-w-3xl" />
       </Box>
       {/* Locked Cards */}
-      <Text as="p" className="text-lg font-semibold text-gray-600 text-center mb-4">
+      <Text
+        as="p"
+        className="text-lg font-semibold text-gray-600 text-center mb-4"
+      >
         Locked categories (complete required sections to unlock)
       </Text>
       <Flex

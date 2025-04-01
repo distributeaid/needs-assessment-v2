@@ -1,22 +1,18 @@
-
-
 tasks:
-
   - before: if [ ! -f .env ]; then cp .env.example .env; fi
 
   - name: bash
     command: bash
 
   - name: flask
-    init: pip install -r backend/requirements.txt 
+    init: pip install -r backend/requirements.txt
     command: flask run --debug
 
   - name: nextjs
-    init: npm install 
-    command: npm run dev
+    init: yarn install
+    command: yarn run dev
 
 ports:
-
   - port: 3000
     name: nextjs
     onOpen: open-preview

@@ -36,7 +36,7 @@ cd needs-assessment
 Make sure you have **Node.js** installed. Then install project dependencies:
 
 ```bash
-npm install
+yarn install
 ```
 
 ### 3. Environment Configuration
@@ -81,7 +81,7 @@ npx prisma migrate reset --force
 Run the Next.js development server:
 
 ```bash
-npm run dev
+yarn run dev
 ```
 
 Visit [http://localhost:3000](http://localhost:3000) to view the app.

@@ -10,14 +10,16 @@ async function globalSetup() {
   try {
     execSync(
       `psql "postgresql://postgres:password@localhost:5432/postgres" -c "CREATE DATABASE test_db WITH OWNER postgres;"`,
-      { stdio: "ignore" }
+      { stdio: "ignore" },
     );
   } catch {
     console.log("⚠️ Test database already exists.");
   }
 
   // Apply migrations & reset
-  execSync("NODE_ENV=test npx prisma migrate reset --force", { stdio: "inherit" });
+  execSync("NODE_ENV=test npx prisma migrate reset --force", {
+    stdio: "inherit",
+  });
 
   console.log("✅ Test database is ready.");
 }

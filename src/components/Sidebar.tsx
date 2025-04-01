@@ -53,7 +53,7 @@ const Sidebar: React.FC<SidebarProps> = ({
                 <Link
                   href={`/assessment/${siteAssessmentId}/page/${page.id}`}
                   className=" flex flex-col text-center text-sm uppercase items-center w-full"
-                  >
+                >
                   {page.title}
                   <SidebarIcon progress={page.progress} />
                 </Link>
