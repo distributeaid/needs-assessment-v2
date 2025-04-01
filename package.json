@@ -11,8 +11,8 @@
     "check:format": "yarn prettier --check .",
     "format": "yarn prettier --write .",
     "lint": "next lint",
-    "test": "NODE_ENV=test DATABASE_URL=postgresql://username:password@localhost:5432/test_db jest",
-    "test:server": "NODE_ENV=test DATABASE_URL=postgresql://username:password@localhost:5432/test_db next dev --turbo"
+    "test": "jest",
+    "test:server": "NODE_ENV=test next dev --turbo"
   },
   "dependencies": {
     "@radix-ui/react-dialog": "^1.1.6",
@@ -33,7 +33,6 @@
     "@babel/preset-env": "^7.26.7",
     "@eslint/eslintrc": "^3",
     "@jest/globals": "^29.7.0",
-    "@prisma/client": "^6.3.1",
     "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^16.2.0",
     "@testing-library/user-event": "^14.6.1",
@@ -52,14 +51,10 @@
     "postcss": "^8",
     "prettier": "^3.4.2",
     "pretty-quick": "^4.0.0",
-    "prisma": "^6.3.1",
     "supertest": "^7.0.0",
     "tailwindcss": "^3.4.1",
     "ts-jest": "^29.2.5",
     "ts-node": "^10.9.2",
     "typescript": "^5.7.3"
-  },
-  "prisma": {
-    "seed": "node prisma/seed.js"
   }
 }

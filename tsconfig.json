@@ -29,7 +29,6 @@
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts",
-    "prisma/**/*.ts",
     "src/**/*.ts",
     "types/**/*.d.ts",
   ],
