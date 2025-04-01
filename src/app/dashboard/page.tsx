@@ -24,7 +24,7 @@ export default function Dashboard() {
       return;
     }
 
-    fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/site-assessment`, {
+    fetch(`/flask-api/api/site-assessment`, {
       headers: {
         "Authorization": `Bearer ${session.user.accessToken}`,
       },

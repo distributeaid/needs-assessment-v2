@@ -41,7 +41,7 @@ export default function AssessmentPage() {
       router.push("/about");
       return;
     }
-    fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/site-assessment`, {
+    fetch(`/flask-api/api/site-assessment`, {
       headers: {
         "Authorization": `Bearer ${session.user.accessToken}`,
       },
@@ -80,7 +80,7 @@ export default function AssessmentPage() {
     const fetchPage = async () => {
       try {
         const res = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/api/site-assessment/${siteAssessment.id}/site-page/${pageId}`,
+          `/flask-api/api/site-assessment/${siteAssessment.id}/site-page/${pageId}`,
           {
             headers: {
               "Authorization": `Bearer ${session.user.accessToken}`,
@@ -138,7 +138,7 @@ export default function AssessmentPage() {
       return;
     }
     const res = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/site-assessment/${siteAssessment.id}/site-page/${pageId}/save`,
+      `/flask-api/api/site-assessment/${siteAssessment.id}/site-page/${pageId}/save`,
       {
         method: "POST",
         headers: {

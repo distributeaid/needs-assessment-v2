@@ -19,6 +19,7 @@ def status():
 
 @api_bp.route("/api/login", methods=["POST"])
 def login():
+    print("HIIII")
     data = request.get_json()
     email = data.get("email")
     user = User.query.filter_by(email=email).first()
@@ -30,12 +31,15 @@ def login():
     # TODO: Verify the password here
 
     token = generate_jwt_payload(user)
-
-    return jsonify({
+    result = {
         "message": "Login successful",
         "user": serialize_user(user),
         "accessToken": token
-    })
+    }
+
+    print(result)
+
+    return jsonify(result)
 
 
 @api_bp.route("/api/standard-items/<page>", methods=["GET"])
