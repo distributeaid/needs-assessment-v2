@@ -71,6 +71,11 @@ def seed_database_from_csv(filepath="backend/data/questions.csv",
                 options = STANDARD_ITEMS.get(row["Page"], None)
             if not options:
                 options = response_options_dict.get(row["ItemText"], None)
+
+            if row["ItemText"] == "Which of the following do you provide?":
+                row["ItemText"] = "Which of the following areas do you have needs in?"
+                options = list(set(page_order_mapping.keys()) - {"Preamble", "Confirmation", "Basic Info", "Demographics"})
+
             question = Question(
                 page_id=page.id,
                 text=row["ItemText"],
