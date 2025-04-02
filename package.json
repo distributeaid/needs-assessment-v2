@@ -4,7 +4,6 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "prepare": "husky install",
     "dev": "next dev --turbo",
     "build": "next build",
     "start": "next start",
