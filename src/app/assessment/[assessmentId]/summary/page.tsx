@@ -5,6 +5,7 @@ import { useParams } from "next/navigation";
 import PageLayout from "@/components/PageLayout";
 import { SidebarProps } from "@/types/models";
 import { useSession } from "next-auth/react";
+import ShareableCarousel from "@/components/ShareableCarousel";
 
 interface SummaryItem {
   sitePageId: number;
@@ -26,17 +27,14 @@ export default function SummaryPage() {
   useEffect(() => {
     const fetchData = async () => {
       if (status !== "authenticated" || !session?.user?.accessToken) return;
+
       const [summaryRes, pagesRes] = await Promise.all([
-        fetch(`/flask-api/api/site-assessment/${assessmentId}/summary`,
-          {
-            headers: { Authorization: `Bearer ${session.user.accessToken}` },
-          }
-        ),
-        fetch(`/flask-api/api/site-assessment/${assessmentId}`,
-          {
-            headers: { Authorization: `Bearer ${session.user.accessToken}` },
-          }
-        ),
+        fetch(`/flask-api/api/site-assessment/${assessmentId}/summary`, {
+          headers: { Authorization: `Bearer ${session.user.accessToken}` },
+        }),
+        fetch(`/flask-api/api/site-assessment/${assessmentId}`, {
+          headers: { Authorization: `Bearer ${session.user.accessToken}` },
+        }),
       ]);
 
       const summaryData = await summaryRes.json();
@@ -66,14 +64,14 @@ export default function SummaryPage() {
       sidebarProps={{
         siteAssessmentId: String(assessmentId),
         sitePages: sidebarPages,
-        currentPageId: "", // none selected
+        currentPageId: "",
         confirmed: true,
       }}
     >
       <div className="space-y-8">
         {data.map((page) => (
-          <div key={page.sitePageId} className="space-y-2">
-            <h2 className="text-xl font-semibold text-blue-700">
+          <div key={page.sitePageId} className="bg-white border border-blue-100 rounded-lg shadow-sm p-6">
+            <h2 className="text-lg font-bold text-blue-800 mb-4">
               <a
                 href={`/assessment/${assessmentId}/page/${page.sitePageId}`}
                 className="hover:underline"
@@ -81,16 +79,53 @@ export default function SummaryPage() {
                 {page.sitePageTitle}
               </a>
             </h2>
-            <ul className="pl-4 list-disc text-gray-800">
+            <div className="space-y-3">
               {page.responses.map((resp) => (
-                <li key={resp.questionId}>
-                  <strong>{resp.questionText}:</strong> {resp.responseValue}
-                </li>
+                <div
+                  key={resp.questionId}
+                  className="bg-blue-50 rounded-md p-3 border border-blue-100"
+                >
+                  <p className="text-sm font-semibold text-blue-900">
+                    {resp.questionText}
+                  </p>
+                  <p className="text-sm text-gray-700">{resp.responseValue}</p>
+                </div>
               ))}
-            </ul>
+            </div>
           </div>
         ))}
       </div>
+      <ShareableCarousel
+        organizationName="Borderlands"
+        peopleServed="1000"
+        cards={[
+          {
+            title: "Top Need",
+            highlight: "Tarpaulins",
+            subtext: "Shelter materials are the highest priority.",
+            backgroundColor: "#082B76",
+          },
+          {
+            title: "Food Support",
+            highlight: "Dried Lentils",
+            subtext: "High demand for long-lasting food items.",
+            backgroundColor: "#3759D9",
+          },
+          {
+            title: "Demographics",
+            highlight: "Formerly Incarcerated",
+            subtext: "Vulnerable population supported.",
+            backgroundColor: "#051E5E",
+          },
+          {
+            title: "Help Needed",
+            highlight: "Community Campaigns",
+            subtext: "Borderlands is interested in local collections.",
+            backgroundColor: "#3759D9",
+          },
+        ]}
+/>
+
     </PageLayout>
   );
 }

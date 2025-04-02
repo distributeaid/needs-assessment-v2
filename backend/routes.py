@@ -200,24 +200,39 @@ def get_assessment_page(site_assessment_id, site_page_id):
 @api_bp.route("/api/site-assessment/<int:site_assessment_id>/summary", methods=["GET"])
 def get_site_assessment_summary(site_assessment_id):
     site_assessment = SiteAssessment.query.get(site_assessment_id)
+    # set the site assessment to complete
+
     if not site_assessment:
         return jsonify({"error": "SiteAssessment not found"}), 404
-
+    if site_assessment:
+        site_assessment.confirmed = True
+        db.session.commit()
     summary = []
     for site_page in site_assessment.site_pages:
         page = Page.query.get(site_page.page_id)
         questions_data = []
         for response in site_page.responses:
+            if not response.value or len(str(response.value)) == 0:
+                continue
             question = Question.query.get(response.question_id)
+            value = response.value
+            str_value = str(response.value)
+            if str_value[-1] == '|':
+                value = value[:-1]
+            if str_value == "true":
+                value = "Yes"
+            if str_value == "false":
+                value = "No"
+
             questions_data.append({
                 "questionId": question.id,
                 "questionText": question.text,
-                "responseValue": response.value,
+                "responseValue": value,
             })
-        summary.append({
-            "sitePageId": site_page.id,
-            "sitePageTitle": page.title,
-            "responses": questions_data
-        })
-
+        if questions_data:
+            summary.append({
+                "sitePageId": site_page.id,
+                "sitePageTitle": page.title,
+                "responses": questions_data
+            })
     return jsonify(summary)

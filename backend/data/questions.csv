@@ -20,7 +20,6 @@
 18,Food,,,Hot meals eaten on site,About how many hot meals do you distribute in a week?,N,YesNo With Numeric Entry,,,20
 19,Food,,,Portable food,About how many portable snacks and meals do you distribute a week?,N,YesNo With Numeric Entry,,,21
 20,Food,,,Food baskets for households,How many people are fed by food baskets each week?,N,YesNo With Numeric Entry,,,22
-21,Food,,,Please select which of the following are represented in the population you serve ,,,MultiSelect,,,23
 22,Food,,,Halal,(if selected) About how many meals of 100 must be halal?,N,YesNo With Numeric Entry,,,24
 23,Food,,,Vegetarian,(if selected) About how many meals of 100 must be vegetarian?,N,YesNo With Numeric Entry,,,25
 24,Food,,,Which of the following do you need over the next six months?,,Y,MultiSelect,<Standard items of category from Strapi>,,26

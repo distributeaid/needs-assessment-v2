@@ -32,7 +32,13 @@ const Sidebar: React.FC<SidebarProps> = ({
         </Heading>
         <SidebarIcon progress="STARTEDOPTIONAL" />
       </Link>
-
+      {confirmed && (
+        <SidebarLink
+          href={`/assessment/${siteAssessmentId}/summary`}
+          label="Summary"
+          icon={<CheckIcon />}
+        />
+      )}
       <div className="w-8 border-t border-[#082B76] my-4" />
 
       {[
@@ -84,15 +90,6 @@ const Sidebar: React.FC<SidebarProps> = ({
         </li>
       );
     })}
-
-  {confirmed && (
-    <SidebarLink
-      href={`/assessment/${siteAssessmentId}/summary`}
-      label="Summary"
-      icon={<CheckIcon />}
-    />
-  )}
-
     </Box>
   );
 };
