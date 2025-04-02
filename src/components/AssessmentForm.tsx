@@ -55,7 +55,7 @@ const AssessmentForm: React.FC<AssessmentFormProps> = ({
   onInputChange,
   onSubmit,
   isConfirmationPage,
-  site
+  site,
 }) => {
   const renderInput = (question: Question) => {
     const value = responses[question.id] || "";
@@ -93,7 +93,9 @@ const AssessmentForm: React.FC<AssessmentFormProps> = ({
       case "SizingGrid":
         return <SizingGridInput {...commonProps} />;
       case "DemoGrid":
-        return <DemoGridInput {...commonProps} peopleServed={site?.peopleServed} />;
+        return (
+          <DemoGridInput {...commonProps} peopleServed={site?.peopleServed} />
+        );
       default:
         return (
           <input

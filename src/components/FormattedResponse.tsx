@@ -45,7 +45,9 @@ const FormattedResponse: React.FC<Props> = ({ value }) => {
             <tr>
               <th className="border px-2 py-1 text-left">Group</th>
               {Object.keys(parsed[Object.keys(parsed)[0]] ?? {}).map((col) => (
-                <th key={col} className="border px-2 py-1 text-left">{col}</th>
+                <th key={col} className="border px-2 py-1 text-left">
+                  {col}
+                </th>
               ))}
             </tr>
           </thead>
@@ -55,8 +57,10 @@ const FormattedResponse: React.FC<Props> = ({ value }) => {
                 <td className="border px-2 py-1 font-medium">{group}</td>
                 {Object.values(values as Record<string, number>).map(
                   (val, idx) => (
-                    <td key={idx} className="border px-2 py-1">{val}</td>
-                  )
+                    <td key={idx} className="border px-2 py-1">
+                      {val}
+                    </td>
+                  ),
                 )}
               </tr>
             ))}
