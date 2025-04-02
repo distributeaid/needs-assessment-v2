@@ -42,6 +42,7 @@ class Question(db.Model):
     options = db.Column(JSON, nullable=True)
     order = db.Column(db.Integer, nullable=False)
     allows_additional_input = db.Column(db.Boolean, default=False)
+    parent_question_id = db.Column(db.Integer, db.ForeignKey('question.id'), nullable=True)
 
 
 class SiteAssessment(db.Model):

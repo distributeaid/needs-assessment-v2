@@ -53,6 +53,7 @@ def seed_database_from_csv(filepath="backend/data/questions.csv",
         response_options_dict = json.load(f)
 
     choices_options = choices_from_google()
+    parent_ids = {}
     # Ensure there is an Assessment for the current season
     assessment = Assessment.query.filter_by(year=current_year, season=current_season).first()
     if not assessment:
@@ -79,9 +80,6 @@ def seed_database_from_csv(filepath="backend/data/questions.csv",
         reader = csv.DictReader(file)
 
         for row in reader:
-            if row["Page"] == "Preamble":
-                continue
-
             # Fetch or create page within the current assessment
             page = Page.query.filter_by(title=row["Page"], assessment_id=assessment.id).first()
             if not page:
@@ -113,6 +111,11 @@ def seed_database_from_csv(filepath="backend/data/questions.csv",
             if row["ItemText"] ==  "Which of the following areas do you have needs in?":
                 options = list(set(page_order_mapping.keys()) - {"Preamble", "Confirmation", "Basic Info", "Demographics"})
 
+            parent_id = None
+            if row["ParentItemID"]:
+                parent_id = parent_ids.get(row["ParentItemID"])
+
+
             question = Question(
                 page_id=page.id,
                 text=row["ItemText"],
@@ -121,9 +124,15 @@ def seed_database_from_csv(filepath="backend/data/questions.csv",
                 type=normalized_type,
                 options=options,
                 order=int(row["QuestionOrder"]),
-                allows_additional_input="WithOther" in raw_type or "With Numeric Entry" in raw_type
+                allows_additional_input="WithOther" in raw_type or "With Numeric Entry" in raw_type,
+                parent_question_id=parent_id
             )
             db.session.add(question)
+            if row["ItemID"]:
+                # get the question id - which means accessing it in the database
+                question = Question.query.filter_by(text=row["ItemText"]).first()
+                parent_ids[row["ItemID"]] = question.id
+
 
     db.session.commit()
 

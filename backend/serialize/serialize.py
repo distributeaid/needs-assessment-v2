@@ -14,6 +14,8 @@ def serialize_question(q: Question) -> dict:
         "options": q.options,
         "order": q.order,
         "allowsAdditionalInput": q.allows_additional_input,
+        "required": q.required,
+        "parentQuestionId": q.parent_question_id,
     }
 
 def serialize_question_response(r: QuestionResponse) -> dict:

@@ -28,6 +28,7 @@ export interface Question {
   required: boolean;
   options?: string[]; // Added options for Dropdown, MultiSelect, and SizingGrid types
   allowsAdditionalInput: boolean;
+  parentQuestionId?: number; // for conditional questions
 }
 
 export interface Page {

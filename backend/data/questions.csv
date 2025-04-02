@@ -1,5 +1,4 @@
 ,Page,ItemID,ParentItemID,ItemText,Subtext,Mandatory in Section,Type,Response Options,Notes,QuestionOrder
-0,Preamble,,,"Elizabeth: highlight that we work with many groups supporting people in many ways, encourage them to fill out the relevant parts.   Roz: think it's good to pair FCs up with groups to help ",,,DisplayText,,,2
 1,Basic Info,,,Organization Name,,Y,Short Response,,,3
 10,Basic Info,,,How many individuals does your organisation support in one month?,,Y,Numeric,,"Adele- this one always confuses people, need some instruction for how to come up with this",12
 2,Basic Info,,,What region do you operate in?,,Y,MultiSelectWithOther,"Existing regions, or 'Other' which will prompt a short response",,4
