@@ -1,0 +1,12 @@
+bcrypt
+flask_sqlalchemy
+flask-cors
+flask-cors
+Flask-Migrate
+Flask-Testing
+Flask==2.3.3
+gunicorn
+pyjwt
+pytest
+python-dotenv
+werkzeug==2.3.7

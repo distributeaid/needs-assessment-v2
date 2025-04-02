@@ -1,6 +1,6 @@
 # Needs Assessment Project
 
-This project is a Next.js application with a Prisma/Postgres backend designed to facilitate the management and completion of needs assessment surveys.
+This project is a Next.js application with a Prisma/Postgres backend designed to facilitate the management and completion of needs assessment Assessments.
 
 ## 🚀 Getting started with Gitpod
 
@@ -36,7 +36,7 @@ cd needs-assessment
 Make sure you have **Node.js** installed. Then install project dependencies:
 
 ```bash
-npm install
+yarn install
 ```
 
 ### 3. Environment Configuration
@@ -50,7 +50,6 @@ cp .env.example .env
 Ensure the following environment variables are correctly set in `.env`:
 
 ```env
-DATABASE_URL="postgresql://postgres:password@localhost:5432/needs_assessment"
 NEXTAUTH_URL=http://localhost:3000
 NEXTAUTH_SECRET=your-secret-key
 ```
@@ -82,7 +81,7 @@ npx prisma migrate reset --force
 Run the Next.js development server:
 
 ```bash
-npm run dev
+yarn run dev
 ```
 
 Visit [http://localhost:3000](http://localhost:3000) to view the app.
@@ -91,7 +90,7 @@ Visit [http://localhost:3000](http://localhost:3000) to view the app.
 
 ## Project Structure
 
-```
+```bash
 needs-assessment/
 ├── prisma/              # Prisma schema and migrations
 ├── src/
@@ -121,9 +120,9 @@ needs-assessment/
 0. **Implement critical features:**
 
    - Incorporate a real authentication system (waiting on updates)
-   - Update survey to reflect the actual questions we want
+   - Update Assessment to reflect the actual questions we want
    - Store all responses in a queryable way (e.g. Baserow?)
-   - Get initial survey questions from Strapi (waiting on strapi deploy)
+   - Get initial Assessment questions from Strapi (waiting on strapi deploy)
 
 1. **Enhance Form Components:**
 
@@ -136,7 +135,7 @@ needs-assessment/
    - Add animations/transitions using **Framer Motion** for smoother interactions.
    - Implement responsive design improvements using **TailwindCSS**.
 
-3. **Survey Summary Page:**
+3. **Assessment Summary Page:**
 
    - Build a summary page that displays a user's completed responses before final submission.
 
@@ -148,15 +147,15 @@ needs-assessment/
 
 1. **Add Role-Based Access Control (RBAC):**
 
-   - Implement roles (Admin, Contributor, Viewer) with different permissions for surveys and responses.
+   - Implement roles (Admin, Contributor, Viewer) with different permissions for Assessments and responses.
 
 2. **Optimize Database Queries:**
 
    - Review and optimize Prisma queries to reduce response times.
-   - Add indexes to frequently queried fields (e.g., `siteId`, `surveyId`).
+   - Add indexes to frequently queried fields (e.g., `siteId`, `AssessmentId`).
 
 3. **Audit Logging:**
-   - Track changes to surveys and responses in an audit log for accountability.
+   - Track changes to Assessments and responses in an audit log for accountability.
 
 #### **Testing & QA:**
 
@@ -166,7 +165,7 @@ needs-assessment/
    - Add tests for form validation and submission.
 
 2. **End-to-End Testing:**
-   - Set up **Cypress** for end-to-end testing of the survey flow.
+   - Set up **Cypress** for end-to-end testing of the Assessment flow.
 
 #### **DevOps & Documentation:**
 
@@ -181,16 +180,16 @@ needs-assessment/
 
 #### **Feature Requests:**
 
-1. **Survey Versioning:**
+1. **Assessment Versioning:**
 
-   - Implement a system to track different versions of surveys over time.
+   - Implement a system to track different versions of Assessments over time.
 
 2. **Data Visualization Dashboard:**
 
-   - Build a dashboard to visualize survey responses using **Chart.js** or **Recharts**.
+   - Build a dashboard to visualize Assessment responses using **Chart.js** or **Recharts**.
 
-3. **Import/Export Surveys:**
-   - Add functionality to import/export surveys and responses as CSV or JSON.
+3. **Import/Export Assessments:**
+   - Add functionality to import/export Assessments and responses as CSV or JSON.
 
 ---
 
@@ -199,6 +198,7 @@ needs-assessment/
 - **Docker Issues:**
 
   - If Docker volumes are stuck, try restarting Docker or force removing volumes:
+
     ```bash
     docker volume prune -f
     ```
@@ -206,6 +206,7 @@ needs-assessment/
 - **Database Errors:**
 
   - If migrations fail, try resetting the database:
+
     ```bash
     npx prisma migrate reset
     ```

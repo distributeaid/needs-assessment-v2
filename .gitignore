@@ -24,6 +24,7 @@ needs-assessment.zip
 # misc
 .DS_Store
 *.pem
+.tmp
 
 # debug
 npm-debug.log*
@@ -41,3 +42,12 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+
+# python
+.venv
+*.pyc
+*.zip
+
+#sqlite
+database.db

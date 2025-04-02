@@ -1,11 +1,12 @@
-import NextAuth from "next-auth";
+import NextAuth, {
+  NextAuthOptions,
+  DefaultSession,
+  DefaultUser,
+} from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
-import { PrismaClient } from "@prisma/client";
-import bcrypt from "bcryptjs";
+import type { JWT } from "next-auth/jwt";
 
-const prisma = new PrismaClient();
-
-export const authOptions = {
+export const authOptions: NextAuthOptions = {
   providers: [
     CredentialsProvider({
       name: "Credentials",
@@ -13,24 +14,27 @@ export const authOptions = {
         email: { label: "Email", type: "email" },
         password: { label: "Password", type: "password" },
       },
-
       async authorize(credentials) {
-        if (!credentials?.email || !credentials?.password) {
-          return null;
+        if (!credentials?.email || !credentials?.password) return null;
+        const res = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/api/login`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              email: credentials.email,
+              password: credentials.password,
+            }),
+          },
+        );
+        const data = await res.json();
+        if (res.ok && data.user && data.accessToken) {
+          return {
+            id: data.user.id.toString(),
+            email: data.user.email,
+            accessToken: data.accessToken,
+          } as DefaultUser & { accessToken?: string };
         }
-
-        const user = await prisma.user.findUnique({
-          where: { email: credentials.email },
-        });
-
-        if (
-          user &&
-          (await bcrypt.compare(credentials.password, user.password))
-        ) {
-          // Convert id to string to match NextAuth's expected type
-          return { id: user.id.toString(), email: user.email };
-        }
-
         return null;
       },
     }),
@@ -38,8 +42,29 @@ export const authOptions = {
   session: {
     strategy: "jwt" as const,
   },
+  callbacks: {
+    async jwt({
+      token,
+      user,
+    }: {
+      token: JWT;
+      user?: (DefaultUser & { accessToken?: string }) | null;
+    }) {
+      if (user) {
+        token.accessToken = user.accessToken;
+      }
+      return token;
+    },
+    async session({ session, token }: { session: DefaultSession; token: JWT }) {
+      session.user = {
+        ...session.user,
+        accessToken: token.accessToken,
+      } as DefaultSession["user"] & { accessToken?: string };
+      return session;
+    },
+  },
   pages: {
-    signIn: "/login",
+    signIn: `/login`,
   },
   secret: process.env.NEXTAUTH_SECRET,
 };
