@@ -4,7 +4,7 @@ import React from "react";
 import { Question } from "@/types/models";
 import SizingGridInput from "@/components/questions/SizingGridInput";
 import MultiSelectInput from "@/components/questions/MultiSelectInput";
-import MultiSelectWithOtherInput from "@/components/questions/MultiSelectWithOtherInput"
+import MultiSelectWithOtherInput from "@/components/questions/MultiSelectWithOtherInput";
 import DemoGridInput from "@/components/questions/DemoGridInput";
 import DropdownInput from "@/components/questions/DropdownInput";
 import DropdownWithOtherInput from "@/components/questions/DropdownWithOtherInput";
@@ -13,10 +13,11 @@ import YesNoWithNumericEntry from "@/components/questions/YesNoWithNumericEntry"
 import { InputProps } from "@/types/ui-models";
 
 interface AssessmentFormProps {
+  isConfirmationPage: boolean;
   questions: Question[];
   responses: Record<number, string | string[]>;
   onInputChange: (questionId: number, value: string | string[]) => void;
-  onSubmit: (confirm: boolean) => void;
+  onSubmit: (confirm: boolean, isConfirmationPage: boolean) => void;
 }
 
 const inputBaseClass = "mt-1 p-2 border text-gray-900 rounded w-full";
@@ -52,23 +53,22 @@ const AssessmentForm: React.FC<AssessmentFormProps> = ({
   responses,
   onInputChange,
   onSubmit,
+  isConfirmationPage,
 }) => {
   const renderInput = (question: Question) => {
     const value = responses[question.id] || "";
-    const commonProps = { question, value, onChange: onInputChange };
-
+    const commonProps = { question, value, onChange: onInputChange, isConfirmationPage };
     switch (question.type) {
       case "Numeric":
         return <NumericInput {...commonProps} />;
       case "YesNo":
         return question.allowsAdditionalInput
-            ? <YesNoWithNumericEntry {...commonProps} />
-            : <YesNoInput {...commonProps} />;
+          ? <YesNoWithNumericEntry {...commonProps} />
+          : <YesNoInput {...commonProps} />;
       case "Dropdown":
-          return question.allowsAdditionalInput
-            ? <DropdownWithOtherInput {...commonProps} />
-            : <DropdownInput {...commonProps} />;
-
+        return question.allowsAdditionalInput
+          ? <DropdownWithOtherInput {...commonProps} />
+          : <DropdownInput {...commonProps} />;
       case "MultiSelect":
         return question.allowsAdditionalInput
           ? <MultiSelectWithOtherInput {...commonProps} />
@@ -96,49 +96,55 @@ const AssessmentForm: React.FC<AssessmentFormProps> = ({
   return (
     <div className="flex-1 px-4 md:px-8 py-6">
       <form className="space-y-6" onSubmit={(e) => e.preventDefault()}>
-      {questions.map((question) => {
-        const input = renderInput(question);
-        const isInline =
-          question.type === "YesNo" || question.type === "Short Response";
+        {questions.map((question) => {
+          const input = renderInput(question);
+          const isInline =
+            question.type === "YesNo" || question.type === "Short Response";
 
-        return (
-          <div key={question.id} className="space-y-1">
-            {isInline ? (
-              <div className="flex items-center gap-4 flex-wrap">
-                <label className="block text-base font-medium text-blue-900">
-                  {question.text}
-                </label>
-                {input}
-              </div>
-            ) : (
-              <>
-                <label className="block text-lg font-medium text-blue-900">
-                  {question.text}
-                </label>
-                {question.subtext && (
-                  <p className="text-sm text-blue-700">{question.subtext}</p>
-                )}
-                {input}
-              </>
-            )}
-          </div>
-        );
-      })}
+          const showSubtext =
+            !!question.subtext &&
+            (!question.allowsAdditionalInput || question.type === "Long Response");
+
+          return (
+            <div key={question.id} className="space-y-1">
+              {isInline ? (
+                <div className="flex items-center gap-4 flex-wrap">
+                  <label className="block text-base font-medium text-blue-900">
+                    {question.text}
+                  </label>
+                  {input}
+                </div>
+              ) : (
+                <>
+                  <label className="block text-lg font-medium text-blue-900">
+                    {question.text}
+                  </label>
+                  {showSubtext && (
+                    <p className="text-sm text-blue-700">{question.subtext}</p>
+                  )}
+                  {input}
+                </>
+              )}
+            </div>
+          );
+        })}
+
         <div className="flex flex-col sm:flex-row justify-end gap-4 pt-6">
           <button
             type="button"
             className="bg-blue-600 text-white px-5 py-2 rounded hover:bg-blue-700 transition"
-            onClick={() => onSubmit(false)}
+            onClick={() => onSubmit(false, isConfirmationPage)}
           >
             Save
           </button>
           <button
             type="button"
             className="bg-green-600 text-white px-5 py-2 rounded hover:bg-green-700 transition"
-            onClick={() => onSubmit(true)}
+            onClick={() => onSubmit(true, isConfirmationPage)}
           >
-            Save & Confirm
+            {isConfirmationPage ? "Save and Finalize" : "Save & Confirm"}
           </button>
+
         </div>
       </form>
     </div>

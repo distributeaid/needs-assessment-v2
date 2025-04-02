@@ -39,7 +39,7 @@ def serialize_site_page(site_page: SitePage) -> dict:
         "progress": site_page.progress,
         "required": site_page.required,
         "state": site_page.state,
-        "site_assessment_id": site_page.site_assessment_id,
+        "siteAssessmentId": site_page.site_assessment_id,
         "page": {
             "id": page.id,
             "title": page.title,
@@ -48,6 +48,7 @@ def serialize_site_page(site_page: SitePage) -> dict:
                 for q in page.questions
             ],
         },
+        'isConfirmationPage': site_page.is_confirmation_page,
     }
 
 def serialize_site_assessment(assessment: SiteAssessment) -> dict:
@@ -61,5 +62,6 @@ def serialize_site_assessment(assessment: SiteAssessment) -> dict:
         "siteId": assessment.site_id,
         "assessmentId": assessment.assessment_id,
         "createdAt": assessment.created_at.isoformat(),
-        "sitePages": serialized_site_pages
+        "sitePages": serialized_site_pages,
+        "confirmed": assessment.confirmed,
     }

@@ -37,9 +37,9 @@ export default function SitePageCard({
       case "STARTEDOPTIONAL":
         return "Continue";
       case "COMPLETE":
-        return "Complete";
-      default:
         return "View";
+      default:
+        return progress;
     }
   };
 

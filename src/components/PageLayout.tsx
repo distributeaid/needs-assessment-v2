@@ -12,6 +12,7 @@ interface PageLayoutProps {
   withSidebar?: boolean;
   sidebarProps?: {
     siteAssessmentId: string;
+    confirmed: boolean;
     sitePages: {
       id: number;
       title: string;
@@ -35,6 +36,7 @@ export default function PageLayout({
           siteAssessmentId={sidebarProps.siteAssessmentId}
           sitePages={sidebarProps.sitePages}
           currentPageId={sidebarProps.currentPageId}
+          confirmed={sidebarProps.confirmed}
         />
       )}
 

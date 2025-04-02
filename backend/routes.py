@@ -3,7 +3,7 @@ import logging
 from flask import Blueprint, request, jsonify
 from sqlalchemy.orm import joinedload
 
-from backend.models import db, User, SiteAssessment, Page, SitePage, QuestionResponse, Site
+from backend.models import db, User, SiteAssessment, Page, SitePage, QuestionResponse, Question
 from backend.consts import STANDARD_ITEMS
 from backend.validation import validate_responses
 from backend.utils.utils import ensure_assessment_exists, unlock_remaining_pages
@@ -84,6 +84,23 @@ def get_site_assessment():
     if not site_assessment:
         ensure_assessment_exists(user.site_id)
         site_assessment = SiteAssessment.query.filter_by(site_id=user.site_id).first()
+
+    response = serialize_site_assessment(site_assessment)
+    return jsonify(response)
+
+
+
+@api_bp.route("/api/site-assessment/<int:site_assessment_id>", methods=["GET"])
+def get_site_assessment_by_id(site_assessment_id):
+    try:
+        user = get_current_user()
+    except JWTError as e:
+        logging.error(f"JWT Error: {e}")
+        return jsonify({"error": str(e)}), 401
+
+    site_assessment = SiteAssessment.query.filter_by(id=site_assessment_id, site_id=user.site_id).first()
+    if not site_assessment:
+        return jsonify({"error": "SiteAssessment not found"}), 404
 
     response = serialize_site_assessment(site_assessment)
     return jsonify(response)
@@ -175,5 +192,32 @@ def get_assessment_page(site_assessment_id, site_page_id):
     return jsonify({
         "title": page.title,
         "questions": questions,
-        "responses": responses
+        "responses": responses,
+        "isConfirmationPage": page.is_confirmation_page,
     })
+
+# /api/site-assessment/<int:site_assessment_id>/summary
+@api_bp.route("/api/site-assessment/<int:site_assessment_id>/summary", methods=["GET"])
+def get_site_assessment_summary(site_assessment_id):
+    site_assessment = SiteAssessment.query.get(site_assessment_id)
+    if not site_assessment:
+        return jsonify({"error": "SiteAssessment not found"}), 404
+
+    summary = []
+    for site_page in site_assessment.site_pages:
+        page = Page.query.get(site_page.page_id)
+        questions_data = []
+        for response in site_page.responses:
+            question = Question.query.get(response.question_id)
+            questions_data.append({
+                "questionId": question.id,
+                "questionText": question.text,
+                "responseValue": response.value,
+            })
+        summary.append({
+            "sitePageId": site_page.id,
+            "sitePageTitle": page.title,
+            "responses": questions_data
+        })
+
+    return jsonify(summary)

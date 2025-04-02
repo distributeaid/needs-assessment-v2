@@ -4,12 +4,15 @@ import Link from "next/link";
 import React from "react";
 import { SidebarProps } from "@/types/models";
 import { Box, Heading } from "@radix-ui/themes";
+import SidebarLink from "@/components/ui/SidebarLink";
 import SidebarIcon from "./SidebarIcon";
+import { CheckIcon } from "lucide-react";
 
 const Sidebar: React.FC<SidebarProps> = ({
   siteAssessmentId,
   sitePages,
   currentPageId,
+  confirmed,
 }) => {
   return (
     <Box
@@ -82,7 +85,13 @@ const Sidebar: React.FC<SidebarProps> = ({
       );
     })}
 
-
+  {confirmed && (
+    <SidebarLink
+      href={`/assessment/${siteAssessmentId}/summary`}
+      label="Summary"
+      icon={<CheckIcon />}
+    />
+  )}
 
     </Box>
   );

@@ -22,6 +22,7 @@ def create_site_assessment(site_id, assessment_id):
             required=is_required,
             progress="UNSTARTEDREQUIRED" if is_required else "LOCKED",
             order=page.order,
+            is_confirmation_page=page.is_confirmation_page,
         )
         db.session.add(site_page)
 
@@ -69,4 +70,6 @@ def unlock_remaining_pages(site_assessment_id):
         for sp in site_pages:
             if not sp.required and sp.progress == "LOCKED":
                 sp.progress = "UNSTARTEDOPTIONAL"
+            if sp.is_confirmation_page and sp.progress == "LOCKED":
+                sp.progress = "UNSTARTEDREQUIRED"
         db.session.commit()

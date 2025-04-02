@@ -18,6 +18,7 @@ const mapPages = (sitePages: SitePage[]): SidebarProps["sitePages"] =>
     title: p.page.title,
     progress: p.progress,
     order: p.page.order,
+    isConfirmationPage: p.isConfirmationPage,
   }));
 
 const buildInitialResponses = (questions: Question[], responses: QuestionResponse[]) =>
@@ -33,9 +34,10 @@ export default function AssessmentPage() {
   const params = useParams();
   const pageId = getIdParam(params.pageId);
 
-  const [siteAssessment, setSiteAssessment] = useState<{ id: number } | null>(null);
+  const [siteAssessment, setSiteAssessment] = useState<{ id: number, confirmed: boolean } | null>(null);
   const [assessmentPages, setAssessmentPages] = useState<SidebarProps["sitePages"]>([]);
-  const [page, setPage] = useState<{ title: string; questions: Question[] } | null>(null);
+  const [page, setPage] = useState<{ title: string; questions: Question[]; isConfirmationPage: boolean } | null>(null);
+
   const [responses, setResponses] = useState<Record<number, string | string[]>>({});
   const [error, setError] = useState<string | null>(null);
 
@@ -60,7 +62,7 @@ export default function AssessmentPage() {
         }
         if (!res.ok) throw new Error(`API Error: ${res.status}`);
         const data = await res.json();
-        setSiteAssessment({ id: data.id });
+        setSiteAssessment({ id: data.id, confirmed: data.confirmed });
         setAssessmentPages(mapPages(data.sitePages));
       } catch (err) {
         setError(err instanceof Error ? err.message : "Unknown error");
@@ -84,7 +86,12 @@ export default function AssessmentPage() {
         );
         if (!res.ok) throw new Error(`API Error: ${res.status}`);
         const data = await res.json();
-        setPage(data);
+        setPage({
+          title: data.title,
+          questions: data.questions,
+          isConfirmationPage: data.isConfirmationPage ?? false,
+        });
+
         setResponses(buildInitialResponses(data.questions, data.responses));
       } catch (err) {
         setError(err instanceof Error ? err.message : "Unknown error");
@@ -102,7 +109,9 @@ export default function AssessmentPage() {
   );
 
 
-  const handleSubmit = async (confirmed = false) => {
+  const handleSubmit = async (confirmed = false, isConfirmationPage = false) => {
+    console.log("handleSubmit", confirmed, isConfirmationPage);
+
     if (!session || !siteAssessment) {
       router.push("/about");
       return;
@@ -116,6 +125,7 @@ export default function AssessmentPage() {
       confirmed,
     };
 
+    // First: Save responses
     const res = await fetch(
       `/flask-api/api/site-assessment/${siteAssessment.id}/site-page/${pageId}/save`,
       {
@@ -131,6 +141,12 @@ export default function AssessmentPage() {
     if (!res.ok) {
       const errorData = await res.json();
       setError(errorData.error || "Failed to save responses.");
+      return;
+    }
+
+    // Then: Route based on context
+    if (isConfirmationPage && confirmed) {
+      router.push(`/assessment/${siteAssessment.id}/summary`);
     } else {
       const currentIndex = assessmentPages.findIndex((p) => p.id === Number(pageId));
       const nextPage = assessmentPages[currentIndex + 1];
@@ -153,9 +169,11 @@ export default function AssessmentPage() {
         siteAssessmentId: siteAssessment.id.toString(),
         sitePages: assessmentPages,
         currentPageId: pageId,
+        confirmed: siteAssessment.confirmed,
       }}
     >
       <AssessmentForm
+        isConfirmationPage={page.isConfirmationPage}
         questions={page.questions}
         responses={responses}
         onInputChange={handleInputChange}

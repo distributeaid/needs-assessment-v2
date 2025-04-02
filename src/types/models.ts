@@ -64,6 +64,7 @@ export interface SitePage {
   };
   responses: QuestionResponse[];
   order: number;
+  isConfirmationPage: boolean;
 }
 
 export interface SiteAssessment {
@@ -72,6 +73,7 @@ export interface SiteAssessment {
   assessmentId: number;
   sitePages: SitePage[];
   assessment: Assessment;
+  confirmed: boolean;
 }
 
 export interface Site {
@@ -85,6 +87,7 @@ export interface SidebarProps {
   siteAssessmentId: string;
   sitePages: { id: number; title: string; progress: ProgressStatus, order: number }[];
   currentPageId?: string;
+  confirmed: boolean;
 }
 
 export interface User {

@@ -51,7 +51,8 @@ def seed_database_from_csv(filepath="backend/data/questions.csv",
                 page = Page(
                     title=row["Page"],
                     assessment_id=assessment.id,
-                    order=page_order_mapping.get(row["Page"], 9999)
+                    order=page_order_mapping.get(row["Page"], 9999),
+                    is_confirmation_page=row["Page"] == "Confirmation"
                 )
                 db.session.add(page)
                 db.session.commit()

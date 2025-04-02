@@ -54,6 +54,7 @@ export default function Dashboard() {
       withSidebar
       sidebarProps={{
         siteAssessmentId: siteAssessment.id.toString(),
+        confirmed: siteAssessment.confirmed,
         sitePages: siteAssessment.sitePages.map((page) => ({
           id: page.id,
           title: page.page.title,
