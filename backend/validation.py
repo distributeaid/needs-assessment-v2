@@ -10,7 +10,7 @@ def validate_responses(responses, require_all=False):
             continue
 
         # Ensure required questions have answers
-        if require_all and question.mandatory and not response.get("value"):
+        if require_all and question.required and not response.get("value"):
             errors.append(f"Missing value for required question: {question.text}")
         if not response.get("value"):
             continue

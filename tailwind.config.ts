@@ -12,10 +12,19 @@ const config: Config = {
         lato: ["lato", "sans-serif"],
         roboto: ["Roboto", "sans-serif"],
       },
+      colors: {
+        status: {
+          done: "#67c18b",
+          todo: "#d6dff5",
+          disabled: "#a4a4a4",
+          clicked: "#142851",
+          hover: "#6bbf8f",
+          error: "#d42f2f",
+        },
+      },
     },
   },
 
   plugins: [],
 };
-
 export default config;

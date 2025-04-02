@@ -1,6 +1,6 @@
 from flask import request, jsonify
 from datetime import datetime
-from backend.models import db, User, SiteAssessment, SitePage, Page, Question, QuestionResponse
+from backend.models import db, User, SiteAssessment, SitePage, Page, Question, QuestionResponse, Site
 from sqlalchemy.orm import joinedload
 
 def serialize_question(q: Question) -> dict:
@@ -9,9 +9,11 @@ def serialize_question(q: Question) -> dict:
         "type": q.type,
         "pageId": q.page_id,
         "text": q.text,
-        "defaultValue": "",  # If you add a default_value column, use that here
-        "options": q.response_options.split(", ") if q.response_options else [],
+        "subtext": q.subtext,
+        "defaultValue": "",
+        "options": q.options,
         "order": q.order,
+        "allowsAdditionalInput": q.allows_additional_input,
     }
 
 def serialize_question_response(r: QuestionResponse) -> dict:
@@ -27,4 +29,51 @@ def serialize_user(user: User) -> dict:
         "id": str(user.id),
         "email": user.email,
         "siteId": user.site_id,
+    }
+
+def serialize_site_page(site_page: SitePage) -> dict:
+    page = Page.query.options(joinedload(Page.questions)).filter_by(id=site_page.page_id).first()
+    site = Site.query.filter_by(id=site_page.site_assessment.site_id).first()
+    return {
+        "id": site_page.id,
+        "pageId": site_page.page_id,
+        "progress": site_page.progress,
+        "required": site_page.required,
+        "state": site_page.state,
+        "siteAssessmentId": site_page.site_assessment_id,
+        "page": {
+            "id": page.id,
+            "title": page.title,
+            "questions": [
+                serialize_question(q)
+                for q in page.questions
+            ],
+        },
+        'isConfirmationPage': site_page.is_confirmation_page,
+        "site": serialize_site(site),
+    }
+
+def serialize_site_assessment(assessment: SiteAssessment) -> dict:
+    site = Site.query.filter_by(id=assessment.site_id).first()
+    serialized_site_pages = [
+        serialize_site_page(sp)
+        for sp in assessment.site_pages
+    ]
+
+    return {
+        "id": assessment.id,
+        "siteId": assessment.site_id,
+        "assessmentId": assessment.assessment_id,
+        "createdAt": assessment.created_at.isoformat(),
+        "sitePages": serialized_site_pages,
+        "confirmed": assessment.confirmed,
+        "site": serialize_site(site),
+    }
+
+def serialize_site(site: Site) -> dict:
+    return {
+        "id": site.id,
+        "name": site.name,
+        "siteId": site.id,
+        "peopleServed": site.people_served,
     }

@@ -1,163 +1,104 @@
 "use client";
 
 import React from "react";
-import { Question } from "@/types/models";
+import { Question, Site } from "@/types/models";
 import SizingGridInput from "@/components/questions/SizingGridInput";
+import MultiSelectInput from "@/components/questions/MultiSelectInput";
+import MultiSelectWithOtherInput from "@/components/questions/MultiSelectWithOtherInput";
+import DemoGridInput from "@/components/questions/DemoGridInput";
+import DropdownInput from "@/components/questions/DropdownInput";
+import DropdownWithOtherInput from "@/components/questions/DropdownWithOtherInput";
+import YesNoInput from "@/components/questions/YesNoInput";
+import YesNoWithNumericEntry from "@/components/questions/YesNoWithNumericEntry";
+import { InputProps } from "@/types/ui-models";
 
 interface AssessmentFormProps {
-  title: string;
+  isConfirmationPage: boolean;
   questions: Question[];
-  responses: { [key: number]: string };
-  onInputChange: (questionId: number, value: string) => void;
-  onSubmit: (confirm: boolean) => void;
+  responses: Record<number, string | string[]>;
+  onInputChange: (questionId: number, value: string | string[]) => void;
+  onSubmit: (confirm: boolean, isConfirmationPage: boolean) => void;
+  site: Site;
 }
 
-interface InputProps {
-  question: Question;
-  value: string;
-  onChange: (questionId: number, value: string) => void;
-}
+const inputBaseClass = "mt-1 p-2 border text-gray-900 rounded w-full";
 
-const NumericInput: React.FC<InputProps> = ({ question, value, onChange }) => (
+const NumericInput = ({ question, value, onChange }: InputProps) => (
   <input
     type="number"
-    className="mt-1 p-2 border text-gray-900 rounded w-full"
+    className={inputBaseClass}
     value={value}
     onChange={(e) => onChange(question.id, e.target.value)}
   />
 );
 
-const DropdownInput: React.FC<InputProps> = ({ question, value, onChange }) => (
-  <select
-    className="mt-1 p-2 border text-gray-900 rounded w-full"
-    value={value}
-    onChange={(e) => onChange(question.id, e.target.value)}
-  >
-    {question.options?.map((option: string) => (
-      <option key={option} value={option}>
-        {option}
-      </option>
-    ))}
-  </select>
-);
-
-const MultiSelectInput: React.FC<InputProps> = ({
-  question,
-  value,
-  onChange,
-}) => {
-  // Convert value to array; if empty string, use an empty array.
-  const selectedValues = value ? value.split(",") : [];
-
-  return (
-    <select
-      multiple
-      className="mt-1 p-2 border text-gray-900 rounded w-full"
-      value={selectedValues}
-      onChange={(e) => {
-        const newValues = Array.from(
-          e.target.selectedOptions,
-          (option) => option.value,
-        );
-        onChange(question.id, newValues.join(","));
-      }}
-    >
-      {question.options?.map((option: string) => (
-        <option key={option} value={option}>
-          {option}
-        </option>
-      ))}
-    </select>
-  );
-};
-
-const ShortResponseInput: React.FC<InputProps> = ({
-  question,
-  value,
-  onChange,
-}) => (
+const ShortResponseInput = ({ question, value, onChange }: InputProps) => (
   <input
     type="text"
-    className="mt-1 p-2 border text-gray-900 rounded w-full"
+    className={inputBaseClass}
     value={value}
     onChange={(e) => onChange(question.id, e.target.value)}
   />
 );
 
-const LongResponseInput: React.FC<InputProps> = ({
-  question,
-  value,
-  onChange,
-}) => (
+const LongResponseInput = ({ question, value, onChange }: InputProps) => (
   <textarea
-    className="mt-1 p-2 border text-gray-900 rounded w-full"
+    className={inputBaseClass}
     value={value}
     onChange={(e) => onChange(question.id, e.target.value)}
   />
 );
 
 const AssessmentForm: React.FC<AssessmentFormProps> = ({
-  title,
   questions,
   responses,
   onInputChange,
   onSubmit,
+  isConfirmationPage,
+  site
 }) => {
   const renderInput = (question: Question) => {
     const value = responses[question.id] || "";
+    const commonProps = {
+      question,
+      value,
+      onChange: onInputChange,
+      isConfirmationPage,
+    };
     switch (question.type) {
       case "Numeric":
-        return (
-          <NumericInput
-            question={question}
-            value={value}
-            onChange={onInputChange}
-          />
+        return <NumericInput {...commonProps} />;
+      case "YesNo":
+        return question.allowsAdditionalInput ? (
+          <YesNoWithNumericEntry {...commonProps} />
+        ) : (
+          <YesNoInput {...commonProps} />
         );
       case "Dropdown":
-        return (
-          <DropdownInput
-            question={question}
-            value={value}
-            onChange={onInputChange}
-          />
+        return question.allowsAdditionalInput ? (
+          <DropdownWithOtherInput {...commonProps} />
+        ) : (
+          <DropdownInput {...commonProps} />
         );
       case "MultiSelect":
-        return (
-          <MultiSelectInput
-            question={question}
-            value={value}
-            onChange={onInputChange}
-          />
+        return question.allowsAdditionalInput ? (
+          <MultiSelectWithOtherInput {...commonProps} />
+        ) : (
+          <MultiSelectInput {...commonProps} />
         );
       case "Short Response":
-        return (
-          <ShortResponseInput
-            question={question}
-            value={value}
-            onChange={onInputChange}
-          />
-        );
+        return <ShortResponseInput {...commonProps} />;
       case "Long Response":
-        return (
-          <LongResponseInput
-            question={question}
-            value={value}
-            onChange={onInputChange}
-          />
-        );
+        return <LongResponseInput {...commonProps} />;
       case "SizingGrid":
-        return (
-          <SizingGridInput
-            question={question}
-            value={value}
-            onChange={onInputChange}
-          />
-        );
+        return <SizingGridInput {...commonProps} />;
+      case "DemoGrid":
+        return <DemoGridInput {...commonProps} peopleServed={site?.peopleServed} />;
       default:
         return (
           <input
             type="text"
+            className={inputBaseClass}
             value={value}
             onChange={(e) => onInputChange(question.id, e.target.value)}
           />
@@ -166,29 +107,56 @@ const AssessmentForm: React.FC<AssessmentFormProps> = ({
   };
 
   return (
-    <div className="flex-1 p-8">
-      <h1 className="text-3xl font-bold mb-6">{title}</h1>
-      <form className="space-y-4" onSubmit={(e) => e.preventDefault()}>
-        {questions.map((question) => (
-          <div key={question.id}>
-            <label className="block text-lg font-medium">{question.text}</label>
-            {renderInput(question)}
-          </div>
-        ))}
-        <div className="flex space-x-4">
+    <div className="flex-1 px-4 md:px-8 py-6">
+      <form className="space-y-6" onSubmit={(e) => e.preventDefault()}>
+        {questions.map((question) => {
+          const input = renderInput(question);
+          const isInline =
+            question.type === "YesNo" || question.type === "Short Response";
+
+          const showSubtext =
+            !!question.subtext &&
+            (!question.allowsAdditionalInput ||
+              question.type === "Long Response");
+
+          return (
+            <div key={question.id} className="space-y-1">
+              {isInline ? (
+                <div className="flex items-center gap-4 flex-wrap">
+                  <label className="block text-base font-medium text-blue-900">
+                    {question.text}
+                  </label>
+                  {input}
+                </div>
+              ) : (
+                <>
+                  <label className="block text-lg font-medium text-blue-900">
+                    {question.text}
+                  </label>
+                  {showSubtext && (
+                    <p className="text-sm text-blue-700">{question.subtext}</p>
+                  )}
+                  {input}
+                </>
+              )}
+            </div>
+          );
+        })}
+
+        <div className="flex flex-col sm:flex-row justify-end gap-4 pt-6">
           <button
             type="button"
-            className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-            onClick={() => onSubmit(false)}
+            className="bg-blue-600 text-white px-5 py-2 rounded hover:bg-blue-700 transition"
+            onClick={() => onSubmit(false, isConfirmationPage)}
           >
             Save
           </button>
           <button
             type="button"
-            className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
-            onClick={() => onSubmit(true)}
+            className="bg-green-600 text-white px-5 py-2 rounded hover:bg-green-700 transition"
+            onClick={() => onSubmit(true, isConfirmationPage)}
           >
-            Save & Confirm
+            {isConfirmationPage ? "Save and Finalize" : "Save & Confirm"}
           </button>
         </div>
       </form>

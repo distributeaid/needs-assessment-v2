@@ -2,13 +2,13 @@
 import { Box } from "@radix-ui/themes";
 import { useRouter } from "next/navigation";
 import { ProgressStatus } from "@/types/models";
-import { progressColors, isRequired } from "@/lib/progressStyles";
 
 interface SitePageCardProps {
   pageId: number;
   siteAssessmentId: number;
   title: string;
   progress: ProgressStatus;
+  order?: number;
 }
 
 export default function SitePageCard({
@@ -37,9 +37,9 @@ export default function SitePageCard({
       case "STARTEDOPTIONAL":
         return "Continue";
       case "COMPLETE":
-        return "Complete";
-      default:
         return "View";
+      default:
+        return progress;
     }
   };
 

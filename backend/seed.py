@@ -1,17 +1,58 @@
 import csv
 from datetime import datetime
+import json
+import pandas as pd
+from collections import defaultdict
 
 import bcrypt
 
 from backend.models import db, Page, Question, Assessment, User, Site
-from backend.consts import QUESTION_TYPES
 
-def seed_database_from_csv(filepath="backend/data/questions.csv"):
+def choices_from_google():
+    sheet_url = "https://docs.google.com/spreadsheets/d/1hh41TeFexc-0Byg3iDSzbA2nLYd05bgSuwrKu-DUmww/export?format=csv&id=1hh41TeFexc-0Byg3iDSzbA2nLYd05bgSuwrKu-DUmww&gid=0"
+    df = pd.read_csv(sheet_url, header=1)
+    needs_assessment_df = df[df['Include in Needs Assessment']==True]
+    needs_assessment_df = needs_assessment_df[['Category', 'Item']]
+    # strip whitespac e from data
+    needs_assessment_df['Category'] = needs_assessment_df['Category'].str.strip()
+    needs_assessment_df['Item'] = needs_assessment_df['Item'].str.strip()
+
+    category_mapper = {'Baby': 'Infants and Children',
+    'Cleaning': 'Hygeine',
+    'Clothing': 'Clothing',
+    'Cooking': 'Food',
+    'Education': 'Infants and Children',
+    'Electronic': 'Household',
+    'Food': 'Food',
+    'Health': 'Hygeine',
+    'Infrastructure': 'Infrastructure',
+    'Office': 'Household',
+    'Shelter': 'Shelter',
+    'Toys & Activities': 'Infants and Children',
+    'W.A.S.H.': 'Hygeine'}
+    needs_assessment_df['Category'] = needs_assessment_df['Category'].map(category_mapper)
+    # drop duplicates
+    needs_assessment_df = needs_assessment_df.drop_duplicates()
+    # create a dictionary of categories and items
+    choices = defaultdict(list)
+    for _, row in needs_assessment_df.iterrows():
+        category = row['Category']
+        item = row['Item']
+        choices[category].append(item)
+    return choices
+
+
+
+def seed_database_from_csv(filepath="backend/data/questions.csv",
+                           options_file="backend/data/response_options.json"):
     """Reads a CSV file and seeds the database with Assessments, Pages, and Questions."""
     # Get current Year & Season
     current_year = datetime.utcnow().year
     current_season = "Spring" if datetime.utcnow().month < 7 else "Fall"
+    with open(options_file, "r", encoding="utf-8") as f:
+        response_options_dict = json.load(f)
 
+    choices_options = choices_from_google()
     # Ensure there is an Assessment for the current season
     assessment = Assessment.query.filter_by(year=current_year, season=current_season).first()
     if not assessment:
@@ -22,13 +63,35 @@ def seed_database_from_csv(filepath="backend/data/questions.csv"):
     # Open CSV with error handling for encoding issues
     with open(filepath, mode="r", encoding="utf-8", errors="replace") as file:
         reader = csv.DictReader(file)
+        # Compute page order from CSV before the loop
+        file.seek(0)  # rewind file to re-read for mapping
+        reader_for_order = csv.DictReader(file)
+        page_order_mapping = {}
+        for row in reader_for_order:
+            page = row["Page"]
+            try:
+                q_order = int(row["QuestionOrder"])
+            except (ValueError, TypeError):
+                continue
+            if page and (page not in page_order_mapping or q_order < page_order_mapping[page]):
+                page_order_mapping[page] = q_order
+        file.seek(0)  # rewind again to use in the main loop
+        reader = csv.DictReader(file)
+
         for row in reader:
             if row["Page"] == "Preamble":
                 continue
+
             # Fetch or create page within the current assessment
             page = Page.query.filter_by(title=row["Page"], assessment_id=assessment.id).first()
             if not page:
-                page = Page(title=row["Page"], assessment_id=assessment.id)
+                page = Page(
+                    title=row["Page"],
+                    assessment_id=assessment.id,
+                    order=page_order_mapping.get(row["Page"], 9999),
+                    is_confirmation_page=row["Page"] == "Confirmation",
+                    is_profile_page=row["Page"] == "Basic Info"
+                )
                 db.session.add(page)
                 db.session.commit()
 
@@ -39,16 +102,26 @@ def seed_database_from_csv(filepath="backend/data/questions.csv"):
             ).first()
             if existing_question:
                 continue  # Skip this question if it already exists
+            raw_type = row["Type"]
+            normalized_type = raw_type.replace(" With Numeric Entry", "").replace("WithOther", "").strip()
+            options = []
+            if 'Strapi' in row["ItemText"] or "do you need over the next six months?" in row["ItemText"]:
+                options = choices_options.get(row["Page"], None)
+            if not options:
+                options = response_options_dict.get(row["ItemText"], None)
 
-            # Create question since it doesn't exist yet
+            if row["ItemText"] ==  "Which of the following areas do you have needs in?":
+                options = list(set(page_order_mapping.keys()) - {"Preamble", "Confirmation", "Basic Info", "Demographics"})
+
             question = Question(
                 page_id=page.id,
                 text=row["ItemText"],
-                subtext=row["Item Subtext"] if row["Item Subtext"] else None,
-                mandatory=True if row["Mandatory in Section"] == "Y" else False,
-                type=QUESTION_TYPES.get(row["Type"].strip().lower(), "Short Answer"),
-                response_options=row["Response Options"] if row["Response Options"] else None,
-                order=int(row["QuestionOrder"])
+                subtext=row["Subtext"] if row["Subtext"] else None,
+                required=True if row["Mandatory in Section"] == "Y" else False,
+                type=normalized_type,
+                options=options,
+                order=int(row["QuestionOrder"]),
+                allows_additional_input="WithOther" in raw_type or "With Numeric Entry" in raw_type
             )
             db.session.add(question)
 

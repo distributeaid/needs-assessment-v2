@@ -4,12 +4,15 @@ import Link from "next/link";
 import React from "react";
 import { SidebarProps } from "@/types/models";
 import { Box, Heading } from "@radix-ui/themes";
+import SidebarLink from "@/components/ui/SidebarLink";
 import SidebarIcon from "./SidebarIcon";
+import { CheckIcon } from "lucide-react";
 
 const Sidebar: React.FC<SidebarProps> = ({
   siteAssessmentId,
   sitePages,
   currentPageId,
+  confirmed,
 }) => {
   return (
     <Box
@@ -29,10 +32,19 @@ const Sidebar: React.FC<SidebarProps> = ({
         </Heading>
         <SidebarIcon progress="STARTEDOPTIONAL" />
       </Link>
-
+      {confirmed && (
+        <SidebarLink
+          href={`/assessment/${siteAssessmentId}/summary`}
+          label="Summary"
+          icon={<CheckIcon />}
+        />
+      )}
       <div className="w-8 border-t border-[#082B76] my-4" />
 
-      {sitePages.map((page) => {
+      {[
+        // Required + complete pages first
+        ...sitePages.sort((a, b) => a.order - b.order),
+      ].map((page) => {
         const isCurrent = currentPageId === String(page.id);
         const isLocked = page.progress === "LOCKED";
         const showRedDot =

@@ -1,150 +1,156 @@
 "use client";
 
-import { useEffect, useState, useMemo, useCallback } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
-import Sidebar from "@/components/Sidebar";
+
+import PageLayout from "@/components/PageLayout";
 import AssessmentForm from "@/components/AssessmentForm";
 import LoadingSpinner from "@/components/LoadingSpinner";
-import { Question, SidebarProps, ProgressStatus } from "@/types/models";
+import {
+  Question,
+  SidebarProps,
+  SitePage,
+  QuestionResponse,
+  Site,
+} from "@/types/models";
+
+const getIdParam = (param: string | string[] | undefined): string =>
+  Array.isArray(param) ? param[0] : param || "";
+
+const mapPages = (sitePages: SitePage[]): SidebarProps["sitePages"] =>
+  sitePages.map((p) => ({
+    id: p.id,
+    title: p.page.title,
+    progress: p.progress,
+    order: p.page.order,
+    isConfirmationPage: p.isConfirmationPage,
+  }));
+
+const buildInitialResponses = (
+  questions: Question[],
+  responses: QuestionResponse[],
+) =>
+  questions.reduce(
+    (acc, q) => {
+      const existing = responses?.find((r) => r.questionId === q.id);
+      acc[q.id] = existing?.value || q.defaultValue || "";
+      return acc;
+    },
+    {} as Record<number, string>,
+  );
 
 export default function AssessmentPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
   const params = useParams();
+  const pageId = getIdParam(params.pageId);
 
-  // We only need the pageId from the URL now.
-  const pageId = useMemo(() => {
-    if (!params.pageId) return "";
-    return Array.isArray(params.pageId) ? params.pageId[0] : params.pageId;
-  }, [params.pageId]);
-
-  // State to hold the siteAssessment instance returned from the backend.
-  const [siteAssessment, setSiteAssessment] = useState<{ id: number } | null>(
-    null,
-  );
-  const [page, setPage] = useState<{
-    title: string;
-    questions: Question[];
+  const [siteAssessment, setSiteAssessment] = useState<{
+    id: number;
+    confirmed: boolean;
   } | null>(null);
-  const [responses, setResponses] = useState<{ [key: number]: string }>({});
   const [assessmentPages, setAssessmentPages] = useState<
     SidebarProps["sitePages"]
   >([]);
+  const [site, setSite] = useState< Site >();
+  const [page, setPage] = useState<{
+    title: string;
+    questions: Question[];
+    isConfirmationPage: boolean;
+  } | null>(null);
+
+  const [responses, setResponses] = useState<Record<number, string | string[]>>(
+    {},
+  );
   const [error, setError] = useState<string | null>(null);
 
-  // Redirect if there's no valid session.
   useEffect(() => {
-    if (status === "loading") return;
-    if (!session?.user?.accessToken) {
+    if (status !== "loading" && !session?.user?.accessToken) {
       router.push("/about");
     }
   }, [session, status, router]);
 
-  // Fetch overall site assessment data (includes siteAssessmentId and sitePages).
   useEffect(() => {
-    if (status === "loading") return;
-    if (!session) {
-      router.push("/about");
-      return;
-    }
-    fetch(`/flask-api/api/site-assessment`, {
-      headers: {
-        Authorization: `Bearer ${session.user.accessToken}`,
-      },
-    })
-      .then((res) => {
+    if (status !== "authenticated" || !session?.user?.accessToken) return;
+
+    const fetchAssessmentAndPages = async () => {
+      try {
+        const res = await fetch(`/flask-api/api/site-assessment`, {
+          headers: { Authorization: `Bearer ${session.user.accessToken}` },
+        });
         if (res.status === 401) {
           signOut();
           router.push("/login");
           throw new Error("Token has expired");
         }
         if (!res.ok) throw new Error(`API Error: ${res.status}`);
-        return res.json();
-      })
-      .then((data) => {
-        // Save the siteAssessment instance.
-        setSiteAssessment({ id: data.siteAssessmentId });
-        // Map sitePages to our UI format.
-        const pagesWithProgress = data.sitePages.map(
-          (page: {
-            id: number;
-            page: { title: string };
-            progress: ProgressStatus;
-          }) => ({
-            id: page.id,
-            title: page.page.title,
-            progress: page.progress,
-          }),
-        );
-        setAssessmentPages(pagesWithProgress);
-      })
-      .catch((err) => console.error("Assessment fetch error:", err));
+        const data = await res.json();
+        setSiteAssessment({ id: data.id, confirmed: data.confirmed });
+        setAssessmentPages(mapPages(data.sitePages));
+        setSite(data.site);
+
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "Unknown error");
+      }
+    };
+
+    fetchAssessmentAndPages();
   }, [session, status, router]);
 
-  // Fetch details for the specific page (its questions and any existing responses)
   useEffect(() => {
-    if (status === "loading") return;
-    if (!session?.user?.accessToken) return;
-    if (!siteAssessment || !pageId) return;
+    if (!session?.user?.accessToken || !siteAssessment || !pageId) return;
 
-    const fetchPage = async () => {
+    const fetchPageQuestions = async () => {
       try {
         const res = await fetch(
           `/flask-api/api/site-assessment/${siteAssessment.id}/site-page/${pageId}`,
           {
-            headers: {
-              Authorization: `Bearer ${session.user.accessToken}`,
-            },
+            headers: { Authorization: `Bearer ${session.user.accessToken}` },
           },
         );
         if (!res.ok) throw new Error(`API Error: ${res.status}`);
         const data = await res.json();
-        setPage(data);
-        const initialResponses = data.questions.reduce(
-          (acc: { [key: number]: string }, question: Question) => {
-            const existing = data.responses?.find(
-              (resp: { questionId: number; value: string }) =>
-                resp.questionId === question.id,
-            );
-            acc[question.id] =
-              existing && existing.value !== ""
-                ? existing.value
-                : question.defaultValue || "";
-            return acc;
-          },
-          {},
-        );
-        setResponses(initialResponses);
-      } catch (err: unknown) {
-        if (err instanceof Error) {
-          if (err.name !== "AbortError") {
-            setError(err.message);
-          }
-        } else {
-          setError("An unknown error occurred.");
-        }
+        setPage({
+          title: data.title,
+          questions: data.questions,
+          isConfirmationPage: data.isConfirmationPage ?? false,
+        });
+
+        setResponses(buildInitialResponses(data.questions, data.responses));
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "Unknown error");
       }
     };
-    fetchPage();
-  }, [siteAssessment, pageId, session, status, router]);
 
-  const handleInputChange = useCallback((questionId: number, value: string) => {
-    setResponses((prev) => ({ ...prev, [questionId]: value }));
-  }, []);
+    fetchPageQuestions();
+  }, [siteAssessment, pageId, session]);
 
-  const handleSubmit = async (confirm = false) => {
-    const payload = {
-      responses: Object.entries(responses).map(([questionId, value]) => ({
-        questionId: parseInt(questionId),
-        value,
-      })),
-      confirmed: confirm,
-    };
+  const handleInputChange = useCallback(
+    (questionId: number, value: string | string[]) => {
+      setResponses((prev) => ({ ...prev, [questionId]: value }));
+    },
+    [],
+  );
+
+  const handleSubmit = async (
+    confirmed = false,
+    isConfirmationPage = false,
+  ) => {
     if (!session || !siteAssessment) {
       router.push("/about");
       return;
     }
+
+    const payload = {
+      responses: Object.entries(responses).map(([questionId, value]) => ({
+        questionId: parseInt(questionId),
+        value: Array.isArray(value) ? value : value.toString(),
+      })),
+      confirmed,
+    };
+
+    // First: Save responses
     const res = await fetch(
       `/flask-api/api/site-assessment/${siteAssessment.id}/site-page/${pageId}/save`,
       {
@@ -156,40 +162,51 @@ export default function AssessmentPage() {
         body: JSON.stringify(payload),
       },
     );
+
     if (!res.ok) {
       const errorData = await res.json();
-      console.error("Error Response:", errorData);
       setError(errorData.error || "Failed to save responses.");
+      return;
+    }
+
+    // Then: Route based on context
+    if (isConfirmationPage && confirmed) {
+      router.push(`/assessment/${siteAssessment.id}/summary`);
     } else {
       const currentIndex = assessmentPages.findIndex(
         (p) => p.id === Number(pageId),
       );
-      if (currentIndex !== -1 && currentIndex < assessmentPages.length - 1) {
-        const nextPageId = assessmentPages[currentIndex + 1].id;
-        router.push(`/assessment/${siteAssessment.id}/page/${nextPageId}`);
-      } else {
-        router.push("/dashboard");
-      }
+      const nextPage = assessmentPages[currentIndex + 1];
+      router.push(
+        nextPage
+          ? `/assessment/${siteAssessment.id}/page/${nextPage.id}`
+          : "/dashboard",
+      );
     }
   };
 
-  if (error) return <div>Error: {error}</div>;
-  if (!page || !siteAssessment) return <LoadingSpinner />;
+  if (error) return <div className="p-4 text-red-600">{error}</div>;
+  if (!site || !page || !siteAssessment) return <LoadingSpinner />;
 
   return (
-    <div className="flex">
-      <Sidebar
-        siteAssessmentId={siteAssessment.id.toString()}
-        sitePages={assessmentPages}
-        currentPageId={pageId}
-      />
+    <PageLayout
+      title={page.title}
+      withSidebar
+      sidebarProps={{
+        siteAssessmentId: siteAssessment.id.toString(),
+        sitePages: assessmentPages,
+        currentPageId: pageId,
+        confirmed: siteAssessment.confirmed,
+      }}
+    >
       <AssessmentForm
-        title={page.title}
+        isConfirmationPage={page.isConfirmationPage}
         questions={page.questions}
         responses={responses}
         onInputChange={handleInputChange}
         onSubmit={handleSubmit}
+        site={site}
       />
-    </div>
+    </PageLayout>
   );
 }

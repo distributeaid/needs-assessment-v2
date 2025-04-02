@@ -1,12 +1,13 @@
 "use client";
+
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import SitePageCard from "@/components/SitePageCard";
-import Sidebar from "@/components/Sidebar";
+import PageLayout from "@/components/PageLayout";
 import { SiteAssessment } from "@/types/models";
-import { Text, Container, Separator, Flex, Box } from "@radix-ui/themes";
+import { Text, Flex, Separator } from "@radix-ui/themes";
 
 export default function Dashboard() {
   const { data: session, status } = useSession();
@@ -47,69 +48,64 @@ export default function Dashboard() {
   const lockedPages = siteAssessment.sitePages.filter(
     (page) => page.progress === "LOCKED",
   );
-
   return (
-    <div className="flex h-screen">
-      <Sidebar
-        siteAssessmentId={siteAssessment.siteAssessmentId.toString()}
-        sitePages={siteAssessment.sitePages.map((page) => ({
+    <PageLayout
+      title="Dashboard"
+      withSidebar
+      sidebarProps={{
+        siteAssessmentId: siteAssessment.id.toString(),
+        confirmed: siteAssessment.confirmed,
+        sitePages: siteAssessment.sitePages.map((page) => ({
           id: page.id,
           title: page.page.title,
           progress: page.progress,
-        }))}
-      />
+          order: page.page.order,
+        })),
+      }}
+    >
+      {/* Unlocked Cards */}
+      <Flex
+        direction={{ initial: "column", md: "row" }}
+        className="gap-6 mt-6 flex justify-center items-center"
+        justify="center"
+        wrap="wrap"
+      >
+        {unlockedPages.map((page) => (
+          <SitePageCard
+            key={page.id}
+            pageId={page.id}
+            siteAssessmentId={page.siteAssessmentId}
+            title={page.page.title}
+            progress={page.progress}
+          />
+        ))}
+      </Flex>
 
-      <Container className="flex-1 bg-gray-100 p-8 overflow-y-auto">
-        <Text as="p" className="text-xl font-bold text-blue-900 mt-4">
-          Select a category to begin your assessment.
-        </Text>
+      <Separator size="4" className="w-3/4 mx-auto mt-2 mb-8" />
 
-        {/* Unlocked Cards */}
-        <Flex
-          direction={{ initial: "column", md: "row" }}
-          className="gap-6 mt-6 flex justify-center items-center"
-          justify="center"
-          wrap="wrap"
-        >
-          {unlockedPages.map((page) => (
-            <SitePageCard
-              key={page.id}
-              pageId={page.id}
-              siteAssessmentId={page.siteAssessmentId}
-              title={page.page.title}
-              progress={page.progress}
-            />
-          ))}
-        </Flex>
-
-        <Box className="flex justify-center w-full my-10">
-          <Separator className="border-t-2 border-gray-500 w-full max-w-3xl" />
-        </Box>
-
-        {/* Locked Cards */}
-        <Text
-          as="p"
-          className="text-lg font-semibold text-gray-600 text-center mb-4"
-        >
-          Locked categories (complete required sections to unlock)
-        </Text>
-        <Flex
-          direction={{ initial: "column", md: "row" }}
-          className="gap-6 mt-2 flex justify-center items-center"
-          justify="center"
-          wrap="wrap"
-        >
-          {lockedPages.map((page) => (
-            <SitePageCard
-              key={page.id}
-              pageId={page.id}
-              siteAssessmentId={page.siteAssessmentId}
-              title={page.page.title}
-              progress={page.progress}
-            />
-          ))}
-        </Flex>
-      </Container>
-    </div>
+      {/* Locked Cards */}
+      <Text
+        as="p"
+        className="text-lg font-semibold text-gray-600 text-center mb-4"
+      >
+        Locked categories (complete required sections to unlock)
+      </Text>
+      <Flex
+        direction={{ initial: "column", md: "row" }}
+        className="gap-6 mt-2 flex justify-center items-center"
+        justify="center"
+        wrap="wrap"
+      >
+        {lockedPages.map((page) => (
+          <SitePageCard
+            key={page.id}
+            pageId={page.id}
+            siteAssessmentId={page.siteAssessmentId}
+            title={page.page.title}
+            progress={page.progress}
+          />
+        ))}
+      </Flex>
+    </PageLayout>
   );
 }

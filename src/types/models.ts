@@ -17,11 +17,17 @@ export interface Question {
     | "Short Response"
     | "Long Response"
     | "SizingGrid"
-    | "YesNo";
+    | "DemoGrid"
+    | "YesNo"
+    | "YesNoWithNumericEntry"
+    | "DisplayText";
   pageId: number;
   text: string;
+  subtext: string;
   defaultValue: string;
+  required: boolean;
   options?: string[]; // Added options for Dropdown, MultiSelect, and SizingGrid types
+  allowsAdditionalInput: boolean;
 }
 
 export interface Page {
@@ -29,6 +35,7 @@ export interface Page {
   title: string;
   assessmentId: number;
   questions: Question[];
+  order: number;
 }
 
 export interface Assessment {
@@ -53,8 +60,11 @@ export interface SitePage {
     id: number;
     title: string;
     questions: Question[];
+    order: number;
   };
   responses: QuestionResponse[];
+  order: number;
+  isConfirmationPage: boolean;
 }
 
 export interface SiteAssessment {
@@ -63,6 +73,7 @@ export interface SiteAssessment {
   assessmentId: number;
   sitePages: SitePage[];
   assessment: Assessment;
+  confirmed: boolean;
 }
 
 export interface Site {
@@ -70,12 +81,19 @@ export interface Site {
   users: User[];
   name: string;
   siteAssessments: SiteAssessment[];
+  peopleServed: number;
 }
 
 export interface SidebarProps {
   siteAssessmentId: string;
-  sitePages: { id: number; title: string; progress: ProgressStatus }[];
+  sitePages: {
+    id: number;
+    title: string;
+    progress: ProgressStatus;
+    order: number;
+  }[];
   currentPageId?: string;
+  confirmed: boolean;
 }
 
 export interface User {
