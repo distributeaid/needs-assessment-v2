@@ -6,7 +6,7 @@ from sqlalchemy.orm import joinedload
 from backend.models import db, User, SiteAssessment, Page, SitePage, QuestionResponse, Question
 from backend.consts import STANDARD_ITEMS
 from backend.validation import validate_responses
-from backend.utils.utils import ensure_assessment_exists, unlock_remaining_pages
+from backend.utils.utils import ensure_assessment_exists, unlock_remaining_pages, update_from_profile_page
 from backend.serialize.serialize import serialize_question, serialize_question_response, \
     serialize_user, serialize_site_assessment
 from backend.utils.jwt_utils import generate_jwt_payload, get_current_user, JWTError
@@ -114,6 +114,8 @@ def save_site_page(site_assessment_id, site_page_id):
     data = request.get_json()
 
     site_page = db.session.get(SitePage, site_page_id)
+    site_assessment = db.session.get(SiteAssessment, site_assessment_id)
+    page = db.session.get(Page, site_page.page_id)
     if not site_page:
         logging.error(f"SitePage {site_page_id} not found")
         return jsonify({"error": "SitePage not found"}), 404
@@ -129,8 +131,14 @@ def save_site_page(site_assessment_id, site_page_id):
         site_page.progress = "COMPLETE"
         unlock_remaining_pages(site_assessment_id)
     else:
-        # TODO: add logic to differentiate optional pages
-        site_page.progress = "STARTEDREQUIRED"
+        if site_page.required:
+            site_page.progress = "STARTEDREQUIRED"
+        else:
+            site_page.progress = "STARTEDOPTIONAL"
+    db.session.commit()
+
+    if page.is_profile_page:
+        update_from_profile_page(page, site_assessment, responses_data)
 
     # Save or update responses
     for response in responses_data:
@@ -146,7 +154,7 @@ def save_site_page(site_assessment_id, site_page_id):
         ).first()
 
         if existing:
-            existing.value = value  # will serialize JSON correctly
+            existing.value = value
         else:
             db.session.add(QuestionResponse(
                 site_page_id=site_page.id,

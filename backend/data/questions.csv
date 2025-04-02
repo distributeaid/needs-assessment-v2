@@ -8,7 +8,7 @@
 6,Basic Info,,WAREHOUSE,What infrastructure do you have?,,,MultiSelect,"forkift, loading bay + pallet jack",,8
 7,Basic Info,,WAREHOUSE,How much space does your warehouse have?,"sqft (if US), m2 (if international)",,Numeric,if warehouse is selected above,,9
 8,Basic Info,,WAREHOUSE,Is your warehouse accessible by truck (18-wheeler)?,,,YesNo,if warehouse is selected above,,10
-9,Basic Info,,,Which of the following do you provide?,,,MultiSelect,"<Sourced from list of pages marked Supply in Strapi - e.g. food, hygeine, etc>",,11
+9,Basic Info,,,Which of the following areas do you have needs in?,,,MultiSelect,"<Sourced from list of pages marked Supply in Strapi - e.g. food, hygeine, etc>",,11
 10,Demographics,,,How many individuals does your organisation support in one month?,,Y,Numeric,,"Adele- this one always confuses people, need some instruction for how to come up with this",12
 11,Demographics,,,Do you serve the same people more than once?,,N,YesNo,,break these own into simpler questions,13
 12,Demographics,,,How frequently do you support the same individual?,,N,DropdownWithOther,"Daily, Weekly, Monthly, Annually, Other",,14

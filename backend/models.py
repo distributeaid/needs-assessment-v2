@@ -16,7 +16,7 @@ class Site(db.Model):
     name = db.Column(db.String(100), unique=True, nullable=False)
     assessments = db.relationship('SiteAssessment', backref='site', lazy=True)
 
-class Assessment(db.Model):  # Template
+class Assessment(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     year = db.Column(db.Integer, nullable=False)
     season = db.Column(db.String(10), nullable=False)
@@ -29,6 +29,7 @@ class Page(db.Model):
     questions = db.relationship('Question', backref='page', lazy=True)
     order = db.Column(db.Integer, nullable=False)
     is_confirmation_page = db.Column(db.Boolean, default=False)
+    is_profile_page = db.Column(db.Boolean, default=False)
 
 class Question(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -60,6 +61,7 @@ class SitePage(db.Model):
     progress = db.Column(db.String(20), default="LOCKED")
     responses = db.relationship('QuestionResponse', backref='site_page', lazy=True)
     is_confirmation_page = db.Column(db.Boolean, default=False)
+    title = db.Column(db.String(255), nullable=False)
 
 
 class QuestionResponse(db.Model):

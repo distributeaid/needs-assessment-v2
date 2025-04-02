@@ -52,7 +52,8 @@ def seed_database_from_csv(filepath="backend/data/questions.csv",
                     title=row["Page"],
                     assessment_id=assessment.id,
                     order=page_order_mapping.get(row["Page"], 9999),
-                    is_confirmation_page=row["Page"] == "Confirmation"
+                    is_confirmation_page=row["Page"] == "Confirmation",
+                    is_profile_page=row["Page"] == "Basic Info"
                 )
                 db.session.add(page)
                 db.session.commit()
@@ -72,8 +73,7 @@ def seed_database_from_csv(filepath="backend/data/questions.csv",
             if not options:
                 options = response_options_dict.get(row["ItemText"], None)
 
-            if row["ItemText"] == "Which of the following do you provide?":
-                row["ItemText"] = "Which of the following areas do you have needs in?"
+            if row["ItemText"] ==  "Which of the following areas do you have needs in?":
                 options = list(set(page_order_mapping.keys()) - {"Preamble", "Confirmation", "Basic Info", "Demographics"})
 
             question = Question(
