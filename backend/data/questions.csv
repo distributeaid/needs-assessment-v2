@@ -10,10 +10,10 @@
 7,Basic Info,,WAREHOUSE,How much space does your warehouse have?,"sqft (if US), m2 (if international)",,Numeric,if warehouse is selected above,,9
 8,Basic Info,,WAREHOUSE,Is your warehouse accessible by truck (18-wheeler)?,,,YesNo,if warehouse is selected above,,10
 9,Basic Info,,,Which of the following areas do you have needs in?,,,MultiSelect,"<Sourced from list of pages marked Supply in Strapi - e.g. food, hygeine, etc>",,11
-12,Demographics,,,How often do you support the same individuals?,,N,DropdownWithOther,"Daily, Weekly, Monthly, Annually",,14
-13,Demographics,,,What % of people are first-time beneficiaries?,,N,Numeric,shown if serve people more than once,,15
 14,Demographics,,,What is the age / gender breakown for people that you serve?,,Y,DemoGrid,,,16
 15,Demographics,,,Are there specific vulnerable communities that you support?,,N,MultiSelectWithOther,"trans / non-binary / queer, refugees, folks who are incarcerate / recently incarcerate, unhoused people, disabled people",,17
+12,Demographics,,,How often do you support the same individuals?,,N,DropdownWithOther,"Daily, Weekly, Monthly, Annually",,14
+13,Demographics,,,What % of people are first-time beneficiaries?,,N,Numeric,shown if serve people more than once,,15
 16,Demographics,,,Is there anything else you'd like to tell us about about the population that you support?,,N,Long Response,,,18
 17,Food,,,Which modes of food distribution does your organization use?,,,DisplayText,,,19
 18,Food,,,Hot meals eaten on site,About how many hot meals do you distribute in a week?,N,YesNo With Numeric Entry,,,20
