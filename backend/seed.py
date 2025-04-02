@@ -22,13 +22,32 @@ def seed_database_from_csv(filepath="backend/data/questions.csv"):
     # Open CSV with error handling for encoding issues
     with open(filepath, mode="r", encoding="utf-8", errors="replace") as file:
         reader = csv.DictReader(file)
+        # Compute page order from CSV before the loop
+        file.seek(0)  # rewind file to re-read for mapping
+        reader_for_order = csv.DictReader(file)
+        page_order_mapping = {}
+        for row in reader_for_order:
+            page = row["Page"]
+            try:
+                q_order = int(row["QuestionOrder"])
+            except (ValueError, TypeError):
+                continue
+            if page and (page not in page_order_mapping or q_order < page_order_mapping[page]):
+                page_order_mapping[page] = q_order
+        file.seek(0)  # rewind again to use in the main loop
+        reader = csv.DictReader(file)
+
         for row in reader:
             if row["Page"] == "Preamble":
                 continue
             # Fetch or create page within the current assessment
             page = Page.query.filter_by(title=row["Page"], assessment_id=assessment.id).first()
             if not page:
-                page = Page(title=row["Page"], assessment_id=assessment.id)
+                page = Page(
+                    title=row["Page"],
+                    assessment_id=assessment.id,
+                    order=page_order_mapping.get(row["Page"], 9999)
+                )
                 db.session.add(page)
                 db.session.commit()
 

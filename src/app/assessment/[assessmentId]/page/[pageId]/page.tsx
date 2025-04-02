@@ -56,7 +56,7 @@ export default function AssessmentPage() {
         return res.json();
       })
       .then((data) => {
-        setSiteAssessment({ id: data.siteAssessmentId });
+        setSiteAssessment({ id: data.id });
         const pages = data.sitePages.map(
           (page: {
             id: number;

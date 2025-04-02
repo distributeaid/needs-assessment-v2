@@ -48,13 +48,12 @@ export default function Dashboard() {
   const lockedPages = siteAssessment.sitePages.filter(
     (page) => page.progress === "LOCKED",
   );
-
   return (
     <PageLayout
       title="Dashboard"
       withSidebar
       sidebarProps={{
-        siteAssessmentId: siteAssessment.siteAssessmentId.toString(),
+        siteAssessmentId: siteAssessment.id.toString(),
         sitePages: siteAssessment.sitePages.map((page) => ({
           id: page.id,
           title: page.page.title,

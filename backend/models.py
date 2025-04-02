@@ -26,6 +26,7 @@ class Page(db.Model):
     title = db.Column(db.String(255), nullable=False)
     assessment_id = db.Column(db.Integer, db.ForeignKey('assessment.id'), nullable=False)
     questions = db.relationship('Question', backref='page', lazy=True)
+    order = db.Column(db.Integer, nullable=False)
 
 class Question(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -48,6 +49,7 @@ class SitePage(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     site_assessment_id = db.Column(db.Integer, db.ForeignKey('site_assessment.id'), nullable=False)
     page_id = db.Column(db.Integer, db.ForeignKey("page.id"), nullable=False)
+    order = db.Column(db.Integer, nullable=False)
     state = db.Column(db.String(10), default='required')
     required = db.Column(db.Boolean, default=False)
     progress = db.Column(db.String(20), default="LOCKED") # 'Locked', 'Unstarted', 'STARTEDREQUIRED', 'Complete'

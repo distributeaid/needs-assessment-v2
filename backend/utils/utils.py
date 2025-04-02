@@ -20,7 +20,8 @@ def create_site_assessment(site_id, assessment_id):
             site_assessment_id=site_assessment.id,
             page_id=page.id,
             required=is_required,
-            progress="UNSTARTEDREQUIRED" if is_required else "LOCKED"
+            progress="UNSTARTEDREQUIRED" if is_required else "LOCKED",
+            order=page.order,
         )
         db.session.add(site_page)
 

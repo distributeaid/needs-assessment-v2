@@ -29,6 +29,7 @@ export interface Page {
   title: string;
   assessmentId: number;
   questions: Question[];
+  order: number;
 }
 
 export interface Assessment {
@@ -53,8 +54,10 @@ export interface SitePage {
     id: number;
     title: string;
     questions: Question[];
+
   };
   responses: QuestionResponse[];
+  order: number;
 }
 
 export interface SiteAssessment {

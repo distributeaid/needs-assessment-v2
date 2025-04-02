@@ -28,3 +28,35 @@ def serialize_user(user: User) -> dict:
         "email": user.email,
         "siteId": user.site_id,
     }
+
+def serialize_site_page(site_page: SitePage) -> dict:
+    page = Page.query.options(joinedload(Page.questions)).filter_by(id=site_page.page_id).first()
+    return {
+        "id": site_page.id,
+        "pageId": site_page.page_id,
+        "progress": site_page.progress,
+        "required": site_page.required,
+        "state": site_page.state,
+        "site_assessment_id": site_page.site_assessment_id,
+        "page": {
+            "id": page.id,
+            "title": page.title,
+            "questions": [
+                serialize_question(q)
+                for q in page.questions
+            ],
+        },
+    }
+
+def serialize_site_assessment(assessment: SiteAssessment) -> dict:
+    serialized_site_pages = [
+        serialize_site_page(sp)
+        for sp in assessment.site_pages
+    ]
+    return {
+        "id": assessment.id,
+        "siteId": assessment.site_id,
+        "assessmentId": assessment.assessment_id,
+        "createdAt": assessment.created_at.isoformat(),
+        "sitePages": serialized_site_pages
+    }

@@ -7,7 +7,8 @@ from backend.models import db, User, SiteAssessment, Page, SitePage, QuestionRes
 from backend.consts import STANDARD_ITEMS
 from backend.validation import validate_responses
 from backend.utils.utils import ensure_assessment_exists, unlock_remaining_pages
-from backend.serialize.serialize import serialize_question, serialize_question_response, serialize_user
+from backend.serialize.serialize import serialize_question, serialize_question_response, \
+    serialize_user, serialize_site_assessment
 from backend.utils.jwt_utils import generate_jwt_payload, get_current_user, JWTError
 
 api_bp = Blueprint("api", __name__)
@@ -84,21 +85,7 @@ def get_site_assessment():
         ensure_assessment_exists(user.site_id)
         site_assessment = SiteAssessment.query.filter_by(site_id=user.site_id).first()
 
-    # Get the SitePages associated with this site assessment.
-    site_pages = SitePage.query.filter_by(site_assessment_id=site_assessment.id).all()
-    response = {
-        "siteAssessmentId": site_assessment.id,
-        "siteId": site_assessment.site_id,
-        "sitePages": [
-            {
-                "id": sp.page_id,
-                "page": {"title": db.session.get(Page, sp.page_id).title},
-                "required": sp.required,
-                "progress": sp.progress,
-            }
-            for sp in site_pages
-        ]
-    }
+    response = serialize_site_assessment(site_assessment)
     return jsonify(response)
 
 
