@@ -16,6 +16,7 @@ interface PageLayoutProps {
       id: number;
       title: string;
       progress: SitePage["progress"];
+      order: number;
     }[];
     currentPageId?: string;
   };

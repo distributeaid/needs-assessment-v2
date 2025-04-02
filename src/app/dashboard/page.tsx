@@ -58,6 +58,7 @@ export default function Dashboard() {
           id: page.id,
           title: page.page.title,
           progress: page.progress,
+          order: page.page.order,
         })),
       }}
     >

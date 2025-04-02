@@ -95,54 +95,55 @@ def save_site_page(site_assessment_id, site_page_id):
     """Save a SitePage with validation, but do not require mandatory questions."""
     logging.info(f"Saving SitePage {site_page_id} for assessment {site_assessment_id}")
     data = request.get_json()
+
     site_page = db.session.get(SitePage, site_page_id)
     if not site_page:
         logging.error(f"SitePage {site_page_id} not found")
         return jsonify({"error": "SitePage not found"}), 404
 
-    # Validate data (ensure proper types)
-    validation_errors = validate_responses(data.get("responses", []))
+    responses_data = data.get("responses", [])
+    validation_errors = validate_responses(responses_data)
     if validation_errors:
         logging.error(f"Validation errors: {validation_errors}")
         return jsonify({"errors": validation_errors}), 400
 
-    # Update progress based on confirmation flag
+    # Update progress
     if data.get("confirmed"):
         site_page.progress = "COMPLETE"
         unlock_remaining_pages(site_assessment_id)
     else:
-        # todo update for optional
+        # TODO: add logic to differentiate optional pages
         site_page.progress = "STARTEDREQUIRED"
 
-    # Process each response
-    responses_data = data.get("responses", [])
+    # Save or update responses
     for response in responses_data:
         question_id = response.get("questionId")
-        answer = response.get("value")
-        if not question_id:
-            continue  # Skip if questionId is missing
-        # Look for an existing response for this question on this site_page
-        question_response = QuestionResponse.query.filter_by(
+        value = response.get("value")
+
+        if question_id is None:
+            continue  # skip incomplete response
+
+        existing = QuestionResponse.query.filter_by(
             site_page_id=site_page.id,
             question_id=question_id
         ).first()
-        if question_response:
-            question_response.value = answer
+
+        if existing:
+            existing.value = value  # will serialize JSON correctly
         else:
-            new_response = QuestionResponse(
+            db.session.add(QuestionResponse(
                 site_page_id=site_page.id,
                 question_id=question_id,
-                value=answer
-            )
-            db.session.add(new_response)
-        logging.info(f"Response saved: {question_id} -> {answer}")
+                value=value
+            ))
+
+        logging.info(f"Saved: Question {question_id} -> {value}")
 
     db.session.commit()
-    if data.get("confirmed"):
-        return jsonify({"message": "SitePage completed successfully"})
-    else:
-        return jsonify({"message": "SitePage saved successfully"})
 
+    return jsonify({
+        "message": "SitePage completed successfully" if data.get("confirmed") else "SitePage saved successfully"
+    })
 
 
 @api_bp.route("/api/site-assessment/<int:site_assessment_id>/site-page/<int:site_page_id>", methods=["GET"])

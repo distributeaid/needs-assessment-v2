@@ -43,6 +43,7 @@ def seed_database_from_csv(filepath="backend/data/questions.csv",
         for row in reader:
             if row["Page"] == "Preamble":
                 continue
+
             # Fetch or create page within the current assessment
             page = Page.query.filter_by(title=row["Page"], assessment_id=assessment.id).first()
             if not page:
@@ -61,15 +62,17 @@ def seed_database_from_csv(filepath="backend/data/questions.csv",
             ).first()
             if existing_question:
                 continue  # Skip this question if it already exists
-
+            raw_type = row["Type"]
+            normalized_type = raw_type.replace(" With Numeric Entry", "").replace("WithOther", "").strip()
             question = Question(
                 page_id=page.id,
                 text=row["ItemText"],
                 subtext=row["Item Subtext"] if row["Item Subtext"] else None,
                 mandatory=True if row["Mandatory in Section"] == "Y" else False,
-                type=row["Type"],
+                type=normalized_type,
                 options=response_options_dict.get(row["ItemText"], None),
-                order=int(row["QuestionOrder"])
+                order=int(row["QuestionOrder"]),
+                allows_additional_input="WithOther" in raw_type or "With Numeric Entry" in raw_type
             )
             db.session.add(question)
 

@@ -38,6 +38,8 @@ class Question(db.Model):
     type = db.Column(db.String(50), nullable=False)
     options = db.Column(JSON, nullable=True)
     order = db.Column(db.Integer, nullable=False)
+    allows_additional_input = db.Column(db.Boolean, default=False)
+
 
 class SiteAssessment(db.Model):  # Instance for a Site
     id = db.Column(db.Integer, primary_key=True)

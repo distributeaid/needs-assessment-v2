@@ -23,6 +23,7 @@ export interface Question {
   defaultValue: string;
   required: boolean;
   options?: string[]; // Added options for Dropdown, MultiSelect, and SizingGrid types
+  allowsAdditionalInput: boolean;
 }
 
 export interface Page {

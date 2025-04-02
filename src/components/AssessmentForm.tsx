@@ -4,6 +4,7 @@ import React from "react";
 import { Question } from "@/types/models";
 import SizingGridInput from "@/components/questions/SizingGridInput";
 import MultiSelectInput from "@/components/questions/MultiSelectInput";
+import YesNoInput from "@/components/questions/YesNoInput";
 import { InputProps } from "@/types/ui-models";
 
 interface AssessmentFormProps {
@@ -70,6 +71,8 @@ const AssessmentForm: React.FC<AssessmentFormProps> = ({
     switch (question.type) {
       case "Numeric":
         return <NumericInput {...commonProps} />;
+      case "YesNo":
+        return <YesNoInput {...commonProps} />;
       case "Dropdown":
         return <DropdownInput {...commonProps} />;
       case "MultiSelect":
