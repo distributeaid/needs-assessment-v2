@@ -42,7 +42,7 @@ class Question(db.Model):
     allows_additional_input = db.Column(db.Boolean, default=False)
 
 
-class SiteAssessment(db.Model):  # Instance for a Site
+class SiteAssessment(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     site_id = db.Column(db.Integer, db.ForeignKey('site.id'), nullable=False)
     assessment_id = db.Column(db.Integer, db.ForeignKey('assessment.id'), nullable=False)

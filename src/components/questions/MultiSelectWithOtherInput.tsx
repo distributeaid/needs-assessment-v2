@@ -4,7 +4,6 @@ import React from "react";
 import { InputProps } from "@/types/ui-models";
 import SelectableButton from "@/components/ui/SelectableButton";
 
-
 const OTHER_PREFIX = "Other:";
 
 const MultiSelectWithOtherInput: React.FC<InputProps> = ({
@@ -19,7 +18,10 @@ const MultiSelectWithOtherInput: React.FC<InputProps> = ({
       : [];
 
   const baseSelections = selected.filter((v) => !v.startsWith(OTHER_PREFIX));
-  const otherValue = selected.find((v) => v.startsWith(OTHER_PREFIX))?.slice(OTHER_PREFIX.length) || "";
+  const otherValue =
+    selected
+      .find((v) => v.startsWith(OTHER_PREFIX))
+      ?.slice(OTHER_PREFIX.length) || "";
 
   const toggleOption = (option: string) => {
     const isSelected = baseSelections.includes(option);

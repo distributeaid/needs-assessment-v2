@@ -57,22 +57,33 @@ const AssessmentForm: React.FC<AssessmentFormProps> = ({
 }) => {
   const renderInput = (question: Question) => {
     const value = responses[question.id] || "";
-    const commonProps = { question, value, onChange: onInputChange, isConfirmationPage };
+    const commonProps = {
+      question,
+      value,
+      onChange: onInputChange,
+      isConfirmationPage,
+    };
     switch (question.type) {
       case "Numeric":
         return <NumericInput {...commonProps} />;
       case "YesNo":
-        return question.allowsAdditionalInput
-          ? <YesNoWithNumericEntry {...commonProps} />
-          : <YesNoInput {...commonProps} />;
+        return question.allowsAdditionalInput ? (
+          <YesNoWithNumericEntry {...commonProps} />
+        ) : (
+          <YesNoInput {...commonProps} />
+        );
       case "Dropdown":
-        return question.allowsAdditionalInput
-          ? <DropdownWithOtherInput {...commonProps} />
-          : <DropdownInput {...commonProps} />;
+        return question.allowsAdditionalInput ? (
+          <DropdownWithOtherInput {...commonProps} />
+        ) : (
+          <DropdownInput {...commonProps} />
+        );
       case "MultiSelect":
-        return question.allowsAdditionalInput
-          ? <MultiSelectWithOtherInput {...commonProps} />
-          : <MultiSelectInput {...commonProps} />;
+        return question.allowsAdditionalInput ? (
+          <MultiSelectWithOtherInput {...commonProps} />
+        ) : (
+          <MultiSelectInput {...commonProps} />
+        );
       case "Short Response":
         return <ShortResponseInput {...commonProps} />;
       case "Long Response":
@@ -103,7 +114,8 @@ const AssessmentForm: React.FC<AssessmentFormProps> = ({
 
           const showSubtext =
             !!question.subtext &&
-            (!question.allowsAdditionalInput || question.type === "Long Response");
+            (!question.allowsAdditionalInput ||
+              question.type === "Long Response");
 
           return (
             <div key={question.id} className="space-y-1">
@@ -144,7 +156,6 @@ const AssessmentForm: React.FC<AssessmentFormProps> = ({
           >
             {isConfirmationPage ? "Save and Finalize" : "Save & Confirm"}
           </button>
-
         </div>
       </form>
     </div>

@@ -46,20 +46,20 @@ const DropdownWithOtherInput: React.FC<InputProps> = ({
 
       {selected === "Other" && (
         <>
-            {question.subtext && (
+          {question.subtext && (
             <p className="text-sm text-blue-900 font-medium mb-1">
-                {question.subtext}
+              {question.subtext}
             </p>
-            )}
-            <input
+          )}
+          <input
             type="text"
             value={otherValue}
             onChange={(e) => setOtherValue(e.target.value)}
             className="w-full px-4 py-2 rounded border text-blue-900"
             placeholder="Enter your response"
-            />
+          />
         </>
-        )}
+      )}
     </div>
   );
 };

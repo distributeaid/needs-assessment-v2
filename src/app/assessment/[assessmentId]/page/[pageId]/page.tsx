@@ -7,7 +7,12 @@ import { useSession, signOut } from "next-auth/react";
 import PageLayout from "@/components/PageLayout";
 import AssessmentForm from "@/components/AssessmentForm";
 import LoadingSpinner from "@/components/LoadingSpinner";
-import { Question, SidebarProps, SitePage, QuestionResponse } from "@/types/models";
+import {
+  Question,
+  SidebarProps,
+  SitePage,
+  QuestionResponse,
+} from "@/types/models";
 
 const getIdParam = (param: string | string[] | undefined): string =>
   Array.isArray(param) ? param[0] : param || "";
@@ -21,12 +26,18 @@ const mapPages = (sitePages: SitePage[]): SidebarProps["sitePages"] =>
     isConfirmationPage: p.isConfirmationPage,
   }));
 
-const buildInitialResponses = (questions: Question[], responses: QuestionResponse[]) =>
-  questions.reduce((acc, q) => {
-    const existing = responses?.find((r) => r.questionId === q.id);
-    acc[q.id] = existing?.value || q.defaultValue || "";
-    return acc;
-  }, {} as Record<number, string>);
+const buildInitialResponses = (
+  questions: Question[],
+  responses: QuestionResponse[],
+) =>
+  questions.reduce(
+    (acc, q) => {
+      const existing = responses?.find((r) => r.questionId === q.id);
+      acc[q.id] = existing?.value || q.defaultValue || "";
+      return acc;
+    },
+    {} as Record<number, string>,
+  );
 
 export default function AssessmentPage() {
   const { data: session, status } = useSession();
@@ -34,11 +45,22 @@ export default function AssessmentPage() {
   const params = useParams();
   const pageId = getIdParam(params.pageId);
 
-  const [siteAssessment, setSiteAssessment] = useState<{ id: number, confirmed: boolean } | null>(null);
-  const [assessmentPages, setAssessmentPages] = useState<SidebarProps["sitePages"]>([]);
-  const [page, setPage] = useState<{ title: string; questions: Question[]; isConfirmationPage: boolean } | null>(null);
+  const [siteAssessment, setSiteAssessment] = useState<{
+    id: number;
+    confirmed: boolean;
+  } | null>(null);
+  const [assessmentPages, setAssessmentPages] = useState<
+    SidebarProps["sitePages"]
+  >([]);
+  const [page, setPage] = useState<{
+    title: string;
+    questions: Question[];
+    isConfirmationPage: boolean;
+  } | null>(null);
 
-  const [responses, setResponses] = useState<Record<number, string | string[]>>({});
+  const [responses, setResponses] = useState<Record<number, string | string[]>>(
+    {},
+  );
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -72,7 +94,6 @@ export default function AssessmentPage() {
     fetchAssessmentAndPages();
   }, [session, status, router]);
 
-
   useEffect(() => {
     if (!session?.user?.accessToken || !siteAssessment || !pageId) return;
 
@@ -82,7 +103,7 @@ export default function AssessmentPage() {
           `/flask-api/api/site-assessment/${siteAssessment.id}/site-page/${pageId}`,
           {
             headers: { Authorization: `Bearer ${session.user.accessToken}` },
-          }
+          },
         );
         if (!res.ok) throw new Error(`API Error: ${res.status}`);
         const data = await res.json();
@@ -105,11 +126,13 @@ export default function AssessmentPage() {
     (questionId: number, value: string | string[]) => {
       setResponses((prev) => ({ ...prev, [questionId]: value }));
     },
-    []
+    [],
   );
 
-
-  const handleSubmit = async (confirmed = false, isConfirmationPage = false) => {
+  const handleSubmit = async (
+    confirmed = false,
+    isConfirmationPage = false,
+  ) => {
     console.log("handleSubmit", confirmed, isConfirmationPage);
 
     if (!session || !siteAssessment) {
@@ -135,7 +158,7 @@ export default function AssessmentPage() {
           Authorization: `Bearer ${session.user.accessToken}`,
         },
         body: JSON.stringify(payload),
-      }
+      },
     );
 
     if (!res.ok) {
@@ -148,12 +171,14 @@ export default function AssessmentPage() {
     if (isConfirmationPage && confirmed) {
       router.push(`/assessment/${siteAssessment.id}/summary`);
     } else {
-      const currentIndex = assessmentPages.findIndex((p) => p.id === Number(pageId));
+      const currentIndex = assessmentPages.findIndex(
+        (p) => p.id === Number(pageId),
+      );
       const nextPage = assessmentPages[currentIndex + 1];
       router.push(
         nextPage
           ? `/assessment/${siteAssessment.id}/page/${nextPage.id}`
-          : "/dashboard"
+          : "/dashboard",
       );
     }
   };

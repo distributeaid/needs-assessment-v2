@@ -48,8 +48,8 @@ const SummaryInput: React.FC<InputProps> = ({ question, onChange }) => {
   const handleChange = (item: string, value: string) => {
     setEstimates((prev) =>
       prev.map((e) =>
-        e.item === item ? { ...e, final: parseInt(value) || 0 } : e
-      )
+        e.item === item ? { ...e, final: parseInt(value) || 0 } : e,
+      ),
     );
   };
 

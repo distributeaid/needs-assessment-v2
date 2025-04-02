@@ -21,7 +21,9 @@ export default function SummaryPage() {
   const { assessmentId } = useParams();
   const [data, setData] = useState<SummaryItem[]>([]);
   const [loading, setLoading] = useState(true);
-  const [sidebarPages, setSidebarPages] = useState<SidebarProps["sitePages"]>([]);
+  const [sidebarPages, setSidebarPages] = useState<SidebarProps["sitePages"]>(
+    [],
+  );
   const { data: session, status } = useSession();
 
   useEffect(() => {
@@ -42,12 +44,18 @@ export default function SummaryPage() {
 
       setData(summaryData);
       setSidebarPages(
-        siteAssessment.sitePages.map((p: { id: number; page: { title: string; order: number }; progress: number }) => ({
-          id: p.id,
-          title: p.page.title,
-          progress: p.progress,
-          order: p.page.order,
-        }))
+        siteAssessment.sitePages.map(
+          (p: {
+            id: number;
+            page: { title: string; order: number };
+            progress: number;
+          }) => ({
+            id: p.id,
+            title: p.page.title,
+            progress: p.progress,
+            order: p.page.order,
+          }),
+        ),
       );
       setLoading(false);
     };
@@ -70,7 +78,10 @@ export default function SummaryPage() {
     >
       <div className="space-y-8">
         {data.map((page) => (
-          <div key={page.sitePageId} className="bg-white border border-blue-100 rounded-lg shadow-sm p-6">
+          <div
+            key={page.sitePageId}
+            className="bg-white border border-blue-100 rounded-lg shadow-sm p-6"
+          >
             <h2 className="text-lg font-bold text-blue-800 mb-4">
               <a
                 href={`/assessment/${assessmentId}/page/${page.sitePageId}`}
@@ -124,8 +135,7 @@ export default function SummaryPage() {
             backgroundColor: "#3759D9",
           },
         ]}
-/>
-
+      />
     </PageLayout>
   );
 }

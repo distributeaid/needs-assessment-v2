@@ -36,7 +36,7 @@ const GridInput: React.FC<GridInputProps> = ({
               ...empty[row],
               ...(parsed?.[row] ?? {}),
             },
-          ])
+          ]),
         ) as Grid;
       } catch {
         console.warn("Failed to parse grid JSON, using default.");
@@ -65,8 +65,7 @@ const GridInput: React.FC<GridInputProps> = ({
 
   return (
     <div className="p-4 border rounded-lg bg-blue-50">
-      <div className="flex items-center justify-between">
-      </div>
+      <div className="flex items-center justify-between"></div>
 
       {
         <div className="mt-4 overflow-x-auto">
@@ -75,7 +74,10 @@ const GridInput: React.FC<GridInputProps> = ({
               <tr>
                 <th></th>
                 {colLabels.map((col) => (
-                  <th key={col} className="px-2 py-1 font-semibold text-blue-900">
+                  <th
+                    key={col}
+                    className="px-2 py-1 font-semibold text-blue-900"
+                  >
                     {col}
                   </th>
                 ))}

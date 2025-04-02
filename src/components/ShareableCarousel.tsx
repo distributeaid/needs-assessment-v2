@@ -38,7 +38,8 @@ const ShareableCarousel: React.FC<ShareableCarouselProps> = ({
     <div className="mt-12">
       <h2 className="text-2xl font-bold mb-4">Shareable Highlights</h2>
       <p className="text-gray-700 mb-6">
-        {organizationName} is serving {peopleServed} people. Here’s a snapshot of their needs:
+        {organizationName} is serving {peopleServed} people. Here’s a snapshot
+        of their needs:
       </p>
 
       <div

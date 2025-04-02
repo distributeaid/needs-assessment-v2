@@ -3,14 +3,20 @@
 import React, { useState, useEffect } from "react";
 import { InputProps } from "@/types/ui-models";
 
-const YesNoWithNumericEntryInput: React.FC<InputProps> = ({ question, value, onChange }) => {
+const YesNoWithNumericEntryInput: React.FC<InputProps> = ({
+  question,
+  value,
+  onChange,
+}) => {
   const [selected, setSelected] = useState<"Yes" | "No" | "">("");
   const [extra, setExtra] = useState("");
 
   // Parse initial value
   useEffect(() => {
     if (typeof value === "string") {
-      const [choice, number] = value.includes("|") ? value.split("|") : [value, ""];
+      const [choice, number] = value.includes("|")
+        ? value.split("|")
+        : [value, ""];
       if (choice === "Yes" || choice === "No") {
         setSelected(choice);
         setExtra(number);
@@ -36,11 +42,13 @@ const YesNoWithNumericEntryInput: React.FC<InputProps> = ({ question, value, onC
             type="button"
             onClick={() => setSelected(choice as "Yes" | "No")}
             className={`px-4 py-2 rounded-full font-semibold transition
-              ${selected === choice
-                ? choice === "Yes"
-                  ? "bg-blue-600 text-white shadow-md"
-                  : "bg-green-500 text-white shadow-md"
-                : "bg-gray-200 text-blue-900 hover:bg-blue-100"}`}
+              ${
+                selected === choice
+                  ? choice === "Yes"
+                    ? "bg-blue-600 text-white shadow-md"
+                    : "bg-green-500 text-white shadow-md"
+                  : "bg-gray-200 text-blue-900 hover:bg-blue-100"
+              }`}
           >
             {choice.toUpperCase()}
           </button>
@@ -50,7 +58,9 @@ const YesNoWithNumericEntryInput: React.FC<InputProps> = ({ question, value, onC
       {selected === "Yes" && (
         <>
           {question.subtext && (
-            <p className="text-sm text-blue-900 font-medium">{question.subtext}</p>
+            <p className="text-sm text-blue-900 font-medium">
+              {question.subtext}
+            </p>
           )}
           <input
             type="number"

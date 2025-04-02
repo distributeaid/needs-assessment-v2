@@ -19,8 +19,8 @@ const MultiSelectInput: React.FC<MultiSelectInputProps> = ({
   const selectedValues = Array.isArray(value)
     ? value
     : value
-    ? value.split(",")
-    : [];
+      ? value.split(",")
+      : [];
 
   const toggleOption = (option: string) => {
     const updated = selectedValues.includes(option)
