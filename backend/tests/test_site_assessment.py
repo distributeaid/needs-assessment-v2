@@ -35,7 +35,7 @@ def test_get_site_assessment(client, setup_site_assessment, auth_header):
     # Verify required pages are Unstarted, others are Locked
     for page in data["sitePages"]:
         if page["required"]:
-            assert page["progress"] == "UNSTARTED"
+            assert page["progress"] == "UNSTARTEDREQUIRED"
         else:
             assert page["progress"] == "LOCKED"
 
@@ -78,5 +78,5 @@ def test_complete_site_page(client, setup_site_assessment):
         non_required_pages = SitePage.query.filter_by(site_assessment_id=setup_site_assessment.id, required=False).all()
         for page in non_required_pages:
             refreshed = db.session.get(SitePage, page.id)
-            assert refreshed.progress == "UNSTARTED"
+            assert refreshed.progress == "UNSTARTEDOPTIONAL"
 

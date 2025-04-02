@@ -2,6 +2,7 @@
 import { Box } from "@radix-ui/themes";
 import { useRouter } from "next/navigation";
 import { ProgressStatus } from "@/types/models";
+import { progressColors, isRequired } from "@/lib/progressStyles";
 
 interface SitePageCardProps {
   pageId: number;

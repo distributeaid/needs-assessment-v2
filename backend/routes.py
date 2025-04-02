@@ -19,7 +19,6 @@ def status():
 
 @api_bp.route("/api/login", methods=["POST"])
 def login():
-    print("HIIII")
     data = request.get_json()
     email = data.get("email")
     user = User.query.filter_by(email=email).first()
@@ -36,8 +35,6 @@ def login():
         "user": serialize_user(user),
         "accessToken": token
     }
-
-    print(result)
 
     return jsonify(result)
 
