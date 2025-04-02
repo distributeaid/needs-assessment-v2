@@ -1,4 +1,4 @@
-import React, { useEffect, useState, JSX } from "react";
+import React, { useEffect, useState, useRef, JSX } from "react";
 import { InputProps } from "@/types/ui-models";
 
 type Grid = Record<string, Record<string, number>>;
@@ -7,7 +7,7 @@ interface GridInputProps extends InputProps {
   rowLabels: string[];
   colLabels: string[];
   summary?: (grid: Grid) => string | JSX.Element | null;
-  initialGrid?: Grid; // <-- New optional prop
+  initialGrid?: Grid;
 }
 
 const GridInput: React.FC<GridInputProps> = ({
@@ -19,15 +19,15 @@ const GridInput: React.FC<GridInputProps> = ({
   summary,
   initialGrid,
 }) => {
-  const emptyGrid: Grid = rowLabels.reduce((acc, row) => {
-    acc[row] = colLabels.reduce((rowAcc, col) => {
-      rowAcc[col] = 0;
-      return rowAcc;
-    }, {} as Record<string, number>);
-    return acc;
-  }, {} as Grid);
-
   const parseGrid = (): Grid => {
+    const empty: Grid = {};
+    rowLabels.forEach((row) => {
+      empty[row] = {};
+      colLabels.forEach((col) => {
+        empty[row][col] = 0;
+      });
+    });
+
     if (typeof value === "string" && value.trim()) {
       try {
         const parsed = JSON.parse(value);
@@ -35,19 +35,39 @@ const GridInput: React.FC<GridInputProps> = ({
           rowLabels.map((row) => [
             row,
             {
-              ...emptyGrid[row],
+              ...empty[row],
               ...(parsed?.[row] ?? {}),
             },
-          ])
+          ]),
         ) as Grid;
       } catch {
         console.warn("Failed to parse grid JSON, using default.");
       }
     }
-    return initialGrid || emptyGrid;
+
+    return empty;
   };
 
-  const [grid, setGrid] = useState<Grid>(parseGrid);
+  // Track whether we’ve already initialized from initialGrid
+  const hasInitialized = useRef(false);
+  const [grid, setGrid] = useState<Grid>(() => {
+    if (initialGrid && !hasInitialized.current) {
+      hasInitialized.current = true;
+      return initialGrid;
+    }
+    return parseGrid();
+  });
+
+  // Re-sync `value` if it's changed from server (e.g. routing or reload)
+  useEffect(() => {
+    const parsed = parseGrid();
+    const totalParsed = Object.values(parsed).flatMap(Object.values).reduce((a, b) => a + b, 0);
+    const totalGrid = Object.values(grid).flatMap(Object.values).reduce((a, b) => a + b, 0);
+    if (totalParsed > 0 && totalParsed !== totalGrid) {
+      setGrid(parsed);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [value]);
 
   useEffect(() => {
     onChange(question.id, JSON.stringify(grid));
@@ -72,7 +92,10 @@ const GridInput: React.FC<GridInputProps> = ({
             <tr>
               <th></th>
               {colLabels.map((col) => (
-                <th key={col} className="px-2 py-1 font-semibold text-blue-900">
+                <th
+                  key={col}
+                  className="px-2 py-1 font-semibold text-blue-900"
+                >
                   {col}
                 </th>
               ))}
@@ -90,7 +113,9 @@ const GridInput: React.FC<GridInputProps> = ({
                       type="number"
                       min="0"
                       value={grid[row][col]}
-                      onChange={(e) => handleChange(row, col, e.target.value)}
+                      onChange={(e) =>
+                        handleChange(row, col, e.target.value)
+                      }
                       className="mt-1 p-2 border rounded w-full"
                     />
                   </td>
