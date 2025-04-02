@@ -17,9 +17,11 @@ export interface Question {
     | "Short Response"
     | "Long Response"
     | "SizingGrid"
+    | "DemoGrid"
     | "YesNo";
   pageId: number;
   text: string;
+  subtext: string;
   defaultValue: string;
   required: boolean;
   options?: string[]; // Added options for Dropdown, MultiSelect, and SizingGrid types

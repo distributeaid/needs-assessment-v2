@@ -34,7 +34,7 @@ class Question(db.Model):
     page_id = db.Column(db.Integer, db.ForeignKey('page.id'), nullable=False)
     text = db.Column(db.String(255), nullable=False)
     subtext = db.Column(db.String(255), nullable=True)
-    mandatory = db.Column(db.Boolean, default=False)
+    required = db.Column(db.Boolean, default=False)
     type = db.Column(db.String(50), nullable=False)
     options = db.Column(JSON, nullable=True)
     order = db.Column(db.Integer, nullable=False)

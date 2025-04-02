@@ -2,15 +2,15 @@ import React from "react";
 import { InputProps } from "@/types/ui-models";
 import GridInput from "@/components/ui/GridInput";
 
-const groups = ["Men", "Women", "Boys", "Girls"];
-const sizes = ["XS", "S", "M", "L", "XL", "XXL"];
+const categories = ["Infants", "Kids", "Teens", "Adults"];
+const genders = ["Male", "Female"];
 
-const SizingGridInput: React.FC<InputProps> = (props) => {
+const DemoGridInput: React.FC<InputProps> = (props) => {
   return (
     <GridInput
       {...props}
-      rowLabels={groups}
-      colLabels={sizes}
+      rowLabels={genders}
+      colLabels={categories}
       summary={(grid) => {
         const total = Object.values(grid).reduce(
           (sum, row) => sum + Object.values(row).reduce((a, b) => a + b, 0),
@@ -18,7 +18,7 @@ const SizingGridInput: React.FC<InputProps> = (props) => {
         );
         return (
           <>
-            Total percentage:{" "}
+            Total people:{" "}
             <span className="font-semibold text-blue-900">{total}</span>
           </>
         );
@@ -27,4 +27,4 @@ const SizingGridInput: React.FC<InputProps> = (props) => {
   );
 };
 
-export default SizingGridInput;
+export default DemoGridInput;

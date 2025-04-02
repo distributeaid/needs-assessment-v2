@@ -5,6 +5,7 @@ import json
 import bcrypt
 
 from backend.models import db, Page, Question, Assessment, User, Site
+from backend.consts import STANDARD_ITEMS
 
 def seed_database_from_csv(filepath="backend/data/questions.csv",
                            options_file="backend/data/response_options.json"):
@@ -64,13 +65,18 @@ def seed_database_from_csv(filepath="backend/data/questions.csv",
                 continue  # Skip this question if it already exists
             raw_type = row["Type"]
             normalized_type = raw_type.replace(" With Numeric Entry", "").replace("WithOther", "").strip()
+            options = []
+            if 'Strapi' in row["ItemText"]:
+                options = STANDARD_ITEMS.get(row["Page"], None)
+            if not options:
+                options = response_options_dict.get(row["ItemText"], None)
             question = Question(
                 page_id=page.id,
                 text=row["ItemText"],
-                subtext=row["Item Subtext"] if row["Item Subtext"] else None,
-                mandatory=True if row["Mandatory in Section"] == "Y" else False,
+                subtext=row["Subtext"] if row["Subtext"] else None,
+                required=True if row["Mandatory in Section"] == "Y" else False,
                 type=normalized_type,
-                options=response_options_dict.get(row["ItemText"], None),
+                options=options,
                 order=int(row["QuestionOrder"]),
                 allows_additional_input="WithOther" in raw_type or "With Numeric Entry" in raw_type
             )

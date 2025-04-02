@@ -4,6 +4,7 @@ import React from "react";
 import { Question } from "@/types/models";
 import SizingGridInput from "@/components/questions/SizingGridInput";
 import MultiSelectInput from "@/components/questions/MultiSelectInput";
+import DemoGridInput from "@/components/questions/DemoGridInput";
 import YesNoInput from "@/components/questions/YesNoInput";
 import { InputProps } from "@/types/ui-models";
 
@@ -13,7 +14,6 @@ interface AssessmentFormProps {
   onInputChange: (questionId: number, value: string | string[]) => void;
   onSubmit: (confirm: boolean) => void;
 }
-
 
 const inputBaseClass = "mt-1 p-2 border text-gray-900 rounded w-full";
 
@@ -83,6 +83,8 @@ const AssessmentForm: React.FC<AssessmentFormProps> = ({
         return <LongResponseInput {...commonProps} />;
       case "SizingGrid":
         return <SizingGridInput {...commonProps} />;
+      case "DemoGrid":
+        return <DemoGridInput {...commonProps} />;
       default:
         return (
           <input
@@ -100,9 +102,12 @@ const AssessmentForm: React.FC<AssessmentFormProps> = ({
       <form className="space-y-6" onSubmit={(e) => e.preventDefault()}>
         {questions.map((question) => (
           <div key={question.id}>
-            <label className="block text-lg font-medium mb-1">
-              {question.text}
-            </label>
+            <div className="mb-1">
+              <h3 className="text-lg font-bold text-blue-900">{question.text}</h3>
+              {question.subtext && (
+                <p className="text-sm text-blue-800 mt-1">{question.subtext}</p>
+              )}
+            </div>
             {renderInput(question)}
           </div>
         ))}

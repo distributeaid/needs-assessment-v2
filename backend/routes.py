@@ -60,7 +60,7 @@ def get_pages():
                     "id": q.id,
                     "text": q.text,
                     "subtext": q.subtext,
-                    "mandatory": q.mandatory,
+                    "required": q.required,
                     "type": q.type,
                     "options": q.options,
                     "order": q.order,

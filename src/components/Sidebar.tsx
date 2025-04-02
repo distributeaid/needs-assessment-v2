@@ -35,20 +35,6 @@ const Sidebar: React.FC<SidebarProps> = ({
       {[
       // Required + complete pages first
       ...sitePages
-        .filter(p => p.progress === "UNSTARTEDREQUIRED" || p.progress === "STARTEDREQUIRED" || p.progress === "COMPLETE")
-        .sort((a, b) => a.order - b.order),
-
-      // Optional
-      ...sitePages
-        .filter(p =>
-          p.progress === "UNSTARTEDOPTIONAL" ||
-          p.progress === "STARTEDOPTIONAL"
-        )
-        .sort((a, b) => a.order - b.order),
-
-      // Locked pages last
-      ...sitePages
-        .filter(p => p.progress === "LOCKED")
         .sort((a, b) => a.order - b.order)
     ].map((page) => {
       const isCurrent = currentPageId === String(page.id);

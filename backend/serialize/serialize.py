@@ -9,6 +9,7 @@ def serialize_question(q: Question) -> dict:
         "type": q.type,
         "pageId": q.page_id,
         "text": q.text,
+        "subtext": q.subtext,
         "defaultValue": "",
         "options": q.options,
         "order": q.order,

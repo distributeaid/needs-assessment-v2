@@ -1,4 +1,4 @@
-REQUIRED_PAGES = {"Basic Info", "Demographics", "Infrastructure"}
+REQUIRED_PAGES = {"Basic Info", "Demographics"}
 
 STANDARD_ITEMS = {
     "Household": [
