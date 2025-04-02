@@ -4,8 +4,12 @@ import React from "react";
 import { Question } from "@/types/models";
 import SizingGridInput from "@/components/questions/SizingGridInput";
 import MultiSelectInput from "@/components/questions/MultiSelectInput";
+import MultiSelectWithOtherInput from "@/components/questions/MultiSelectWithOtherInput"
 import DemoGridInput from "@/components/questions/DemoGridInput";
+import DropdownInput from "@/components/questions/DropdownInput";
+import DropdownWithOtherInput from "@/components/questions/DropdownWithOtherInput";
 import YesNoInput from "@/components/questions/YesNoInput";
+import YesNoWithNumericEntry from "@/components/questions/YesNoWithNumericEntry";
 import { InputProps } from "@/types/ui-models";
 
 interface AssessmentFormProps {
@@ -24,20 +28,6 @@ const NumericInput = ({ question, value, onChange }: InputProps) => (
     value={value}
     onChange={(e) => onChange(question.id, e.target.value)}
   />
-);
-
-const DropdownInput = ({ question, value, onChange }: InputProps) => (
-  <select
-    className={inputBaseClass}
-    value={value}
-    onChange={(e) => onChange(question.id, e.target.value)}
-  >
-    {question.options?.map((option) => (
-      <option key={option} value={option}>
-        {option}
-      </option>
-    ))}
-  </select>
 );
 
 const ShortResponseInput = ({ question, value, onChange }: InputProps) => (
@@ -63,7 +53,6 @@ const AssessmentForm: React.FC<AssessmentFormProps> = ({
   onInputChange,
   onSubmit,
 }) => {
-  console.log("questions", questions);
   const renderInput = (question: Question) => {
     const value = responses[question.id] || "";
     const commonProps = { question, value, onChange: onInputChange };
@@ -72,11 +61,18 @@ const AssessmentForm: React.FC<AssessmentFormProps> = ({
       case "Numeric":
         return <NumericInput {...commonProps} />;
       case "YesNo":
-        return <YesNoInput {...commonProps} />;
+        return question.allowsAdditionalInput
+            ? <YesNoWithNumericEntry {...commonProps} />
+            : <YesNoInput {...commonProps} />;
       case "Dropdown":
-        return <DropdownInput {...commonProps} />;
+          return question.allowsAdditionalInput
+            ? <DropdownWithOtherInput {...commonProps} />
+            : <DropdownInput {...commonProps} />;
+
       case "MultiSelect":
-        return <MultiSelectInput {...commonProps} />;
+        return question.allowsAdditionalInput
+          ? <MultiSelectWithOtherInput {...commonProps} />
+          : <MultiSelectInput {...commonProps} />;
       case "Short Response":
         return <ShortResponseInput {...commonProps} />;
       case "Long Response":
@@ -100,18 +96,34 @@ const AssessmentForm: React.FC<AssessmentFormProps> = ({
   return (
     <div className="flex-1 px-4 md:px-8 py-6">
       <form className="space-y-6" onSubmit={(e) => e.preventDefault()}>
-        {questions.map((question) => (
-          <div key={question.id}>
-            <div className="mb-1">
-              <h3 className="text-lg font-bold text-blue-900">{question.text}</h3>
-              {question.subtext && (
-                <p className="text-sm text-blue-800 mt-1">{question.subtext}</p>
-              )}
-            </div>
-            {renderInput(question)}
-          </div>
-        ))}
+      {questions.map((question) => {
+        const input = renderInput(question);
+        const isInline =
+          question.type === "YesNo" || question.type === "Short Response";
 
+        return (
+          <div key={question.id} className="space-y-1">
+            {isInline ? (
+              <div className="flex items-center gap-4 flex-wrap">
+                <label className="block text-base font-medium text-blue-900">
+                  {question.text}
+                </label>
+                {input}
+              </div>
+            ) : (
+              <>
+                <label className="block text-lg font-medium text-blue-900">
+                  {question.text}
+                </label>
+                {question.subtext && (
+                  <p className="text-sm text-blue-700">{question.subtext}</p>
+                )}
+                {input}
+              </>
+            )}
+          </div>
+        );
+      })}
         <div className="flex flex-col sm:flex-row justify-end gap-4 pt-6">
           <button
             type="button"

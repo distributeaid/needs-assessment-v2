@@ -66,7 +66,7 @@ def seed_database_from_csv(filepath="backend/data/questions.csv",
             raw_type = row["Type"]
             normalized_type = raw_type.replace(" With Numeric Entry", "").replace("WithOther", "").strip()
             options = []
-            if 'Strapi' in row["ItemText"]:
+            if 'Strapi' in row["ItemText"] or "do you need over the next six months?" in row["ItemText"]:
                 options = STANDARD_ITEMS.get(row["Page"], None)
             if not options:
                 options = response_options_dict.get(row["ItemText"], None)

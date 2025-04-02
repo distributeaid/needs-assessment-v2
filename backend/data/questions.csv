@@ -1,7 +1,7 @@
 ,Page,ItemID,ParentItemID,ItemText,Subtext,Mandatory in Section,Type,Response Options,Notes,QuestionOrder
 0,Preamble,,,"Elizabeth: highlight that we work with many groups supporting people in many ways, encourage them to fill out the relevant parts.   Roz: think it's good to pair FCs up with groups to help ",,,DisplayText,,,2
 1,Basic Info,,,Organization Name,,Y,Short Response,,,3
-2,Basic Info,,,What region do you operate in?,,Y,MultiselectWithOther,"Existing regions, or 'Other' which will prompt a short response",,4
+2,Basic Info,,,What region do you operate in?,,Y,MultiSelectWithOther,"Existing regions, or 'Other' which will prompt a short response",,4
 3,Basic Info,,,"If applicable, what US state do you operate in?",,N,MultiSelect,<US States>,only show if US related region is selected,5
 4,Basic Info,,,"Specific location (city / state, zip code, etc)",,N,Short Response,,,6
 5,Basic Info,WAREHOUSE,,Do you have a warehouse?,,Y,YesNo,,,7
@@ -14,9 +14,9 @@
 12,Demographics,,,How frequently do you support the same individual?,,N,DropdownWithOther,"Daily, Weekly, Monthly, Annually, Other",,14
 13,Demographics,,,What % of people are first-time beneficiaries?,,N,Numeric,shown if serve people more than once,,15
 14,Demographics,,,What is the age / gender breakown for people that you serve?,,Y,DemoGrid,,,16
-15,Demographics,,,Are there specific vulnerable communities that you support?,,N,MultiSelect,"trans / non-binary / queer, refugees, folks who are incarcerate / recently incarcerate, unhoused people, disabled people",,17
+15,Demographics,,,Are there specific vulnerable communities that you support?,,N,MultiSelectWithOther,"trans / non-binary / queer, refugees, folks who are incarcerate / recently incarcerate, unhoused people, disabled people",,17
 16,Demographics,,,Is there anything else you'd like to tell us about about the population that you support?,,N,Long Response,,,18
-17,Food,,,Which modes of food distribution does your organization use?,,,MultiSelect,,,19
+17,Food,,,Which modes of food distribution does your organization use?,,,DisplayText,,,19
 18,Food,,,Hot meals eaten on site,About how many hot meals do you distribute in a week?,N,YesNo With Numeric Entry,,,20
 19,Food,,,Portable food,About how many portable snacks and meals do you distribute a week?,N,YesNo With Numeric Entry,,,21
 20,Food,,,Food baskets for households,How many people are fed by food baskets each week?,N,YesNo With Numeric Entry,,,22

@@ -18,7 +18,9 @@ export interface Question {
     | "Long Response"
     | "SizingGrid"
     | "DemoGrid"
-    | "YesNo";
+    | "YesNo"
+    | "YesNoWithNumericEntry"
+    | "DisplayText";
   pageId: number;
   text: string;
   subtext: string;
