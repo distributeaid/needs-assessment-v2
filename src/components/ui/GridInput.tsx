@@ -61,8 +61,12 @@ const GridInput: React.FC<GridInputProps> = ({
   // Re-sync `value` if it's changed from server (e.g. routing or reload)
   useEffect(() => {
     const parsed = parseGrid();
-    const totalParsed = Object.values(parsed).flatMap(Object.values).reduce((a, b) => a + b, 0);
-    const totalGrid = Object.values(grid).flatMap(Object.values).reduce((a, b) => a + b, 0);
+    const totalParsed = Object.values(parsed)
+      .flatMap(Object.values)
+      .reduce((a, b) => a + b, 0);
+    const totalGrid = Object.values(grid)
+      .flatMap(Object.values)
+      .reduce((a, b) => a + b, 0);
     if (totalParsed > 0 && totalParsed !== totalGrid) {
       setGrid(parsed);
     }
@@ -92,10 +96,7 @@ const GridInput: React.FC<GridInputProps> = ({
             <tr>
               <th></th>
               {colLabels.map((col) => (
-                <th
-                  key={col}
-                  className="px-2 py-1 font-semibold text-blue-900"
-                >
+                <th key={col} className="px-2 py-1 font-semibold text-blue-900">
                   {col}
                 </th>
               ))}
@@ -113,9 +114,7 @@ const GridInput: React.FC<GridInputProps> = ({
                       type="number"
                       min="0"
                       value={grid[row][col]}
-                      onChange={(e) =>
-                        handleChange(row, col, e.target.value)
-                      }
+                      onChange={(e) => handleChange(row, col, e.target.value)}
                       className="mt-1 p-2 border rounded w-full"
                     />
                   </td>

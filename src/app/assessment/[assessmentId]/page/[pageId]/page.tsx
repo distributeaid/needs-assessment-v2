@@ -53,7 +53,7 @@ export default function AssessmentPage() {
   const [assessmentPages, setAssessmentPages] = useState<
     SidebarProps["sitePages"]
   >([]);
-  const [site, setSite] = useState< Site >();
+  const [site, setSite] = useState<Site>();
   const [page, setPage] = useState<{
     title: string;
     questions: Question[];
@@ -89,7 +89,6 @@ export default function AssessmentPage() {
         setSiteAssessment({ id: data.id, confirmed: data.confirmed });
         setAssessmentPages(mapPages(data.sitePages));
         setSite(data.site);
-
       } catch (err) {
         setError(err instanceof Error ? err.message : "Unknown error");
       }

@@ -35,7 +35,9 @@ export default function SummaryPage() {
   } | null>(null);
 
   const [loading, setLoading] = useState(true);
-  const [sidebarPages, setSidebarPages] = useState<SidebarProps["sitePages"]>([]);
+  const [sidebarPages, setSidebarPages] = useState<SidebarProps["sitePages"]>(
+    [],
+  );
   const { data: session, status } = useSession();
 
   useEffect(() => {
@@ -62,7 +64,7 @@ export default function SummaryPage() {
           title: p.page.title,
           progress: p.progress,
           order: p.page.order,
-        }))
+        })),
       );
       setLoading(false);
     };
@@ -86,16 +88,27 @@ export default function SummaryPage() {
       <div className="space-y-8">
         {/* responses grouped by sitePage */}
         {data.map((page) => (
-          <div key={page.sitePageId} className="bg-white border border-blue-100 rounded-lg shadow-sm p-6">
+          <div
+            key={page.sitePageId}
+            className="bg-white border border-blue-100 rounded-lg shadow-sm p-6"
+          >
             <h2 className="text-lg font-bold text-blue-800 mb-4">
-              <a href={`/assessment/${assessmentId}/page/${page.sitePageId}`} className="hover:underline">
+              <a
+                href={`/assessment/${assessmentId}/page/${page.sitePageId}`}
+                className="hover:underline"
+              >
                 {page.sitePageTitle}
               </a>
             </h2>
             <div className="space-y-3">
               {page.responses.map((resp) => (
-                <div key={resp.questionId} className="bg-blue-50 rounded-md p-3 border border-blue-100">
-                  <p className="text-sm font-semibold text-blue-900">{resp.questionText}</p>
+                <div
+                  key={resp.questionId}
+                  className="bg-blue-50 rounded-md p-3 border border-blue-100"
+                >
+                  <p className="text-sm font-semibold text-blue-900">
+                    {resp.questionText}
+                  </p>
                   <FormattedResponse value={resp.responseValue} />
                 </div>
               ))}

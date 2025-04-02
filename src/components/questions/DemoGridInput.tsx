@@ -28,7 +28,7 @@ const DemoGridInput: React.FC<InputProps & { peopleServed?: number }> = ({
     const existingTotal = parsed
       ? Object.values(parsed).reduce(
           (sum, row) => sum + Object.values(row).reduce((a, b) => a + b, 0),
-          0
+          0,
         )
       : 0;
 
@@ -61,7 +61,7 @@ const DemoGridInput: React.FC<InputProps & { peopleServed?: number }> = ({
       summary={(grid) => {
         const total = Object.values(grid).reduce(
           (sum, row) => sum + Object.values(row).reduce((a, b) => a + b, 0),
-          0
+          0,
         );
         return (
           <>
