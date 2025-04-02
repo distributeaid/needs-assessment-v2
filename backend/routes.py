@@ -206,6 +206,8 @@ def get_site_assessment_summary(site_assessment_id):
         site_assessment.confirmed = True
         db.session.commit()
     summary = []
+    top_needs = []
+    cards = []
     for site_page in site_assessment.site_pages:
         page = Page.query.get(site_page.page_id)
         questions_data = []
@@ -222,6 +224,18 @@ def get_site_assessment_summary(site_assessment_id):
             if str_value == "false":
                 value = "No"
 
+            if "need" in question.text.lower():
+                top_needs.append(str_value)
+                if type(value) == list:
+                    str_value = ", ".join(value)
+
+                cards.append({
+                    "title": f"{site_assessment.site.name} needs {page.title} items",
+                    "highlight": str_value,
+                    "subtext": question.subtext if question.subtext else "",
+                    "backgroundColor": "#082B76"
+                })
+
             questions_data.append({
                 "questionId": question.id,
                 "questionText": question.text,
@@ -233,4 +247,13 @@ def get_site_assessment_summary(site_assessment_id):
                 "sitePageTitle": page.title,
                 "responses": questions_data
             })
-    return jsonify(summary)
+
+    return jsonify({
+        "summary": summary,
+        "carousel": {
+            "organizationName": site_assessment.site.name,
+            "peopleServed": site_assessment.site.people_served,
+            "cards": cards
+        }
+    })
+
