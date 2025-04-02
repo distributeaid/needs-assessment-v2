@@ -36,7 +36,7 @@ export default function AssessmentPage() {
   const [siteAssessment, setSiteAssessment] = useState<{ id: number } | null>(null);
   const [assessmentPages, setAssessmentPages] = useState<SidebarProps["sitePages"]>([]);
   const [page, setPage] = useState<{ title: string; questions: Question[] } | null>(null);
-  const [responses, setResponses] = useState<Record<number, string>>({});
+  const [responses, setResponses] = useState<Record<number, string | string[]>>({});
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -94,9 +94,13 @@ export default function AssessmentPage() {
     fetchPageQuestions();
   }, [siteAssessment, pageId, session]);
 
-  const handleInputChange = useCallback((questionId: number, value: string) => {
-    setResponses((prev) => ({ ...prev, [questionId]: value }));
-  }, []);
+  const handleInputChange = useCallback(
+    (questionId: number, value: string | string[]) => {
+      setResponses((prev) => ({ ...prev, [questionId]: value }));
+    },
+    []
+  );
+
 
   const handleSubmit = async (confirmed = false) => {
     if (!session || !siteAssessment) {
@@ -107,7 +111,7 @@ export default function AssessmentPage() {
     const payload = {
       responses: Object.entries(responses).map(([questionId, value]) => ({
         questionId: parseInt(questionId),
-        value,
+        value: Array.isArray(value) ? value : value.toString(),
       })),
       confirmed,
     };

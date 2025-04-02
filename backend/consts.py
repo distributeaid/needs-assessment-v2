@@ -1,19 +1,5 @@
 REQUIRED_PAGES = {"Basic Info", "Demographics", "Infrastructure"}
 
-QUESTION_TYPES = {
-    "age_gender_grid": "Age/Gender Grid",
-    "multiselect_with_other": "MultiselectWithOther",
-    "sizing_grid": "SizingGrid",
-    "true_false": "True/False",
-    "short_answer": "Short Answer",
-    "multi_select": "MultiSelect",
-    "dropdown_with_other": "DropdownWithOther",
-    "true_false_numeric": "True/False With Numeric Entry",
-    "long_answer": "Long Answer",
-    "display_text": "DisplayText",
-    "numeric": "Numeric",
-}
-
 STANDARD_ITEMS = {
     "Household": [
         "Bedding", "Towels", "Cooking Utensils", "Pots and Pans", "Plates and Bowls",

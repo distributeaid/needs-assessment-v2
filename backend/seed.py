@@ -5,7 +5,6 @@ import json
 import bcrypt
 
 from backend.models import db, Page, Question, Assessment, User, Site
-from backend.consts import QUESTION_TYPES
 
 def seed_database_from_csv(filepath="backend/data/questions.csv",
                            options_file="backend/data/response_options.json"):
@@ -63,21 +62,13 @@ def seed_database_from_csv(filepath="backend/data/questions.csv",
             if existing_question:
                 continue  # Skip this question if it already exists
 
-            # Create question since it doesn't exist yet
-            raw_response_options = row["Response Options"].strip() if row["Response Options"] else ""
-            options = response_options_dict.get(row["ItemText"], None)
-            if options:
-                response_options = ",".join(options)
-            else:
-                response_options = raw_response_options or None
-
             question = Question(
                 page_id=page.id,
                 text=row["ItemText"],
                 subtext=row["Item Subtext"] if row["Item Subtext"] else None,
                 mandatory=True if row["Mandatory in Section"] == "Y" else False,
-                type=QUESTION_TYPES.get(row["Type"].strip(), "Short Answer"),
-                response_options=response_options,
+                type=row["Type"],
+                options=response_options_dict.get(row["ItemText"], None),
                 order=int(row["QuestionOrder"])
             )
             db.session.add(question)

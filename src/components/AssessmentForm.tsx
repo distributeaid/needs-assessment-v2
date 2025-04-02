@@ -3,19 +3,16 @@
 import React from "react";
 import { Question } from "@/types/models";
 import SizingGridInput from "@/components/questions/SizingGridInput";
+import MultiSelectInput from "@/components/questions/MultiSelectInput";
+import { InputProps } from "@/types/ui-models";
 
 interface AssessmentFormProps {
   questions: Question[];
-  responses: Record<number, string>;
-  onInputChange: (questionId: number, value: string) => void;
+  responses: Record<number, string | string[]>;
+  onInputChange: (questionId: number, value: string | string[]) => void;
   onSubmit: (confirm: boolean) => void;
 }
 
-interface InputProps {
-  question: Question;
-  value: string;
-  onChange: (questionId: number, value: string) => void;
-}
 
 const inputBaseClass = "mt-1 p-2 border text-gray-900 rounded w-full";
 
@@ -42,30 +39,6 @@ const DropdownInput = ({ question, value, onChange }: InputProps) => (
   </select>
 );
 
-const MultiSelectInput = ({ question, value, onChange }: InputProps) => {
-  const selectedValues = value ? value.split(",") : [];
-  return (
-    <select
-      multiple
-      className={inputBaseClass}
-      value={selectedValues}
-      onChange={(e) => {
-        const newValues = Array.from(
-          e.target.selectedOptions,
-          (opt) => opt.value,
-        );
-        onChange(question.id, newValues.join(","));
-      }}
-    >
-      {question.options?.map((option) => (
-        <option key={option} value={option}>
-          {option}
-        </option>
-      ))}
-    </select>
-  );
-};
-
 const ShortResponseInput = ({ question, value, onChange }: InputProps) => (
   <input
     type="text"
@@ -89,6 +62,7 @@ const AssessmentForm: React.FC<AssessmentFormProps> = ({
   onInputChange,
   onSubmit,
 }) => {
+  console.log("questions", questions);
   const renderInput = (question: Question) => {
     const value = responses[question.id] || "";
     const commonProps = { question, value, onChange: onInputChange };

@@ -62,7 +62,7 @@ def get_pages():
                     "subtext": q.subtext,
                     "mandatory": q.mandatory,
                     "type": q.type,
-                    "response_options": q.response_options.split(", ") if q.response_options else [],
+                    "options": q.options,
                     "order": q.order,
                 }
                 for q in page.questions

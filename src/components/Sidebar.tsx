@@ -33,17 +33,16 @@ const Sidebar: React.FC<SidebarProps> = ({
       <div className="w-8 border-t border-[#082B76] my-4" />
 
       {[
-      // Required pages first
+      // Required + complete pages first
       ...sitePages
-        .filter(p => p.progress === "UNSTARTEDREQUIRED" || p.progress === "STARTEDREQUIRED")
+        .filter(p => p.progress === "UNSTARTEDREQUIRED" || p.progress === "STARTEDREQUIRED" || p.progress === "COMPLETE")
         .sort((a, b) => a.order - b.order),
 
-      // Optional + Complete pages next
+      // Optional
       ...sitePages
         .filter(p =>
           p.progress === "UNSTARTEDOPTIONAL" ||
-          p.progress === "STARTEDOPTIONAL" ||
-          p.progress === "COMPLETE"
+          p.progress === "STARTEDOPTIONAL"
         )
         .sort((a, b) => a.order - b.order),
 

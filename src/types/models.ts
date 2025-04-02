@@ -21,6 +21,7 @@ export interface Question {
   pageId: number;
   text: string;
   defaultValue: string;
+  required: boolean;
   options?: string[]; // Added options for Dropdown, MultiSelect, and SizingGrid types
 }
 

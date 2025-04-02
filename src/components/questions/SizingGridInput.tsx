@@ -1,11 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Question } from "@/types/models";
-
-interface InputProps {
-  question: Question;
-  value: string;
-  onChange: (questionId: number, value: string) => void;
-}
+import { InputProps } from "@/types/ui-models";
 
 interface Distribution {
   [category: string]: {
@@ -33,21 +27,22 @@ const getDefaultDistribution = (): Distribution =>
   }, {} as Distribution);
 
 const SizingGridInput: React.FC<InputProps> = ({
-  question,
-  value,
-  onChange,
-}) => {
-  // Parse initial value or fall back to default
-  const [distribution, setDistribution] = useState<Distribution>(() => {
-    if (value) {
+    question,
+    value,
+    onChange,
+  }) => {
+    const parsedValue =
+      typeof value === "string" && value.trim() !== "" ? value : "{}";
+
+    const [distribution, setDistribution] = useState<Distribution>(() => {
       try {
-        return JSON.parse(value);
+        return JSON.parse(parsedValue);
       } catch (err) {
         console.error("Error parsing sizing grid value:", err);
+        return getDefaultDistribution();
       }
-    }
-    return getDefaultDistribution();
-  });
+    });
+
 
   // Track collapsed/expanded state; collapsed by default
   const [isExpanded, setIsExpanded] = useState(false);

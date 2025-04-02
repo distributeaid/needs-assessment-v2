@@ -1,5 +1,6 @@
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
+from sqlalchemy.dialects.mysql import JSON
 
 db = SQLAlchemy()
 
@@ -35,7 +36,7 @@ class Question(db.Model):
     subtext = db.Column(db.String(255), nullable=True)
     mandatory = db.Column(db.Boolean, default=False)
     type = db.Column(db.String(50), nullable=False)
-    response_options = db.Column(db.Text, nullable=True)
+    options = db.Column(JSON, nullable=True)
     order = db.Column(db.Integer, nullable=False)
 
 class SiteAssessment(db.Model):  # Instance for a Site
@@ -60,4 +61,4 @@ class QuestionResponse(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     site_page_id = db.Column(db.Integer, db.ForeignKey('site_page.id'), nullable=False)
     question_id = db.Column(db.Integer, db.ForeignKey('question.id'), nullable=False)
-    value = db.Column(db.String(255), nullable=True)
+    value = db.Column(JSON, nullable=True)

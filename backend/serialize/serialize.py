@@ -9,8 +9,8 @@ def serialize_question(q: Question) -> dict:
         "type": q.type,
         "pageId": q.page_id,
         "text": q.text,
-        "defaultValue": "",  # If you add a default_value column, use that here
-        "options": q.response_options.split(", ") if q.response_options else [],
+        "defaultValue": "",
+        "options": q.options,
         "order": q.order,
     }
 
@@ -53,6 +53,7 @@ def serialize_site_assessment(assessment: SiteAssessment) -> dict:
         serialize_site_page(sp)
         for sp in assessment.site_pages
     ]
+
     return {
         "id": assessment.id,
         "siteId": assessment.site_id,
