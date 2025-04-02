@@ -1,14 +1,14 @@
 import logging
+import json
 
 from flask import Blueprint, request, jsonify
 from sqlalchemy.orm import joinedload
 
-from backend.models import db, User, SiteAssessment, Page, SitePage, QuestionResponse, Question
-from backend.consts import STANDARD_ITEMS
+from backend.models import db, User, SiteAssessment, Page, SitePage, QuestionResponse, Question, Site
 from backend.validation import validate_responses
 from backend.utils.utils import ensure_assessment_exists, unlock_remaining_pages, update_from_profile_page
 from backend.serialize.serialize import serialize_question, serialize_question_response, \
-    serialize_user, serialize_site_assessment
+    serialize_user, serialize_site_assessment, serialize_site
 from backend.utils.jwt_utils import generate_jwt_payload, get_current_user, JWTError
 
 api_bp = Blueprint("api", __name__)
@@ -39,12 +39,6 @@ def login():
 
     return jsonify(result)
 
-
-@api_bp.route("/api/standard-items/<page>", methods=["GET"])
-def get_standard_items(page):
-    """Return standard items for a given page (e.g., Clothing -> Pants, Shirts)."""
-    items = STANDARD_ITEMS.get(page, [])
-    return jsonify({"page": page, "items": items})
 
 @api_bp.route("/api/pages", methods=["GET"])
 def get_pages():
@@ -196,12 +190,14 @@ def get_assessment_page(site_assessment_id, site_page_id):
         responses = [serialize_question_response(r) for r in site_page.responses]
 
     questions = [serialize_question(q) for q in page.questions]
+    site = Site.query.get(user.site_id)
 
     return jsonify({
         "title": page.title,
         "questions": questions,
         "responses": responses,
         "isConfirmationPage": page.is_confirmation_page,
+        "site": serialize_site(site),
     })
 
 # /api/site-assessment/<int:site_assessment_id>/summary

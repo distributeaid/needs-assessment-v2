@@ -1,11 +1,47 @@
 import csv
 from datetime import datetime
 import json
+import pandas as pd
+from collections import defaultdict
 
 import bcrypt
 
 from backend.models import db, Page, Question, Assessment, User, Site
-from backend.consts import STANDARD_ITEMS
+
+def choices_from_google():
+    sheet_url = "https://docs.google.com/spreadsheets/d/1hh41TeFexc-0Byg3iDSzbA2nLYd05bgSuwrKu-DUmww/export?format=csv&id=1hh41TeFexc-0Byg3iDSzbA2nLYd05bgSuwrKu-DUmww&gid=0"
+    df = pd.read_csv(sheet_url, header=1)
+    needs_assessment_df = df[df['Include in Needs Assessment']==True]
+    needs_assessment_df = needs_assessment_df[['Category', 'Item']]
+    # strip whitespac e from data
+    needs_assessment_df['Category'] = needs_assessment_df['Category'].str.strip()
+    needs_assessment_df['Item'] = needs_assessment_df['Item'].str.strip()
+
+    category_mapper = {'Baby': 'Infants and Children',
+    'Cleaning': 'Hygeine',
+    'Clothing': 'Clothing',
+    'Cooking': 'Food',
+    'Education': 'Infants and Children',
+    'Electronic': 'Household',
+    'Food': 'Food',
+    'Health': 'Hygeine',
+    'Infrastructure': 'Infrastructure',
+    'Office': 'Household',
+    'Shelter': 'Shelter',
+    'Toys & Activities': 'Infants and Children',
+    'W.A.S.H.': 'Hygeine'}
+    needs_assessment_df['Category'] = needs_assessment_df['Category'].map(category_mapper)
+    # drop duplicates
+    needs_assessment_df = needs_assessment_df.drop_duplicates()
+    # create a dictionary of categories and items
+    choices = defaultdict(list)
+    for _, row in needs_assessment_df.iterrows():
+        category = row['Category']
+        item = row['Item']
+        choices[category].append(item)
+    return choices
+
+
 
 def seed_database_from_csv(filepath="backend/data/questions.csv",
                            options_file="backend/data/response_options.json"):
@@ -16,6 +52,7 @@ def seed_database_from_csv(filepath="backend/data/questions.csv",
     with open(options_file, "r", encoding="utf-8") as f:
         response_options_dict = json.load(f)
 
+    choices_options = choices_from_google()
     # Ensure there is an Assessment for the current season
     assessment = Assessment.query.filter_by(year=current_year, season=current_season).first()
     if not assessment:
@@ -69,7 +106,7 @@ def seed_database_from_csv(filepath="backend/data/questions.csv",
             normalized_type = raw_type.replace(" With Numeric Entry", "").replace("WithOther", "").strip()
             options = []
             if 'Strapi' in row["ItemText"] or "do you need over the next six months?" in row["ItemText"]:
-                options = STANDARD_ITEMS.get(row["Page"], None)
+                options = choices_options.get(row["Page"], None)
             if not options:
                 options = response_options_dict.get(row["ItemText"], None)
 

@@ -6,6 +6,7 @@ import PageLayout from "@/components/PageLayout";
 import { SidebarProps } from "@/types/models";
 import { useSession } from "next-auth/react";
 import ShareableCarousel from "@/components/ShareableCarousel";
+import FormattedResponse from "@/components/FormattedResponse";
 
 interface SummaryItem {
   sitePageId: number;
@@ -99,7 +100,7 @@ export default function SummaryPage() {
                   <p className="text-sm font-semibold text-blue-900">
                     {resp.questionText}
                   </p>
-                  <p className="text-sm text-gray-700">{resp.responseValue}</p>
+                  <FormattedResponse value={resp.responseValue} />
                 </div>
               ))}
             </div>

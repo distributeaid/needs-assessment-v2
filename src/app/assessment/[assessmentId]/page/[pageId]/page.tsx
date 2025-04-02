@@ -12,6 +12,7 @@ import {
   SidebarProps,
   SitePage,
   QuestionResponse,
+  Site,
 } from "@/types/models";
 
 const getIdParam = (param: string | string[] | undefined): string =>
@@ -44,6 +45,7 @@ export default function AssessmentPage() {
   const router = useRouter();
   const params = useParams();
   const pageId = getIdParam(params.pageId);
+  const [site, setSite] = useState< Site >();
 
   const [siteAssessment, setSiteAssessment] = useState<{
     id: number;
@@ -86,6 +88,8 @@ export default function AssessmentPage() {
         const data = await res.json();
         setSiteAssessment({ id: data.id, confirmed: data.confirmed });
         setAssessmentPages(mapPages(data.sitePages));
+        setSite(data.site);
+
       } catch (err) {
         setError(err instanceof Error ? err.message : "Unknown error");
       }
@@ -203,6 +207,7 @@ export default function AssessmentPage() {
         responses={responses}
         onInputChange={handleInputChange}
         onSubmit={handleSubmit}
+        site={site}
       />
     </PageLayout>
   );

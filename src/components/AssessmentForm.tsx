@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { Question } from "@/types/models";
+import { Question, Site } from "@/types/models";
 import SizingGridInput from "@/components/questions/SizingGridInput";
 import MultiSelectInput from "@/components/questions/MultiSelectInput";
 import MultiSelectWithOtherInput from "@/components/questions/MultiSelectWithOtherInput";
@@ -18,6 +18,7 @@ interface AssessmentFormProps {
   responses: Record<number, string | string[]>;
   onInputChange: (questionId: number, value: string | string[]) => void;
   onSubmit: (confirm: boolean, isConfirmationPage: boolean) => void;
+  site?: Site;
 }
 
 const inputBaseClass = "mt-1 p-2 border text-gray-900 rounded w-full";

@@ -1,6 +1,7 @@
 ,Page,ItemID,ParentItemID,ItemText,Subtext,Mandatory in Section,Type,Response Options,Notes,QuestionOrder
 0,Preamble,,,"Elizabeth: highlight that we work with many groups supporting people in many ways, encourage them to fill out the relevant parts.   Roz: think it's good to pair FCs up with groups to help ",,,DisplayText,,,2
 1,Basic Info,,,Organization Name,,Y,Short Response,,,3
+10,Basic Info,,,How many individuals does your organisation support in one month?,,Y,Numeric,,"Adele- this one always confuses people, need some instruction for how to come up with this",12
 2,Basic Info,,,What region do you operate in?,,Y,MultiSelectWithOther,"Existing regions, or 'Other' which will prompt a short response",,4
 3,Basic Info,,,"If applicable, what US state do you operate in?",,N,MultiSelect,<US States>,only show if US related region is selected,5
 4,Basic Info,,,"Specific location (city / state, zip code, etc)",,N,Short Response,,,6
@@ -9,9 +10,8 @@
 7,Basic Info,,WAREHOUSE,How much space does your warehouse have?,"sqft (if US), m2 (if international)",,Numeric,if warehouse is selected above,,9
 8,Basic Info,,WAREHOUSE,Is your warehouse accessible by truck (18-wheeler)?,,,YesNo,if warehouse is selected above,,10
 9,Basic Info,,,Which of the following areas do you have needs in?,,,MultiSelect,"<Sourced from list of pages marked Supply in Strapi - e.g. food, hygeine, etc>",,11
-10,Demographics,,,How many individuals does your organisation support in one month?,,Y,Numeric,,"Adele- this one always confuses people, need some instruction for how to come up with this",12
 11,Demographics,,,Do you serve the same people more than once?,,N,YesNo,,break these own into simpler questions,13
-12,Demographics,,,How frequently do you support the same individual?,,N,DropdownWithOther,"Daily, Weekly, Monthly, Annually, Other",,14
+12,Demographics,,,How frequently do you support the same individual?,,N,DropdownWithOther,"Daily, Weekly, Monthly, Annually",,14
 13,Demographics,,,What % of people are first-time beneficiaries?,,N,Numeric,shown if serve people more than once,,15
 14,Demographics,,,What is the age / gender breakown for people that you serve?,,Y,DemoGrid,,,16
 15,Demographics,,,Are there specific vulnerable communities that you support?,,N,MultiSelectWithOther,"trans / non-binary / queer, refugees, folks who are incarcerate / recently incarcerate, unhoused people, disabled people",,17

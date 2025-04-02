@@ -15,6 +15,7 @@ class Site(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), unique=True, nullable=False)
     assessments = db.relationship('SiteAssessment', backref='site', lazy=True)
+    people_served = db.Column(db.Integer, default=0)
 
 class Assessment(db.Model):
     id = db.Column(db.Integer, primary_key=True)

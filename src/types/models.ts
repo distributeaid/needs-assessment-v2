@@ -81,6 +81,7 @@ export interface Site {
   users: User[];
   name: string;
   siteAssessments: SiteAssessment[];
+  peopleServed: number;
 }
 
 export interface SidebarProps {

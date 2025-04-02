@@ -1,6 +1,6 @@
 from flask import request, jsonify
 from datetime import datetime
-from backend.models import db, User, SiteAssessment, SitePage, Page, Question, QuestionResponse
+from backend.models import db, User, SiteAssessment, SitePage, Page, Question, QuestionResponse, Site
 from sqlalchemy.orm import joinedload
 
 def serialize_question(q: Question) -> dict:
@@ -64,4 +64,12 @@ def serialize_site_assessment(assessment: SiteAssessment) -> dict:
         "createdAt": assessment.created_at.isoformat(),
         "sitePages": serialized_site_pages,
         "confirmed": assessment.confirmed,
+    }
+
+def serialize_site(site: Site) -> dict:
+    return {
+        "id": site.id,
+        "name": site.name,
+        "siteId": site.id,
+        "peopleServed": site.people_served,
     }
