@@ -54,7 +54,7 @@ export interface SitePage {
     id: number;
     title: string;
     questions: Question[];
-
+    order: number;
   };
   responses: QuestionResponse[];
   order: number;
