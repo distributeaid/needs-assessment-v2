@@ -1,16 +1,20 @@
 import csv
 from datetime import datetime
+import json
 
 import bcrypt
 
 from backend.models import db, Page, Question, Assessment, User, Site
 from backend.consts import QUESTION_TYPES
 
-def seed_database_from_csv(filepath="backend/data/questions.csv"):
+def seed_database_from_csv(filepath="backend/data/questions.csv",
+                           options_file="backend/data/response_options.json"):
     """Reads a CSV file and seeds the database with Assessments, Pages, and Questions."""
     # Get current Year & Season
     current_year = datetime.utcnow().year
     current_season = "Spring" if datetime.utcnow().month < 7 else "Fall"
+    with open(options_file, "r", encoding="utf-8") as f:
+        response_options_dict = json.load(f)
 
     # Ensure there is an Assessment for the current season
     assessment = Assessment.query.filter_by(year=current_year, season=current_season).first()
@@ -60,13 +64,20 @@ def seed_database_from_csv(filepath="backend/data/questions.csv"):
                 continue  # Skip this question if it already exists
 
             # Create question since it doesn't exist yet
+            raw_response_options = row["Response Options"].strip() if row["Response Options"] else ""
+            options = response_options_dict.get(row["ItemText"], None)
+            if options:
+                response_options = ",".join(options)
+            else:
+                response_options = raw_response_options or None
+
             question = Question(
                 page_id=page.id,
                 text=row["ItemText"],
                 subtext=row["Item Subtext"] if row["Item Subtext"] else None,
                 mandatory=True if row["Mandatory in Section"] == "Y" else False,
-                type=QUESTION_TYPES.get(row["Type"].strip().lower(), "Short Answer"),
-                response_options=row["Response Options"] if row["Response Options"] else None,
+                type=QUESTION_TYPES.get(row["Type"].strip(), "Short Answer"),
+                response_options=response_options,
                 order=int(row["QuestionOrder"])
             )
             db.session.add(question)

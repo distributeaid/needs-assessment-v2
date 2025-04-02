@@ -8,6 +8,7 @@ interface SitePageCardProps {
   siteAssessmentId: number;
   title: string;
   progress: ProgressStatus;
+  order?: number;
 }
 
 export default function SitePageCard({

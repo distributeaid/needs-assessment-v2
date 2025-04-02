@@ -1,0 +1,79 @@
+{
+  "What region do you operate in?": [
+    "Western Europe",
+    "Eastern Europe",
+    "Middle East",
+    "North Africa",
+    "North America"
+  ],
+  "If applicable, what US state do you operate in?": [
+    "California",
+    "Texas",
+    "New York",
+    "Florida",
+    "Illinois"
+  ],
+  "What infrastructure do you have?": [
+    "Forklift",
+    "Loading Bay",
+    "Pallet Jack",
+    "Shelving Units",
+    "Storage Containers"
+  ],
+  "Which of the following do you provide?": [
+    "Food",
+    "Hygiene Kits",
+    "Shelter Items",
+    "Clothing",
+    "Household Supplies"
+  ],
+  "How frequently do you support the same individual?": [
+    "Daily",
+    "Weekly",
+    "Monthly",
+    "Annually",
+    "Other"
+  ],
+  "Are there specific vulnerable communities that you support?": [
+    "Trans / Non-binary / Queer",
+    "Refugees",
+    "Formerly Incarcerated",
+    "Unhoused People",
+    "Disabled People"
+  ],
+  "Which modes of food distribution does your organization use?": [
+    "Hot meals on site",
+    "Food baskets",
+    "Portable snacks",
+    "Emergency food kits",
+    "Community fridges"
+  ],
+  "Please select which of the following are represented in the population you serve ": [
+    "Children",
+    "Elderly",
+    "Pregnant People",
+    "People with Disabilities",
+    "Refugees"
+  ],
+  "Which of the following do you need over the next six months?": [
+    "Blankets",
+    "Diapers",
+    "Tents",
+    "Warm Clothing",
+    "Cleaning Supplies"
+  ],
+  "Which applications do you need hygeine supplies for?": [
+    "Personal Hygiene",
+    "First Aid",
+    "Menstrual Health",
+    "Baby Care",
+    "Sanitation Facilities"
+  ],
+  "The DA team uses your needs assessment data to provide a variety of support & services. Please check any support / services that you are interested in learning more about and a team member will reach out. ": [
+    "Regional Needs Reporting",
+    "Community Collection Campaigns",
+    "In-Kind Donor Outreach",
+    "Joint Procurement Planning",
+    "Aid Matching"
+  ]
+}
