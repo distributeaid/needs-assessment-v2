@@ -45,7 +45,6 @@ export default function AssessmentPage() {
   const router = useRouter();
   const params = useParams();
   const pageId = getIdParam(params.pageId);
-  const [site, setSite] = useState< Site >();
 
   const [siteAssessment, setSiteAssessment] = useState<{
     id: number;
@@ -54,6 +53,7 @@ export default function AssessmentPage() {
   const [assessmentPages, setAssessmentPages] = useState<
     SidebarProps["sitePages"]
   >([]);
+  const [site, setSite] = useState< Site >();
   const [page, setPage] = useState<{
     title: string;
     questions: Question[];
@@ -137,8 +137,6 @@ export default function AssessmentPage() {
     confirmed = false,
     isConfirmationPage = false,
   ) => {
-    console.log("handleSubmit", confirmed, isConfirmationPage);
-
     if (!session || !siteAssessment) {
       router.push("/about");
       return;
@@ -188,7 +186,7 @@ export default function AssessmentPage() {
   };
 
   if (error) return <div className="p-4 text-red-600">{error}</div>;
-  if (!page || !siteAssessment) return <LoadingSpinner />;
+  if (!site || !page || !siteAssessment) return <LoadingSpinner />;
 
   return (
     <PageLayout

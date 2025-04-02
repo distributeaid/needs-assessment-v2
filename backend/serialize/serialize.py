@@ -33,6 +33,7 @@ def serialize_user(user: User) -> dict:
 
 def serialize_site_page(site_page: SitePage) -> dict:
     page = Page.query.options(joinedload(Page.questions)).filter_by(id=site_page.page_id).first()
+    site = Site.query.filter_by(id=site_page.site_assessment.site_id).first()
     return {
         "id": site_page.id,
         "pageId": site_page.page_id,
@@ -49,9 +50,11 @@ def serialize_site_page(site_page: SitePage) -> dict:
             ],
         },
         'isConfirmationPage': site_page.is_confirmation_page,
+        "site": serialize_site(site),
     }
 
 def serialize_site_assessment(assessment: SiteAssessment) -> dict:
+    site = Site.query.filter_by(id=assessment.site_id).first()
     serialized_site_pages = [
         serialize_site_page(sp)
         for sp in assessment.site_pages
@@ -64,6 +67,7 @@ def serialize_site_assessment(assessment: SiteAssessment) -> dict:
         "createdAt": assessment.created_at.isoformat(),
         "sitePages": serialized_site_pages,
         "confirmed": assessment.confirmed,
+        "site": serialize_site(site),
     }
 
 def serialize_site(site: Site) -> dict:

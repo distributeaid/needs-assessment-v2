@@ -18,7 +18,7 @@ interface AssessmentFormProps {
   responses: Record<number, string | string[]>;
   onInputChange: (questionId: number, value: string | string[]) => void;
   onSubmit: (confirm: boolean, isConfirmationPage: boolean) => void;
-  site?: Site;
+  site: Site;
 }
 
 const inputBaseClass = "mt-1 p-2 border text-gray-900 rounded w-full";
@@ -55,6 +55,7 @@ const AssessmentForm: React.FC<AssessmentFormProps> = ({
   onInputChange,
   onSubmit,
   isConfirmationPage,
+  site
 }) => {
   const renderInput = (question: Question) => {
     const value = responses[question.id] || "";
@@ -92,7 +93,7 @@ const AssessmentForm: React.FC<AssessmentFormProps> = ({
       case "SizingGrid":
         return <SizingGridInput {...commonProps} />;
       case "DemoGrid":
-        return <DemoGridInput {...commonProps} />;
+        return <DemoGridInput {...commonProps} peopleServed={site?.peopleServed} />;
       default:
         return (
           <input

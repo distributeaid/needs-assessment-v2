@@ -27,11 +27,12 @@
     "Clothing",
     "Household Supplies"
   ],
-  "How frequently do you support the same individual?": [
+  "How often do you support the same individuals?": [
     "Daily",
     "Weekly",
     "Monthly",
-    "Annually"
+    "Annually",
+    "Never"
   ],
   "Are there specific vulnerable communities that you support?": [
     "Trans / Non-binary / Queer",

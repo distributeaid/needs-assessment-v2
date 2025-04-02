@@ -19,7 +19,6 @@ const isJson = (str: string) => {
 };
 
 const FormattedResponse: React.FC<Props> = ({ value }) => {
-    console.log("FormattedResponse", value);
   const parsed = isJson(value);
 
   if (parsed === null) {

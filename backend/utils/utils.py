@@ -101,6 +101,6 @@ def update_from_profile_page(page, site_assessment, responses_data):
             db.session.add(site)
         if question and question.text == "How many individuals does your organisation support in one month?":
             site = Site.query.filter_by(id=site_assessment.site_id).first()
-            site.num_people = response["value"]
+            site.people_served = response["value"]
             db.session.add(site)
     db.session.commit()

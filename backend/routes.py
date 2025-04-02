@@ -173,17 +173,12 @@ def get_assessment_page(site_assessment_id, site_page_id):
         logging.error(f"JWT Error: {e}")
         return jsonify({"error": str(e)}), 401
 
-    # Look up the page with its questions
-    page = Page.query.options(joinedload(Page.questions)).filter_by(id=site_page_id).first()
-    if not page:
-        return jsonify({"error": "Page not found"}), 404
+    # Look up the SitePage
+    site_page = SitePage.query.get(site_page_id)
+    if not site_page:
+        return jsonify({"error": "SitePage not found"}), 404
 
-    # Look up the SitePage for this page, given the assessment and the user's site.
-    site_page = SitePage.query.join(SiteAssessment).filter(
-        SitePage.page_id == site_page_id,
-        SiteAssessment.id == site_assessment_id,
-        SiteAssessment.site_id == user.site_id
-    ).first()
+    page = Page.query.get(site_page.page_id)
 
     responses = []
     if site_page:
@@ -200,7 +195,6 @@ def get_assessment_page(site_assessment_id, site_page_id):
         "site": serialize_site(site),
     })
 
-# /api/site-assessment/<int:site_assessment_id>/summary
 @api_bp.route("/api/site-assessment/<int:site_assessment_id>/summary", methods=["GET"])
 def get_site_assessment_summary(site_assessment_id):
     site_assessment = SiteAssessment.query.get(site_assessment_id)
