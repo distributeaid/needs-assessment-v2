@@ -9,5 +9,5 @@ gunicorn
 pyjwt
 pytest
 python-dotenv
-werkzeug==2.3.7
+werkzeug==3.0.6
 pandas
