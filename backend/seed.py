@@ -3,6 +3,7 @@ from datetime import datetime
 import json
 import pandas as pd
 from collections import defaultdict
+from datetime import datetime, UTC
 
 import bcrypt
 
@@ -45,8 +46,8 @@ def choices_from_google():
 
 
 def seed_assessment_from_csv(current_year, current_season,
-        filepath="backend/data/questions.csv",
-        options_file="backend/data/response_options.json"):
+        filepath="data/questions.csv",
+        options_file="data/response_options.json"):
     """Reads a CSV file and seeds the database with Assessments, Pages, and Questions."""
     assessment = Assessment(year=current_year, season=current_season)
     db.session.add(assessment)
@@ -202,8 +203,8 @@ def seed_users():
 
 def seed_database():
     """Seed the database with test data."""
-    current_year = datetime.utcnow().year
-    current_season = "Spring" if datetime.utcnow().month < 7 else "Fall"
+    current_year = datetime.now(UTC).year
+    current_season = "Spring" if datetime.now(UTC).month < 7 else "Fall"
     assessment = Assessment.query.filter_by(year=current_year, season=current_season).first()
     if not assessment:
         seed_assessment_from_csv(current_year=current_year, current_season=current_season)

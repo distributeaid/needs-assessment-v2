@@ -11,7 +11,7 @@ def serialize_model(obj):
     return {k: values[k] for k in sorted(values)}
 
 
-def export_seed_data(path="backend/data/test_seed.json"):
+def export_seed_data(path="data/test_seed.json"):
     data = {
         "assessments": [],
         "pages": [],

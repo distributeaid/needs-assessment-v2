@@ -5,12 +5,12 @@ tasks:
     command: bash
 
   - name: flask
-    init: pip install -r backend/requirements.txt
-    command: flask run --debug
+    init: cd backend && poetry install
+    command: poetry run flask run --debug --host=0.0.0.0
 
   - name: nextjs
     init: yarn install
-    command: yarn run dev
+    command: yarn dev
 
 ports:
   - port: 3000

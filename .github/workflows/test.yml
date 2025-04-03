@@ -10,6 +10,11 @@ jobs:
   test:
     runs-on: ubuntu-latest
 
+    env:
+      FLASK_API_URL: http://localhost:5000
+      NEXTAUTH_URL: http://localhost:3000
+      NEXTAUTH_SECRET: your_secret_here
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -19,11 +24,25 @@ jobs:
         with:
           node-version: 18
 
-      - name: Install dependencies
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.12"
+
+      - name: Install Poetry
+        run: |
+          curl -sSL https://install.python-poetry.org | python3 -
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
+
+      - name: Install Python dependencies with Poetry
+        working-directory: backend
+        run: poetry install --no-interaction --no-root
+
+      - name: Install Node.js dependencies
         run: yarn install
 
-      - name: Start server
-        run: yarn test:server
-
-      - name: Run tests
-        run: yarn test
+      - name: Run full test suite (Vitest, Pytest, Next build)
+        run: |
+          yarn vitest run
+          cd backend && poetry run pytest
+          yarn build

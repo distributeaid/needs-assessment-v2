@@ -1,5 +1,5 @@
 from flask_sqlalchemy import SQLAlchemy
-from datetime import datetime
+from datetime import datetime, UTC
 from sqlalchemy.dialects.mysql import JSON
 
 db = SQLAlchemy()
@@ -49,7 +49,7 @@ class SiteAssessment(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     site_id = db.Column(db.Integer, db.ForeignKey('site.id'), nullable=False)
     assessment_id = db.Column(db.Integer, db.ForeignKey('assessment.id'), nullable=False)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=datetime.now(UTC))
     site_pages = db.relationship('SitePage', backref='site_assessment', lazy=True)
     confirmed = db.Column(db.Boolean, default=False)
 
@@ -76,4 +76,4 @@ class SiteAssessmentResult(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     site_assessment_id = db.Column(db.Integer, db.ForeignKey('site_assessment.id'), nullable=False)
     data = db.Column(db.JSON, nullable=False)
-    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.now(UTC), onupdate=datetime.now(UTC))

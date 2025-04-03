@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, UTC
 
 from flask import session, request
 from flask import jsonify
@@ -39,14 +39,14 @@ def get_current_user():
 
 def get_current_season():
     """Determine the current season based on the month."""
-    month = datetime.utcnow().month
+    month = datetime.now(UTC).month
     return "Spring" if month < 7 else "Fall"
 
 
 def ensure_assessment_exists(site_id):
     """Ensure a SiteAssessment exists for the user's site."""
     # Get current year & season
-    current_year = datetime.utcnow().year
+    current_year = datetime.now(UTC).year
     current_season = get_current_season()
 
     # Find the corresponding Assessment

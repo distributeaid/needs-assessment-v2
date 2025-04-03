@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "next dev --turbo",
-    "dev:backend": "flask run --debug",
+    "dev:backend": "cd backend && poetry run flask run --debug",
     "build": "next build",
     "start": "next start",
     "check:types": "yarn tsc",
@@ -13,9 +13,9 @@
     "format": "yarn prettier --write .",
     "lint": "next lint",
     "test": "vitest",
-    "test:backend": "pytest backend/tests/",
+    "test:backend": "cd backend && poetry run pytest",
     "test:watch": "vitest --watch",
-    "test:server": "vitest run && pytest backend/tests/ && next build"
+    "test:server": "vitest run && next build && cd backend && poetry run pytest"
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx}": [
