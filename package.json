@@ -15,7 +15,7 @@
     "test": "vitest",
     "test:backend": "pytest backend/tests/",
     "test:watch": "vitest --watch",
-    "test:server": "vitest run && pytest backend/tests/"
+    "test:server": "vitest run && pytest backend/tests/ && next build"
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx}": [
@@ -62,6 +62,7 @@
     "jsdom": "^26.0.0",
     "lint-staged": "^15.5.0",
     "postcss": "^8.5.3",
+    "postcss-nesting": "^13.0.1",
     "prettier": "^3.5.3",
     "pretty-quick": "^4.0.0",
     "supertest": "^7.0.0",
@@ -69,5 +70,6 @@
     "ts-node": "^10.9.2",
     "typescript": "^5.7.3",
     "vitest": "^3.1.1"
-  }
+  },
+  "license": "MIT"
 }

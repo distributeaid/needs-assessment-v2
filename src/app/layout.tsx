@@ -4,7 +4,7 @@ import { Providers } from "./providers";
 import Navbar from "@/components/Navbar";
 import "@radix-ui/themes/styles.css";
 
-const yantramanav = Yantramanav({ weight: ["400", "700"] });
+const yantramanav = Yantramanav({ weight: ["400", "700"], subsets: ["latin"] });
 
 export const metadata = {
   title: "Needs Assessment",
