@@ -40,31 +40,6 @@ def login():
     return jsonify(result)
 
 
-@api_bp.route("/api/pages", methods=["GET"])
-def get_pages():
-    """Return all pages with their associated questions."""
-    pages = Page.query.all()
-    response = []
-
-    for page in pages:
-        response.append({
-            "page": page.title,
-            "questions": [
-                {
-                    "id": q.id,
-                    "text": q.text,
-                    "subtext": q.subtext,
-                    "required": q.required,
-                    "type": q.type,
-                    "options": q.options,
-                    "order": q.order,
-                }
-                for q in page.questions
-            ]
-        })
-
-    return jsonify(response)
-
 @api_bp.route("/api/site-assessment", methods=["GET"])
 def get_site_assessment():
     try:

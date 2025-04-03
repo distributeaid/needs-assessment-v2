@@ -2,7 +2,7 @@ import json
 
 from backend.models import Assessment, Page, Question, Site, User
 
-def load_seed_data(db, path="backend/data/test_seed.json"):
+def load_seed_data(db, path="data/test_seed.json"):
     with open(path, "r", encoding="utf-8") as f:
         data = json.load(f)
 
