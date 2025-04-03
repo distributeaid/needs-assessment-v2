@@ -2,6 +2,7 @@ import pytest
 from backend.app import app
 from backend.models import db, User
 from backend.seed import seed_database
+from backend.utils.import_data import load_seed_data
 from backend.utils.jwt_utils import generate_jwt_payload
 
 @pytest.fixture
@@ -11,8 +12,9 @@ def client():
 
     with app.test_client() as client:
         with app.app_context():
+            db.drop_all()
             db.create_all()
-            seed_database()
+            load_seed_data(db)
         yield client
         with app.app_context():
             db.drop_all()
