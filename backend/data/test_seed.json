@@ -134,7 +134,13 @@
     {
       "allows_additional_input": false,
       "id": 4,
-      "options": ["California", "Texas", "New York", "Florida", "Illinois"],
+      "options": [
+        "California",
+        "Texas",
+        "New York",
+        "Florida",
+        "Illinois"
+      ],
       "order": 5,
       "page_id": 1,
       "parent_question_id": null,
@@ -213,13 +219,13 @@
       "allows_additional_input": false,
       "id": 10,
       "options": [
-        "Infants and Children",
+        "Food",
+        "Shelter",
         "Hygeine",
         "Infrastructure",
-        "Shelter",
         "Clothing",
         "Household",
-        "Food"
+        "Infants and Children"
       ],
       "order": 11,
       "page_id": 1,
@@ -262,7 +268,13 @@
     {
       "allows_additional_input": true,
       "id": 13,
-      "options": ["Daily", "Weekly", "Monthly", "Annually", "Never"],
+      "options": [
+        "Daily",
+        "Weekly",
+        "Monthly",
+        "Annually",
+        "Never"
+      ],
       "order": 14,
       "page_id": 2,
       "parent_question_id": null,
@@ -794,45 +806,40 @@
     },
     {
       "id": 2,
-      "name": "rbeskafjnlwm",
-      "people_served": ""
+      "name": "Admin Site",
+      "people_served": 0
     },
     {
       "id": 3,
       "name": "Shared Site",
-      "people_served": 0
-    },
-    {
-      "id": 4,
-      "name": "Admin Site",
       "people_served": 0
     }
   ],
   "users": [
     {
       "email": "testuser@example.com",
-      "hashed_password": "$2b$12$cFKYpKqrXVLWLWl/dFJfXeO8EhDM7nnBJVK0LkFh5bkiUIzZOM1MW",
+      "hashed_password": "$2b$12$UftCIA0h6WoxuayNTVynVuwuvOvBVDUX8BPN1ip1VIw3YeF/vjFuO",
       "id": 1,
       "site_id": 1,
       "username": "testuser"
     },
     {
       "email": "admin@example.com",
-      "hashed_password": "$2b$12$cFKYpKqrXVLWLWl/dFJfXeO8EhDM7nnBJVK0LkFh5bkiUIzZOM1MW",
+      "hashed_password": "$2b$12$UftCIA0h6WoxuayNTVynVuwuvOvBVDUX8BPN1ip1VIw3YeF/vjFuO",
       "id": 2,
       "site_id": 2,
       "username": "admin"
     },
     {
       "email": "user1@example.com",
-      "hashed_password": "$2b$12$cFKYpKqrXVLWLWl/dFJfXeO8EhDM7nnBJVK0LkFh5bkiUIzZOM1MW",
+      "hashed_password": "$2b$12$UftCIA0h6WoxuayNTVynVuwuvOvBVDUX8BPN1ip1VIw3YeF/vjFuO",
       "id": 3,
       "site_id": 3,
       "username": "user1"
     },
     {
       "email": "user2@example.com",
-      "hashed_password": "$2b$12$cFKYpKqrXVLWLWl/dFJfXeO8EhDM7nnBJVK0LkFh5bkiUIzZOM1MW",
+      "hashed_password": "$2b$12$UftCIA0h6WoxuayNTVynVuwuvOvBVDUX8BPN1ip1VIw3YeF/vjFuO",
       "id": 4,
       "site_id": 3,
       "username": "user2"

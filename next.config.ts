@@ -1,12 +1,17 @@
 import type { NextConfig } from "next";
 
+const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+
 const nextConfig: NextConfig = {
+  env: {
+    FLASK_API_URL: apiUrl,
+  },
+
   async rewrites() {
     return [
       {
-        // When you call /flask-api/… it gets rewritten to your Flask endpoint
         source: "/flask-api/:path*",
-        destination: `${process.env.NEXT_PUBLIC_API_URL}/:path*`,
+        destination: `${apiUrl}/:path*`,
       },
     ];
   },
