@@ -7,6 +7,7 @@ from collections import defaultdict
 import bcrypt
 
 from backend.models import db, Page, Question, Assessment, User, Site
+from backend.utils.export_data import export_seed_data
 
 def choices_from_google():
     sheet_url = "https://docs.google.com/spreadsheets/d/1hh41TeFexc-0Byg3iDSzbA2nLYd05bgSuwrKu-DUmww/export?format=csv&id=1hh41TeFexc-0Byg3iDSzbA2nLYd05bgSuwrKu-DUmww&gid=0"
@@ -43,23 +44,19 @@ def choices_from_google():
 
 
 
-def seed_database_from_csv(filepath="backend/data/questions.csv",
-                           options_file="backend/data/response_options.json"):
+def seed_assessment_from_csv(current_year, current_season,
+        filepath="backend/data/questions.csv",
+        options_file="backend/data/response_options.json"):
     """Reads a CSV file and seeds the database with Assessments, Pages, and Questions."""
-    # Get current Year & Season
-    current_year = datetime.utcnow().year
-    current_season = "Spring" if datetime.utcnow().month < 7 else "Fall"
+    assessment = Assessment(year=current_year, season=current_season)
+    db.session.add(assessment)
+    db.session.commit()
+
     with open(options_file, "r", encoding="utf-8") as f:
         response_options_dict = json.load(f)
 
     choices_options = choices_from_google()
     parent_ids = {}
-    # Ensure there is an Assessment for the current season
-    assessment = Assessment.query.filter_by(year=current_year, season=current_season).first()
-    if not assessment:
-        assessment = Assessment(year=current_year, season=current_season)
-        db.session.add(assessment)
-        db.session.commit()
 
     # Open CSV with error handling for encoding issues
     with open(filepath, mode="r", encoding="utf-8", errors="replace") as file:
@@ -114,7 +111,6 @@ def seed_database_from_csv(filepath="backend/data/questions.csv",
             parent_id = None
             if row["ParentItemID"]:
                 parent_id = parent_ids.get(row["ParentItemID"])
-
 
             question = Question(
                 page_id=page.id,
@@ -206,6 +202,11 @@ def seed_users():
 
 def seed_database():
     """Seed the database with test data."""
-    seed_database_from_csv()
+    current_year = datetime.utcnow().year
+    current_season = "Spring" if datetime.utcnow().month < 7 else "Fall"
+    assessment = Assessment.query.filter_by(year=current_year, season=current_season).first()
+    if not assessment:
+        seed_assessment_from_csv(current_year=current_year, current_season=current_season)
     seed_users()
-    print("Database seeded successfully.")
+    print("✅ Database seeded successfully.")
+    export_seed_data()

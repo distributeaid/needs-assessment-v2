@@ -1,5 +1,5 @@
 from backend.app import app
-from backend.models import db, Site, Assessment, SiteAssessment, SitePage
+from backend.models import db, Site, Assessment, SiteAssessment, SitePage, Page
 from backend.utils.utils import create_site_assessment
 import pytest
 
@@ -28,13 +28,14 @@ def test_get_site_assessment(client, setup_site_assessment, auth_header):
     assert response.status_code == 200
     data = response.json
 
-    assert "siteAssessmentId" in data
+    assert "id" in data
+    assert "assessmentId" in data
     assert "sitePages" in data
     assert len(data["sitePages"]) > 0, "SiteAssessment should contain pages"
 
     # Verify required pages are Unstarted, others are Locked
     for page in data["sitePages"]:
-        if page["required"]:
+        if page["required"] and page["page"]["title"] == "Basic Info":
             assert page["progress"] == "UNSTARTEDREQUIRED"
         else:
             assert page["progress"] == "LOCKED"
@@ -76,7 +77,11 @@ def test_complete_site_page(client, setup_site_assessment):
 
         # Check that non-required pages are now Unstarted
         non_required_pages = SitePage.query.filter_by(site_assessment_id=setup_site_assessment.id, required=False).all()
-        for page in non_required_pages:
-            refreshed = db.session.get(SitePage, page.id)
-            assert refreshed.progress == "UNSTARTEDOPTIONAL"
+        for site_page in non_required_pages:
+            refreshed = db.session.get(SitePage, site_page.id)
+            page = db.session.get(Page, site_page.page_id)
+            if page.is_confirmation_page:
+                assert refreshed.progress == "UNSTARTEDREQUIRED"
+            else:
+                assert refreshed.progress == "UNSTARTEDOPTIONAL"
 

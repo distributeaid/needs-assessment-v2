@@ -82,6 +82,7 @@ def unlock_remaining_pages(site_assessment_id):
                     sp.progress = "UNSTARTEDREQUIRED"
                 else:
                     sp.progress = "UNSTARTEDOPTIONAL"
+                db.session.add(sp)
         db.session.commit()
 
 def update_from_profile_page(page, site_assessment, responses_data):

@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "next dev --turbo",
+    "dev:backend": "flask run --debug",
     "build": "next build",
     "start": "next start",
     "check:types": "yarn tsc",
@@ -12,8 +13,9 @@
     "format": "yarn prettier --write .",
     "lint": "next lint",
     "test": "vitest",
+    "test:backend": "pytest backend/tests/",
     "test:watch": "vitest --watch",
-    "test:server": "vitest run"
+    "test:server": "vitest run && pytest backend/tests/"
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx}": [
