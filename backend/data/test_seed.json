@@ -219,13 +219,13 @@
       "allows_additional_input": false,
       "id": 10,
       "options": [
-        "Infrastructure",
-        "Clothing",
-        "Infants and Children",
         "Hygeine",
-        "Household",
+        "Infants and Children",
         "Shelter",
-        "Food"
+        "Household",
+        "Food",
+        "Infrastructure",
+        "Clothing"
       ],
       "order": 11,
       "page_id": 1,
@@ -818,28 +818,28 @@
   "users": [
     {
       "email": "testuser@example.com",
-      "hashed_password": "$2b$12$iJtOr8bnv.8a/KUQAIIMKOUWdhnSbLcZjVjXG79XaiXo/aH8RH3qC",
+      "hashed_password": "$2b$12$A4bQHlSTDkobOPxHIDRtuuML0iuTChdpNUQVYxO8.8utEUhN7ibpS",
       "id": 1,
       "site_id": 1,
       "username": "testuser"
     },
     {
       "email": "admin@example.com",
-      "hashed_password": "$2b$12$iJtOr8bnv.8a/KUQAIIMKOUWdhnSbLcZjVjXG79XaiXo/aH8RH3qC",
+      "hashed_password": "$2b$12$A4bQHlSTDkobOPxHIDRtuuML0iuTChdpNUQVYxO8.8utEUhN7ibpS",
       "id": 2,
       "site_id": 2,
       "username": "admin"
     },
     {
       "email": "user1@example.com",
-      "hashed_password": "$2b$12$iJtOr8bnv.8a/KUQAIIMKOUWdhnSbLcZjVjXG79XaiXo/aH8RH3qC",
+      "hashed_password": "$2b$12$A4bQHlSTDkobOPxHIDRtuuML0iuTChdpNUQVYxO8.8utEUhN7ibpS",
       "id": 3,
       "site_id": 3,
       "username": "user1"
     },
     {
       "email": "user2@example.com",
-      "hashed_password": "$2b$12$iJtOr8bnv.8a/KUQAIIMKOUWdhnSbLcZjVjXG79XaiXo/aH8RH3qC",
+      "hashed_password": "$2b$12$A4bQHlSTDkobOPxHIDRtuuML0iuTChdpNUQVYxO8.8utEUhN7ibpS",
       "id": 4,
       "site_id": 3,
       "username": "user2"
