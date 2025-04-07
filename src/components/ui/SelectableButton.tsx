@@ -18,8 +18,10 @@ const SelectableButton: React.FC<SelectableButtonProps> = ({
     <button
       type="button"
       onClick={onClick}
-      className={`${statusColors.base} ${
-        selected ? statusColors.selected : statusColors.unselected
+      className={`${statusColors.choice} ${
+        selected
+          ? statusColors.variants.primary
+          : statusColors.variants.secondary
       }`}
     >
       {label}

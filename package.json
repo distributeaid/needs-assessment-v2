@@ -10,7 +10,7 @@
     "start": "next start",
     "check:types": "yarn tsc",
     "check:format": "yarn prettier --check .",
-    "format": "yarn prettier --write .",
+    "format": "yarn prettier --write . && cd backend && poetry run black .",
     "lint": "next lint",
     "test": "vitest",
     "test:backend": "cd backend && poetry run pytest",

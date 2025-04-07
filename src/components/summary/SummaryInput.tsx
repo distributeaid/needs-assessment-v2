@@ -17,7 +17,7 @@ const SummaryInput: React.FC<InputProps> = ({ question, onChange }) => {
     const fetchEstimates = async () => {
       setLoading(true);
       try {
-        const res = await fetch("/flask-api/api/estimate-needs", {
+        const res = await fetch("/flask-api/estimate-needs", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ questionId: question.id }),

@@ -7,6 +7,7 @@ from backend.routes import api_bp
 from backend.seed import seed_database
 
 import logging
+
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 

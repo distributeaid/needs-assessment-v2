@@ -24,7 +24,7 @@ export default function Dashboard() {
       return;
     }
 
-    fetch(`/flask-api/api/site-assessment`, {
+    fetch(`/flask-api/site-assessment`, {
       headers: {
         Authorization: `Bearer ${session.user.accessToken}`,
       },

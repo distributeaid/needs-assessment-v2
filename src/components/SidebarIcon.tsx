@@ -5,15 +5,9 @@ import { Tooltip } from "radix-ui";
 import { progressColors } from "@/lib/progressStyles";
 interface SidebarIconProps {
   progress: SidebarProps["sitePages"][0]["progress"];
-  prevPage?: string;
-  isLast?: boolean;
 }
 
-const SidebarIcon: React.FC<SidebarIconProps> = ({
-  progress,
-  isLast = false,
-  prevPage = "",
-}) => {
+const SidebarIcon: React.FC<SidebarIconProps> = ({ progress }) => {
   const isLocked = progress === "LOCKED";
 
   const imageComponent = (
@@ -44,13 +38,9 @@ const SidebarIcon: React.FC<SidebarIconProps> = ({
                 {/* text shown in tooltip */}
                 <Box
                   className="p-2 rounded "
-                  style={{ backgroundColor: "black" }}
+                  style={{ backgroundColor: progressColors[progress] }}
                 >
-                  <Text>
-                    {isLast
-                      ? "Please complete all required pages"
-                      : `Please complete the ${prevPage} page`}
-                  </Text>
+                  <Text>Please complete the required pages.</Text>
                 </Box>
 
                 <Tooltip.Arrow />

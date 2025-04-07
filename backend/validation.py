@@ -1,5 +1,6 @@
 from backend.models import Question
 
+
 def validate_responses(responses, require_all=False):
     """Validate responses before saving or completing a SitePage."""
     errors = []
@@ -16,15 +17,16 @@ def validate_responses(responses, require_all=False):
             continue
 
         # Numeric validationx
-        if question.type == "Numeric":
+        if question.question_type == "Numeric":
             try:
                 response["value"] = float(response["value"])
             except ValueError:
-                errors.append(f"Invalid numeric response for question: {question.text}: {response['value']}")
-
+                errors.append(
+                    f"Invalid numeric response for question: {question.text}: {response['value']}"
+                )
 
         # MultiSelect validation
-        if question.type in ["MultiSelect", "MultiselectWithOther"]:
+        if question.question_type in ["MultiSelect", "MultiselectWithOther"]:
             if not isinstance(response.get("value"), list):
                 errors.append(f"MultiSelect responses must be a list for question: {question.text}")
 

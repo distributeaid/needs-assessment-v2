@@ -11,6 +11,7 @@ import DropdownWithOtherInput from "@/components/questions/DropdownWithOtherInpu
 import YesNoInput from "@/components/questions/YesNoInput";
 import YesNoWithNumericEntry from "@/components/questions/YesNoWithNumericEntry";
 import { InputProps } from "@/types/ui-models";
+import ActionButton from "@/components/ui/ActionButton";
 
 interface AssessmentFormProps {
   isConfirmationPage: boolean;
@@ -18,7 +19,7 @@ interface AssessmentFormProps {
   responses: Record<number, string | string[]>;
   onInputChange: (questionId: number, value: string | string[]) => void;
   onSubmit: (confirm: boolean, isConfirmationPage: boolean) => void;
-  site: Site;
+  site?: Site;
 }
 
 const inputBaseClass = "mt-1 p-2 border text-gray-900 rounded w-full";
@@ -146,20 +147,16 @@ const AssessmentForm: React.FC<AssessmentFormProps> = ({
         })}
 
         <div className="flex flex-col sm:flex-row justify-end gap-4 pt-6">
-          <button
-            type="button"
-            className="bg-blue-600 text-white px-5 py-2 rounded hover:bg-blue-700 transition"
+          <ActionButton
+            label="Save"
             onClick={() => onSubmit(false, isConfirmationPage)}
-          >
-            Save
-          </button>
-          <button
-            type="button"
-            className="bg-green-600 text-white px-5 py-2 rounded hover:bg-green-700 transition"
+            variant="primary"
+          />
+          <ActionButton
+            label={isConfirmationPage ? "Save and Finalize" : "Save & Confirm"}
             onClick={() => onSubmit(true, isConfirmationPage)}
-          >
-            {isConfirmationPage ? "Save and Finalize" : "Save & Confirm"}
-          </button>
+            variant="success"
+          />
         </div>
       </form>
     </div>

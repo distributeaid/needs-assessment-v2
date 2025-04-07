@@ -8,8 +8,6 @@ def test_get_site_assessment(client, auth_header):
         response = client.get("/api/site-assessment", headers=auth_header)
         assert response.status_code == 200
         data = response.json
-        print(data)
-
         assert "id" in data
         assert "assessmentId" in data
         assert "sitePages" in data
@@ -17,7 +15,7 @@ def test_get_site_assessment(client, auth_header):
 
         # Verify required pages are Unstarted, others are Locked
         for page in data["sitePages"]:
-            if page["required"] and page["page"]["title"] == "Basic Info":
+            if page["required"] and page["page"]["title"] == "Demographics":
                 assert page["progress"] == "UNSTARTEDREQUIRED"
             else:
                 assert page["progress"] == "LOCKED"
@@ -35,7 +33,7 @@ def test_save_site_page(client, auth_header):
 
         response = client.post(
             f"/api/site-assessment/{site_page.site_assessment_id}/site-page/{site_page.id}/save",
-            json={"responses": []}
+            json={"responses": []},
         )
         assert response.status_code == 200
         assert response.json["message"] == "SitePage saved successfully"
@@ -51,11 +49,14 @@ def test_complete_site_page(client, auth_header):
         # Complete all required pages
         user = User.query.filter_by(email="testuser@example.com").first()
         site_assessment = SiteAssessment.query.filter_by(site_id=user.site_id).first()
-        required_pages = SitePage.query.filter_by(site_assessment_id=site_assessment.id, required=True).all()
+        required_pages = SitePage.query.filter_by(
+            site_assessment_id=site_assessment.id, required=True
+        ).all()
         for page in required_pages:
-            response = client.post(f"/api/site-assessment/{page.site_assessment_id}/site-page/{page.id}/save",
-                                    json={"responses": [],
-                                    "confirmed": True})
+            response = client.post(
+                f"/api/site-assessment/{page.site_assessment_id}/site-page/{page.id}/save",
+                json={"responses": [], "confirmed": True},
+            )
             assert response.status_code == 200
             assert response.json["message"] == "SitePage completed successfully"
 
@@ -65,7 +66,9 @@ def test_complete_site_page(client, auth_header):
             assert refreshed.progress == "COMPLETE"
 
         # Check that non-required pages are now Unstarted
-        non_required_pages = SitePage.query.filter_by(site_assessment_id=site_assessment.id, required=False).all()
+        non_required_pages = SitePage.query.filter_by(
+            site_assessment_id=site_assessment.id, required=False
+        ).all()
         for site_page in non_required_pages:
             refreshed = db.session.get(SitePage, site_page.id)
             page = db.session.get(Page, site_page.page_id)
@@ -73,4 +76,3 @@ def test_complete_site_page(client, auth_header):
                 assert refreshed.progress == "UNSTARTEDREQUIRED"
             else:
                 assert refreshed.progress == "UNSTARTEDOPTIONAL"
-
