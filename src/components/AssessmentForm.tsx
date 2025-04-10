@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { Question, Site } from "@/types/models";
 import SizingGridInput from "@/components/questions/SizingGridInput";
 import MultiSelectInput from "@/components/questions/MultiSelectInput";
@@ -11,6 +11,7 @@ import DropdownWithOtherInput from "@/components/questions/DropdownWithOtherInpu
 import YesNoInput from "@/components/questions/YesNoInput";
 import YesNoWithNumericEntry from "@/components/questions/YesNoWithNumericEntry";
 import { InputProps } from "@/types/ui-models";
+import { Text } from "@radix-ui/themes";
 
 interface AssessmentFormProps {
   isConfirmationPage: boolean;
@@ -57,6 +58,26 @@ const AssessmentForm: React.FC<AssessmentFormProps> = ({
   isConfirmationPage,
   site,
 }) => {
+  const [requiredNotAnswered, setRequiredNotAnswered] = useState(false);
+  //check if all required questions are answered
+  const checkRequired = (
+    questions: Question[],
+    responses: Record<number, string | string[]>,
+  ) => {
+    const requiredQuestions = questions.filter((question) => question.required);
+    // console.log(requiredQuestions)
+
+    // check if reponses are not empty, null or empty array
+    const allRequiredAnswered = requiredQuestions.every(
+      (question) =>
+        responses[question.id] != null &&
+        responses[question.id] !== "" &&
+        responses[question.id].length != 0,
+    );
+    console.log(allRequiredAnswered);
+    setRequiredNotAnswered(!allRequiredAnswered);
+    return allRequiredAnswered;
+  };
   const renderInput = (question: Question) => {
     const value = responses[question.id] || "";
     const commonProps = {
@@ -107,6 +128,8 @@ const AssessmentForm: React.FC<AssessmentFormProps> = ({
         );
     }
   };
+  console.log(questions);
+  console.log(responses);
 
   return (
     <div className="flex-1 px-4 md:px-8 py-6">
@@ -120,21 +143,25 @@ const AssessmentForm: React.FC<AssessmentFormProps> = ({
             !!question.subtext &&
             (!question.allowsAdditionalInput ||
               question.type === "Long Response");
-
+          const showRedDot = question.required;
           return (
             <div key={question.id} className="space-y-1">
               {isInline ? (
                 <div className="flex items-center gap-4 flex-wrap">
                   <label className="block text-base font-medium text-blue-900">
                     {question.text}
+                    {showRedDot && <span style={{ color: "red" }}> *</span>}
                   </label>
+
                   {input}
                 </div>
               ) : (
                 <>
                   <label className="block text-lg font-medium text-blue-900">
                     {question.text}
+                    {showRedDot && <span style={{ color: "red" }}> *</span>}
                   </label>
+
                   {showSubtext && (
                     <p className="text-sm text-blue-700">{question.subtext}</p>
                   )}
@@ -146,17 +173,31 @@ const AssessmentForm: React.FC<AssessmentFormProps> = ({
         })}
 
         <div className="flex flex-col sm:flex-row justify-end gap-4 pt-6">
+          {/* possible alternative : instead of text at bottom of pg when required questions aren't answered, have the text pop up under the unanswered questions themself? Open to other suggestions */}
+          {requiredNotAnswered && (
+            <Text>
+              Please answer all Required <span style={{ color: "red" }}>*</span>{" "}
+              questions
+            </Text>
+          )}
           <button
             type="button"
             className="bg-blue-600 text-white px-5 py-2 rounded hover:bg-blue-700 transition"
-            onClick={() => onSubmit(false, isConfirmationPage)}
+            // if all required questions are answered, then submit
+            onClick={() => {
+              if (checkRequired(questions, responses))
+                onSubmit(false, isConfirmationPage);
+            }}
           >
             Save
           </button>
           <button
             type="button"
             className="bg-green-600 text-white px-5 py-2 rounded hover:bg-green-700 transition"
-            onClick={() => onSubmit(true, isConfirmationPage)}
+            onClick={() => {
+              if (checkRequired(questions, responses))
+                onSubmit(true, isConfirmationPage);
+            }}
           >
             {isConfirmationPage ? "Save and Finalize" : "Save & Confirm"}
           </button>
