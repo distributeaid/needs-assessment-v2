@@ -57,7 +57,6 @@ const AssessmentForm: React.FC<AssessmentFormProps> = ({
   isConfirmationPage,
   site,
 }) => {
-  const [parentQuestion, setParentQuestion] = useState({ 6: "" });
   const renderInput = (question: Question) => {
     const value = responses[question.id] || "";
     const commonProps = {
