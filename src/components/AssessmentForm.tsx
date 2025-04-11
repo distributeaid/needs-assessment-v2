@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { Question, Site } from "@/types/models";
 import SizingGridInput from "@/components/questions/SizingGridInput";
 import MultiSelectInput from "@/components/questions/MultiSelectInput";
@@ -57,6 +57,7 @@ const AssessmentForm: React.FC<AssessmentFormProps> = ({
   isConfirmationPage,
   site,
 }) => {
+  const [parentQuestion, setParentQuestion] = useState({ 6: "" });
   const renderInput = (question: Question) => {
     const value = responses[question.id] || "";
     const commonProps = {
@@ -107,6 +108,8 @@ const AssessmentForm: React.FC<AssessmentFormProps> = ({
         );
     }
   };
+  console.log(questions.filter((question) => question.parentQuestionId));
+  console.log(responses);
 
   return (
     <div className="flex-1 px-4 md:px-8 py-6">
@@ -120,27 +123,30 @@ const AssessmentForm: React.FC<AssessmentFormProps> = ({
             !!question.subtext &&
             (!question.allowsAdditionalInput ||
               question.type === "Long Response");
-
+          const hasParent = question.parentQuestionId;
           return (
             <div key={question.id} className="space-y-1">
-              {isInline ? (
-                <div className="flex items-center gap-4 flex-wrap">
-                  <label className="block text-base font-medium text-blue-900">
-                    {question.text}
-                  </label>
-                  {input}
-                </div>
-              ) : (
-                <>
-                  <label className="block text-lg font-medium text-blue-900">
-                    {question.text}
-                  </label>
-                  {showSubtext && (
-                    <p className="text-sm text-blue-700">{question.subtext}</p>
-                  )}
-                  {input}
-                </>
-              )}
+              {(!hasParent || responses[hasParent] == "true") &&
+                (isInline ? (
+                  <div className="flex items-center gap-4 flex-wrap">
+                    <label className="block text-base font-medium text-blue-900">
+                      {question.text}
+                    </label>
+                    {input}
+                  </div>
+                ) : (
+                  <>
+                    <label className="block text-lg font-medium text-blue-900">
+                      {question.text}
+                    </label>
+                    {showSubtext && (
+                      <p className="text-sm text-blue-700">
+                        {question.subtext}
+                      </p>
+                    )}
+                    {input}
+                  </>
+                ))}
             </div>
           );
         })}
