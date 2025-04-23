@@ -139,30 +139,32 @@ const AssessmentForm: React.FC<AssessmentFormProps> = ({
             (!question.allowsAdditionalInput ||
               question.type === "Long Response");
           const showRedDot = question.required;
+          const hasParent = question.parentQuestionId;
+
           return (
             <div key={question.id} className="space-y-1">
-              {isInline ? (
-                <div className="flex items-center gap-4 flex-wrap">
-                  <label className="block text-base font-medium text-blue-900">
-                    {question.text}
-                    {showRedDot && <span style={{ color: "red" }}> *</span>}
-                  </label>
-
-                  {input}
-                </div>
-              ) : (
-                <>
-                  <label className="block text-lg font-medium text-blue-900">
-                    {question.text}
-                    {showRedDot && <span style={{ color: "red" }}> *</span>}
-                  </label>
-
-                  {showSubtext && (
-                    <p className="text-sm text-blue-700">{question.subtext}</p>
-                  )}
-                  {input}
-                </>
-              )}
+              {(!hasParent || responses[hasParent] == "true") &&
+                (isInline ? (
+                  <div className="flex items-center gap-4 flex-wrap">
+                    <label className="block text-base font-medium text-blue-900">
+                      {question.text}
+                    </label>
+                    {input}
+                  </div>
+                ) : (
+                  <>
+                    <label className="block text-lg font-medium text-blue-900">
+                      {question.text}
+                      {showRedDot && <span style={{ color: "red" }}> *</span>}
+                    </label>
+                    {showSubtext && (
+                      <p className="text-sm text-blue-700">
+                        {question.subtext}
+                      </p>
+                    )}
+                    {input}
+                  </>
+                ))}
             </div>
           );
         })}
