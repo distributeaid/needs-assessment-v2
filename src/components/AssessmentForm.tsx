@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 import { Question, Site } from "@/types/models";
 import SizingGridInput from "@/components/questions/SizingGridInput";
 import MultiSelectInput from "@/components/questions/MultiSelectInput";
@@ -107,8 +107,6 @@ const AssessmentForm: React.FC<AssessmentFormProps> = ({
         );
     }
   };
-  console.log(questions.filter((question) => question.parentQuestionId));
-  console.log(responses);
 
   return (
     <div className="flex-1 px-4 md:px-8 py-6">
