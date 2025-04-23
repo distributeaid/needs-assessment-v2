@@ -65,8 +65,6 @@ const AssessmentForm: React.FC<AssessmentFormProps> = ({
     responses: Record<number, string | string[]>,
   ) => {
     const requiredQuestions = questions.filter((question) => question.required);
-    // console.log(requiredQuestions)
-
     // check if reponses are not empty, null or empty array
     const allRequiredAnswered = requiredQuestions.every(
       (question) =>
@@ -74,7 +72,6 @@ const AssessmentForm: React.FC<AssessmentFormProps> = ({
         responses[question.id] !== "" &&
         responses[question.id].length != 0,
     );
-    console.log(allRequiredAnswered);
     setRequiredNotAnswered(!allRequiredAnswered);
     return allRequiredAnswered;
   };
@@ -128,8 +125,6 @@ const AssessmentForm: React.FC<AssessmentFormProps> = ({
         );
     }
   };
-  console.log(questions);
-  console.log(responses);
 
   return (
     <div className="flex-1 px-4 md:px-8 py-6">
@@ -176,7 +171,7 @@ const AssessmentForm: React.FC<AssessmentFormProps> = ({
           {/* possible alternative : instead of text at bottom of pg when required questions aren't answered, have the text pop up under the unanswered questions themself? Open to other suggestions */}
           {requiredNotAnswered && (
             <Text>
-              Please answer all Required <span style={{ color: "red" }}>*</span>{" "}
+              Please answer all required <span style={{ color: "red" }}>*</span>{" "}
               questions
             </Text>
           )}
@@ -185,8 +180,7 @@ const AssessmentForm: React.FC<AssessmentFormProps> = ({
             className="bg-blue-600 text-white px-5 py-2 rounded hover:bg-blue-700 transition"
             // if all required questions are answered, then submit
             onClick={() => {
-              if (checkRequired(questions, responses))
-                onSubmit(false, isConfirmationPage);
+              onSubmit(false, isConfirmationPage);
             }}
           >
             Save
