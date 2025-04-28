@@ -716,6 +716,12 @@
       "name": "Shared Site",
       "organization_id": 3,
       "people_served": 0
+    },
+    {
+      "id": 4,
+      "name": "",
+      "organization_id": 4,
+      "people_served": ""
     }
   ],
   "users": [
@@ -746,6 +752,13 @@
       "id": 4,
       "organization_id": 3,
       "site_id": 3
+    },
+    {
+      "email": "admin123@example.com",
+      "hashed_password": "$2b$12$oKCcp4Jh3KFSun4J5PFbQONoI/2pVocW1Ga1FjPkeuwbPPThjKyqS",
+      "id": 5,
+      "organization_id": 4,
+      "site_id": 4
     }
   ]
 }

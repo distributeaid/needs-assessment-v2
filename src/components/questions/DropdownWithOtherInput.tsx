@@ -9,14 +9,18 @@ const DropdownWithOtherInput: React.FC<InputProps> = ({
   onChange,
 }) => {
   const options = question.options ?? [];
-  const isCustomValue = typeof value === "string" && !options.includes(value);
-  const [selected, setSelected] = useState(isCustomValue ? "Other" : value);
+  const isCustomValue =
+    typeof value === "string" && value !== "" && !options.includes(value);
+
+  const [selected, setSelected] = useState(
+    value ? (isCustomValue ? "Other" : value) : "",
+  );
   const [otherValue, setOtherValue] = useState(isCustomValue ? value : "");
 
   useEffect(() => {
     if (selected === "Other") {
       onChange(question.id, otherValue);
-    } else {
+    } else if (selected !== "") {
       onChange(question.id, selected);
     }
   }, [selected, otherValue, onChange, question.id]);
@@ -47,7 +51,7 @@ const DropdownWithOtherInput: React.FC<InputProps> = ({
       {selected === "Other" && (
         <>
           {question.subtext && (
-            <p className="text-sm text-blue-900 font-medium mb-1">
+            <p className="text-md text-blue-900 font-semibold mb-2">
               {question.subtext}
             </p>
           )}
