@@ -1,34 +1,36 @@
 "use client";
 
 import React from "react";
+import { colors } from "@/styles/colors";
 import { InputProps } from "@/types/ui-models";
 
-const DropdownInput: React.FC<InputProps> = ({ question, value, onChange }) => {
-  const options = question.options ?? [];
+const baseInputClasses =
+  "mt-1 p-2 text-gray-900 rounded w-full transition-colors duration-300 h-10";
 
-  return (
-    <div className="bg-blue-50 p-4 rounded-md border">
-      <select
-        value={value}
-        onChange={(e) => onChange(question.id, e.target.value)}
-        className={`
-          w-full px-4 py-2 rounded-full border
-          text-sm font-semibold text-blue-900
-          bg-white hover:bg-blue-100 transition
-          focus:outline-none focus:ring-2 focus:ring-blue-500
-        `}
-      >
-        <option value="" disabled>
-          Click to select one
-        </option>
-        {options.map((opt) => (
-          <option key={opt} value={opt}>
-            {opt}
-          </option>
-        ))}
-      </select>
-    </div>
-  );
-};
+const getInputBackgroundStyle = (value: string | string[]) => ({
+  backgroundColor: Array.isArray(value)
+    ? value.length > 0
+      ? colors.input.filled
+      : colors.input.empty
+    : value
+      ? colors.input.filled
+      : colors.input.empty,
+});
+
+const DropdownInput: React.FC<InputProps> = ({ question, value, onChange }) => (
+  <select
+    className={baseInputClasses}
+    style={getInputBackgroundStyle(value)}
+    value={value}
+    onChange={(e) => onChange(question.id, e.target.value)}
+  >
+    <option value="">Select an option</option>
+    {question.options?.map((option) => (
+      <option key={option} value={option}>
+        {option}
+      </option>
+    ))}
+  </select>
+);
 
 export default DropdownInput;

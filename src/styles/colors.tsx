@@ -1,3 +1,5 @@
+// src/styles/colors.tsx
+
 export const colors = {
   primary: {
     base: "#051E5E",
@@ -13,4 +15,8 @@ export const colors = {
   },
   error: "#DC3545",
   disabled: "rgba(0,0,0,0.5)",
+  input: {
+    empty: "#C5CFE4",
+    filled: "#5AC597",
+  },
 };

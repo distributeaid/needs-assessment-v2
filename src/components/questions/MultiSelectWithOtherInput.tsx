@@ -29,7 +29,7 @@ const MultiSelectWithOtherInput: React.FC<InputProps> = ({
       ? baseSelections.filter((v) => v !== option)
       : [...baseSelections, option];
 
-    // If "Other" was selected, preserve it
+    // Preserve "Other" if it was selected
     if (selected.some((v) => v.startsWith(OTHER_PREFIX))) {
       updated.push(`${OTHER_PREFIX}${otherValue}`);
     }
@@ -58,24 +58,20 @@ const MultiSelectWithOtherInput: React.FC<InputProps> = ({
             onClick={() => toggleOption(option)}
           />
         ))}
-        {/* "Other" button */}
         <SelectableButton
           key="other"
           label="Other"
           selected={isOtherSelected}
           onClick={() => {
             if (isOtherSelected) {
-              // remove Other
               onChange(question.id, baseSelections);
             } else {
-              // add empty Other
               onChange(question.id, [...baseSelections, `${OTHER_PREFIX}`]);
             }
           }}
         />
       </div>
 
-      {/* Show input field if "Other" is selected */}
       {isOtherSelected && (
         <div>
           {question.subtext && (
@@ -88,7 +84,10 @@ const MultiSelectWithOtherInput: React.FC<InputProps> = ({
             value={otherValue}
             onChange={(e) => handleOtherChange(e.target.value)}
             placeholder="Please specify..."
-            className="w-full mt-1 p-2 border rounded text-blue-900"
+            className="w-full mt-1 p-2 text-gray-900 rounded transition-colors duration-300 h-10"
+            style={{
+              backgroundColor: otherValue ? "#5AC597" : "#C5CFE4",
+            }}
           />
         </div>
       )}

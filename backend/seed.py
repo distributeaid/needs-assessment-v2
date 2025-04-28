@@ -98,11 +98,7 @@ def maybe_create_question(
     raw_type = row["Type"]
     normalized_type = raw_type.replace(" With Numeric Entry", "").replace("WithOther", "").strip()
     allows_additional_input = "WithOther" in raw_type or "With Numeric Entry" in raw_type
-    if row["ItemText"] == "Which of the following areas do you have needs in?":
-        options = list(
-            set(page_order_mapping.keys())
-            - {"Preamble", "Confirmation", "Site", "Demographics", "Organization"}
-        )
+
     if page:
         existing_question = Question.query.filter_by(page_id=page.id, text=row["ItemText"]).first()
     elif row["Page"] == "Organization":
@@ -111,10 +107,17 @@ def maybe_create_question(
         existing_question = SiteQuestion.query.filter_by(text=row["ItemText"]).first()
 
     if existing_question:
-        return existing_question  # Skip this question if it already exists
+        return existing_question
     options = []
-    if "Strapi" in row["ItemText"] or "do you need over the next six months?" in row["ItemText"]:
+    if row["ItemText"] == "Which of the following areas do you have needs in?":
+        options = list(
+            set(page_order_mapping.keys())
+            - {"Preamble", "Confirmation", "Site", "Demographics", "Organization"}
+        )
+    elif "Strapi" in row["ItemText"] or "do you need over the next six months?" in row["ItemText"]:
         options = choices_options.get(row["Page"], None)
+        options += ["None"]
+        allows_additional_input = True
     if not options:
         options = response_options_dict.get(row["ItemText"], None)
     parent_id = None

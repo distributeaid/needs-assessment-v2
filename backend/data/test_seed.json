@@ -243,7 +243,7 @@
       "text": "Vegetarian"
     },
     {
-      "allows_additional_input": false,
+      "allows_additional_input": true,
       "id": 12,
       "options": [
         "Bowl",
@@ -275,7 +275,8 @@
         "Energy Bar",
         "Fish",
         "Flour",
-        "Food"
+        "Food",
+        "None"
       ],
       "order": 26,
       "page_id": 2,
@@ -332,7 +333,7 @@
       "text": "Distributed for people to take?"
     },
     {
-      "allows_additional_input": false,
+      "allows_additional_input": true,
       "id": 16,
       "options": [
         "Ammonia",
@@ -365,7 +366,8 @@
         "Water Heater",
         "Water Pump",
         "Water Purification Tablet",
-        "Water Storage Tank"
+        "Water Storage Tank",
+        "None"
       ],
       "order": 30,
       "page_id": 3,
@@ -390,7 +392,7 @@
       "text": "How many housing units will you be providing household items for in the next six months?"
     },
     {
-      "allows_additional_input": false,
+      "allows_additional_input": true,
       "id": 18,
       "options": [
         "Battery",
@@ -407,7 +409,8 @@
         "Solar Panel",
         "Office Supplies",
         "Paper",
-        "Stationery"
+        "Stationery",
+        "None"
       ],
       "order": 32,
       "page_id": 4,
@@ -421,6 +424,24 @@
     {
       "allows_additional_input": false,
       "id": 19,
+      "options": [
+        "Emergency Shelter",
+        "Temporary Shelter",
+        "Long-term Shelter",
+        "Distribution to Individuals"
+      ],
+      "order": 33,
+      "page_id": 5,
+      "parent_question_id": null,
+      "question_type": "Dropdown",
+      "required": true,
+      "slug": "",
+      "subtext": null,
+      "text": "What best characterises how you use shelter items?"
+    },
+    {
+      "allows_additional_input": false,
+      "id": 20,
       "options": null,
       "order": 33,
       "page_id": 5,
@@ -432,8 +453,8 @@
       "text": "How many people will you be providing shelter items to over the next six months?"
     },
     {
-      "allows_additional_input": false,
-      "id": 20,
+      "allows_additional_input": true,
+      "id": 21,
       "options": [
         "Camping Equipment",
         "Cot",
@@ -447,7 +468,8 @@
         "Rucksack",
         "Sleeping Bag",
         "Tent",
-        "Tarp"
+        "Tarp",
+        "None"
       ],
       "order": 34,
       "page_id": 5,
@@ -460,7 +482,7 @@
     },
     {
       "allows_additional_input": false,
-      "id": 21,
+      "id": 22,
       "options": null,
       "order": 35,
       "page_id": 6,
@@ -473,7 +495,7 @@
     },
     {
       "allows_additional_input": false,
-      "id": 22,
+      "id": 23,
       "options": null,
       "order": 36,
       "page_id": 6,
@@ -485,8 +507,8 @@
       "text": "How many people total will you be providing clothing to over the next six months?"
     },
     {
-      "allows_additional_input": false,
-      "id": 23,
+      "allows_additional_input": true,
+      "id": 24,
       "options": [
         "Belt",
         "Boots",
@@ -522,7 +544,8 @@
         "Underwear",
         "Winter Boots",
         "Winter Shoes",
-        "Work Gloves"
+        "Work Gloves",
+        "None"
       ],
       "order": 37,
       "page_id": 6,
@@ -534,8 +557,8 @@
       "text": "Which of the following do you need over the next six months?"
     },
     {
-      "allows_additional_input": false,
-      "id": 24,
+      "allows_additional_input": true,
+      "id": 25,
       "options": [
         "Bottle",
         "Car Seat",
@@ -583,7 +606,8 @@
         "Coloring Book",
         "Exercise Mat",
         "Sticker Page",
-        "Stuffed Animal"
+        "Stuffed Animal",
+        "None"
       ],
       "order": 38,
       "page_id": 7,
@@ -595,15 +619,16 @@
       "text": "Which of the following do you need over the next six months?"
     },
     {
-      "allows_additional_input": false,
-      "id": 25,
+      "allows_additional_input": true,
+      "id": 26,
       "options": [
         "Rope",
         "Safety Goggles",
         "Sand Bag",
         "Screw",
         "Shovel",
-        "Tyvek Suit"
+        "Tyvek Suit",
+        "None"
       ],
       "order": 39,
       "page_id": 8,
@@ -616,7 +641,7 @@
     },
     {
       "allows_additional_input": false,
-      "id": 26,
+      "id": 27,
       "options": null,
       "order": 40,
       "page_id": 9,
@@ -629,7 +654,7 @@
     },
     {
       "allows_additional_input": false,
-      "id": 27,
+      "id": 28,
       "options": null,
       "order": 41,
       "page_id": 9,
@@ -642,7 +667,7 @@
     },
     {
       "allows_additional_input": false,
-      "id": 28,
+      "id": 29,
       "options": [
         "Regional Needs Reporting",
         "Community Collection Campaigns",
@@ -661,7 +686,7 @@
     },
     {
       "allows_additional_input": false,
-      "id": 29,
+      "id": 30,
       "options": null,
       "order": 43,
       "page_id": 9,
@@ -696,28 +721,28 @@
   "users": [
     {
       "email": "testuser@example.com",
-      "hashed_password": "$2b$12$CeMtrayNZEeZyIW2c5fn/uk5GVGFCZHXjaoOfwrMepM5aEj.AC9X2",
+      "hashed_password": "$2b$12$OLaMewl6dMtInS2l.BtHv.j2j40OEuRL4z3uO4bwu.bFxq1kftnxC",
       "id": 1,
       "organization_id": 1,
       "site_id": 1
     },
     {
       "email": "admin@example.com",
-      "hashed_password": "$2b$12$CeMtrayNZEeZyIW2c5fn/uk5GVGFCZHXjaoOfwrMepM5aEj.AC9X2",
+      "hashed_password": "$2b$12$OLaMewl6dMtInS2l.BtHv.j2j40OEuRL4z3uO4bwu.bFxq1kftnxC",
       "id": 2,
       "organization_id": 2,
       "site_id": 2
     },
     {
       "email": "user1@example.com",
-      "hashed_password": "$2b$12$CeMtrayNZEeZyIW2c5fn/uk5GVGFCZHXjaoOfwrMepM5aEj.AC9X2",
+      "hashed_password": "$2b$12$OLaMewl6dMtInS2l.BtHv.j2j40OEuRL4z3uO4bwu.bFxq1kftnxC",
       "id": 3,
       "organization_id": 3,
       "site_id": 3
     },
     {
       "email": "user2@example.com",
-      "hashed_password": "$2b$12$CeMtrayNZEeZyIW2c5fn/uk5GVGFCZHXjaoOfwrMepM5aEj.AC9X2",
+      "hashed_password": "$2b$12$OLaMewl6dMtInS2l.BtHv.j2j40OEuRL4z3uO4bwu.bFxq1kftnxC",
       "id": 4,
       "organization_id": 3,
       "site_id": 3

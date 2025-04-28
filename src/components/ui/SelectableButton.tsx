@@ -15,25 +15,17 @@ const SelectableButton: React.FC<SelectableButtonProps> = ({
   selected,
   onClick,
 }) => {
-  const backgroundColor = selected
-    ? colors.primary.base
-    : colors.secondary.base;
-  const hoverColor = selected ? colors.primary.hover : colors.secondary.hover;
+  const backgroundColor = selected ? colors.input.filled : colors.input.empty;
+  const textColor = selected ? "text-white" : "text-blue-900";
 
   return (
     <button
       type="button"
       onClick={onClick}
-      className={`${statusColors.choice} ${selected ? "text-white" : "text-blue-900"}`}
+      className={`${statusColors.choice} ${textColor} transform transition-transform duration-200 hover:scale-105`}
       style={{
         backgroundColor,
         transition: "background-color 0.2s ease-in-out",
-      }}
-      onMouseEnter={(e) => {
-        e.currentTarget.style.backgroundColor = hoverColor;
-      }}
-      onMouseLeave={(e) => {
-        e.currentTarget.style.backgroundColor = backgroundColor;
       }}
     >
       {label}

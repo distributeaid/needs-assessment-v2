@@ -41,40 +41,27 @@ const Sidebar: React.FC<SidebarProps> = ({
       )}
       <div className="w-8 border-t border-[#082B76] my-4" />
 
-      {[
-        // Required + complete pages first
-        ...sitePages.sort((a, b) => a.order - b.order),
-      ].map((page) => {
+      {[...sitePages.sort((a, b) => a.order - b.order)].map((page) => {
         const isCurrent = currentPageId === String(page.id);
         const isLocked = page.progress === "LOCKED";
-        const showRedDot =
-          page.progress === "UNSTARTEDREQUIRED" ||
-          page.progress === "STARTEDREQUIRED";
 
         const content = (
-          <div
-            className={`flex flex-col items-center text-center w-full text-xs uppercase font-medium ${
-              isCurrent ? "text-white" : "text-[#082B76]"
-            }`}
-          >
-            <span className="mb-1 text-[10px] px-1 text-center break-words leading-tight">
+          <div className="flex flex-col items-center text-center w-full text-xs uppercase font-medium text-[#082B76]">
+            <span
+              className={`mb-1 text-[10px] px-1 break-words leading-tight ${
+                isCurrent ? "font-bold" : "font-medium"
+              }`}
+            >
               {page.title}
             </span>
-            <div className="relative">
-              <SidebarIcon progress={page.progress} />
-              {showRedDot && (
-                <span className="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full translate-x-1 -translate-y-1" />
-              )}
-            </div>
+            <SidebarIcon progress={page.progress} isActive={isCurrent} />
           </div>
         );
 
         return (
           <li
             key={page.id}
-            className={`mb-3 w-full px-2 py-1 rounded-md text-center list-none ${
-              isCurrent ? "bg-[#082B76]" : ""
-            }`}
+            className="mb-3 w-full px-2 py-1 rounded-md list-none"
           >
             {isLocked ? (
               <div className="cursor-not-allowed">{content}</div>

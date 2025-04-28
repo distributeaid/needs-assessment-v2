@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import { Question, Site } from "@/types/models";
+import { colors } from "@/styles/colors";
 import SizingGridInput from "@/components/questions/SizingGridInput";
 import MultiSelectInput from "@/components/questions/MultiSelectInput";
 import MultiSelectWithOtherInput from "@/components/questions/MultiSelectWithOtherInput";
@@ -23,12 +24,24 @@ interface AssessmentFormProps {
   site?: Site;
 }
 
-const inputBaseClass = "mt-1 p-2 border text-gray-900 rounded w-full";
+const baseInputClasses =
+  "mt-1 p-2 text-gray-900 rounded w-full transition-colors duration-300 h-10";
+
+const getInputBackgroundStyle = (value: string | string[]) => ({
+  backgroundColor: Array.isArray(value)
+    ? value.length > 0
+      ? colors.input.filled
+      : colors.input.empty
+    : value
+      ? colors.input.filled
+      : colors.input.empty,
+});
 
 const NumericInput = ({ question, value, onChange }: InputProps) => (
   <input
     type="number"
-    className={inputBaseClass}
+    className={baseInputClasses}
+    style={getInputBackgroundStyle(value)}
     value={value}
     onChange={(e) => onChange(question.id, e.target.value)}
   />
@@ -37,7 +50,8 @@ const NumericInput = ({ question, value, onChange }: InputProps) => (
 const ShortResponseInput = ({ question, value, onChange }: InputProps) => (
   <input
     type="text"
-    className={inputBaseClass}
+    className={baseInputClasses}
+    style={getInputBackgroundStyle(value)}
     value={value}
     onChange={(e) => onChange(question.id, e.target.value)}
   />
@@ -45,7 +59,8 @@ const ShortResponseInput = ({ question, value, onChange }: InputProps) => (
 
 const LongResponseInput = ({ question, value, onChange }: InputProps) => (
   <textarea
-    className={inputBaseClass}
+    className={baseInputClasses}
+    style={getInputBackgroundStyle(value)}
     value={value}
     onChange={(e) => onChange(question.id, e.target.value)}
   />
@@ -76,6 +91,7 @@ const AssessmentForm: React.FC<AssessmentFormProps> = ({
     setRequiredNotAnswered(!allRequiredAnswered);
     return allRequiredAnswered;
   };
+
   const renderInput = (question: Question) => {
     const value = responses[question.id] || "";
     const commonProps = {
@@ -84,7 +100,10 @@ const AssessmentForm: React.FC<AssessmentFormProps> = ({
       onChange: onInputChange,
       isConfirmationPage,
     };
+
     switch (question.type) {
+      case "DisplayText":
+        return;
       case "Numeric":
         return <NumericInput {...commonProps} />;
       case "YesNo":
@@ -119,7 +138,8 @@ const AssessmentForm: React.FC<AssessmentFormProps> = ({
         return (
           <input
             type="text"
-            className={inputBaseClass}
+            className={baseInputClasses}
+            style={getInputBackgroundStyle(value)}
             value={value}
             onChange={(e) => onInputChange(question.id, e.target.value)}
           />
@@ -132,9 +152,6 @@ const AssessmentForm: React.FC<AssessmentFormProps> = ({
       <form className="space-y-6" onSubmit={(e) => e.preventDefault()}>
         {questions.map((question) => {
           const input = renderInput(question);
-          const isInline =
-            question.type === "YesNo" || question.type === "Short Response";
-
           const showSubtext =
             !!question.subtext &&
             (!question.allowsAdditionalInput ||
@@ -144,34 +161,24 @@ const AssessmentForm: React.FC<AssessmentFormProps> = ({
 
           return (
             <div key={question.id} className="space-y-1">
-              {(!hasParent || responses[hasParent] == "true") &&
-                (isInline ? (
-                  <div className="flex items-center gap-4 flex-wrap">
-                    <label className="block text-base font-medium text-blue-900">
-                      {question.text}
-                    </label>
-                    {input}
-                  </div>
-                ) : (
-                  <>
-                    <label className="block text-lg font-medium text-blue-900">
-                      {question.text}
-                      {showRedDot && <span style={{ color: "red" }}> *</span>}
-                    </label>
-                    {showSubtext && (
-                      <p className="text-sm text-blue-700">
-                        {question.subtext}
-                      </p>
-                    )}
-                    {input}
-                  </>
-                ))}
+              {(!hasParent || responses[hasParent] == "true") && (
+                <>
+                  <label className="block font-bold text-2xl md:text-[32px] md:leading-[35px] text-[#1D2F73]">
+                    {question.text}
+                    {showRedDot && <span className="text-red-500"> *</span>}
+                  </label>
+
+                  {showSubtext && (
+                    <p className="text-sm text-blue-700">{question.subtext}</p>
+                  )}
+                  {input}
+                </>
+              )}
             </div>
           );
         })}
 
         <div className="flex flex-col sm:flex-row justify-end gap-4 pt-6">
-          {/* possible alternative : instead of text at bottom of pg when required questions aren't answered, have the text pop up under the unanswered questions themself? Open to other suggestions */}
           {requiredNotAnswered && (
             <Text>
               Please answer all required <span style={{ color: "red" }}>*</span>{" "}
@@ -186,7 +193,6 @@ const AssessmentForm: React.FC<AssessmentFormProps> = ({
               onSubmit(false, isConfirmationPage);
             }}
           />
-
           <ActionButton
             type="button"
             variant="success"

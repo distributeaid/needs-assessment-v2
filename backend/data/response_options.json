@@ -6,6 +6,12 @@
     "North Africa",
     "North America"
   ],
+  "What best characterises how you use shelter items?": [
+    "Emergency Shelter",
+    "Temporary Shelter",
+    "Long-term Shelter",
+    "Distribution to Individuals"
+  ],
   "If applicable, what US states do you operate in?": [
     "AL",
     "AK",

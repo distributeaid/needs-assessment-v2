@@ -1,15 +1,20 @@
+"use client";
+
 import Image from "next/image";
-import { SidebarProps } from "@/types/models";
 import { Flex, Box, Text } from "@radix-ui/themes";
 import * as Tooltip from "@radix-ui/react-tooltip";
-import { Lock } from "lucide-react";
 import { progressColors } from "@/lib/progressStyles";
+import { SidebarProps } from "@/types/models";
 
 interface SidebarIconProps {
   progress: SidebarProps["sitePages"][0]["progress"];
+  isActive?: boolean;
 }
 
-const SidebarIcon: React.FC<SidebarIconProps> = ({ progress }) => {
+const SidebarIcon: React.FC<SidebarIconProps> = ({
+  progress,
+  isActive = false,
+}) => {
   const isLocked = progress === "LOCKED";
 
   return (
@@ -18,33 +23,27 @@ const SidebarIcon: React.FC<SidebarIconProps> = ({ progress }) => {
       justify="center"
       style={{
         backgroundColor: progressColors[progress],
-        borderRadius: "8px",
-        position: "relative",
-        width: "50px",
-        height: "50px",
+        width: 50,
+        height: 50,
+        boxShadow: isActive ? "0 0 0 3px rgba(8, 43, 118, 0.5)" : undefined, // 🌟 active glow
       }}
+      className="rounded-md transition-all duration-300"
     >
-      <Tooltip.Provider>
-        <Tooltip.Root delayDuration={0}>
-          <Tooltip.Trigger asChild>
-            {isLocked ? (
-              <Lock
-                size={40} // Same size as the fingerprint
-                strokeWidth={1.5} // Optional: make it thinner
-                color="gray"
-                style={{ opacity: 0.7 }}
-              />
-            ) : (
-              <Image
-                src="/images/fingerprint.png"
-                alt="Fingerprint"
-                width={40}
-                height={40}
-                style={{ opacity: 1 }}
-              />
-            )}
-          </Tooltip.Trigger>
-          {isLocked && (
+      {isLocked ? (
+        <Tooltip.Provider>
+          <Tooltip.Root delayDuration={0}>
+            <Tooltip.Trigger asChild>
+              <div className="flex items-center justify-center w-full h-full">
+                <Image
+                  src="/images/fingerprint.png"
+                  alt="Fingerprint"
+                  width={30}
+                  height={30}
+                  style={{ width: "auto", height: "auto" }}
+                  priority
+                />
+              </div>
+            </Tooltip.Trigger>
             <Tooltip.Portal>
               <Tooltip.Content side="right" sideOffset={5}>
                 <Box
@@ -56,9 +55,18 @@ const SidebarIcon: React.FC<SidebarIconProps> = ({ progress }) => {
                 <Tooltip.Arrow />
               </Tooltip.Content>
             </Tooltip.Portal>
-          )}
-        </Tooltip.Root>
-      </Tooltip.Provider>
+          </Tooltip.Root>
+        </Tooltip.Provider>
+      ) : (
+        <Image
+          src="/images/fingerprint.png"
+          alt="Fingerprint"
+          width={30}
+          height={30}
+          style={{ width: "auto", height: "auto" }}
+          priority
+        />
+      )}
     </Flex>
   );
 };
