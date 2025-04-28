@@ -50,4 +50,5 @@ next-env.d.ts
 *.zip
 
 #sqlite
+test_seed.json
 database.db

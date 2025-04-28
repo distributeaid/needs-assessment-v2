@@ -1,17 +1,46 @@
 import logging
-import json
+import bcrypt
 
 from flask import Blueprint, request, jsonify
 from sqlalchemy.orm import joinedload
 
-from backend.models import db, User, SiteAssessment, Page, SitePage, QuestionResponse, Question, Site
+from backend.models import (
+    db,
+    User,
+    SiteAssessment,
+    Page,
+    SitePage,
+    QuestionResponse,
+    Question,
+    Site,
+    Organization,
+    OrganizationQuestion,
+    OrganizationQuestionResponse,
+    SiteQuestion,
+    SiteQuestionResponse,
+)
 from backend.validation import validate_responses
-from backend.utils.utils import ensure_assessment_exists, unlock_remaining_pages, update_from_profile_page
-from backend.serialize.serialize import serialize_question, serialize_question_response, \
-    serialize_user, serialize_site_assessment, serialize_site
+from backend.utils.utils import (
+    ensure_assessment_exists,
+    unlock_remaining_pages,
+    update_from_profile_page,
+)
+from backend.serialize.serialize import (
+    serialize_question,
+    serialize_question_response,
+    serialize_user_data,
+    serialize_site_assessment,
+    serialize_site,
+    serialize_user,
+)
 from backend.utils.jwt_utils import generate_jwt_payload, get_current_user, JWTError
+from backend.logic.manipulate_site_info import (
+    create_or_update_site_from_responses,
+    create_or_update_org_from_responses,
+)
 
 api_bp = Blueprint("api", __name__)
+
 
 @api_bp.route("/api/status", methods=["GET"])
 def status():
@@ -25,18 +54,15 @@ def login():
     user = User.query.filter_by(email=email).first()
     if not user:
         return jsonify({"error": "User not found"}), 404
-    # create assessment on user creation
-    ensure_assessment_exists(user.site_id)
-    # get the users site and print any site assessments
-    # TODO: Verify the password here
 
     token = generate_jwt_payload(user)
-    result = {
-        "message": "Login successful",
-        "user": serialize_user(user),
-        "accessToken": token
-    }
-
+    result = {"message": "Login successful", "user": serialize_user(user), "accessToken": token}
+    # if the user has a site, create an assessment for them
+    if user.site_id:
+        site_assessment = SiteAssessment.query.filter_by(site_id=user.site_id).first()
+        if not site_assessment:
+            # Create a new SiteAssessment instance
+            ensure_assessment_exists(user.site_id)
     return jsonify(result)
 
 
@@ -48,15 +74,24 @@ def get_site_assessment():
         logging.error(f"JWT Error: {e}")
         return jsonify({"error": str(e)}), 401
 
-    # Look up or create a SiteAssessment instance for the user's site.
+    # Look up SiteAssessment instance for the user's site.
     site_assessment = SiteAssessment.query.filter_by(site_id=user.site_id).first()
     if not site_assessment:
-        ensure_assessment_exists(user.site_id)
-        site_assessment = SiteAssessment.query.filter_by(site_id=user.site_id).first()
+        # see if the user has a site. if they have a site, create a new assessment
+        # otherwise, return something reflecting that they need to create a site
+        site = Site.query.filter_by(id=user.site_id).first()
+        if site:
+            # Create a new SiteAssessment instance
+            ensure_assessment_exists(site.id)
+            site_assessment = SiteAssessment.query.filter_by(site_id=user.site_id).first()
+        else:
+            return (
+                jsonify({"error": "No SiteAssessment found and no site associated with user."}),
+                404,
+            )
 
     response = serialize_site_assessment(site_assessment)
     return jsonify(response)
-
 
 
 @api_bp.route("/api/site-assessment/<int:site_assessment_id>", methods=["GET"])
@@ -67,7 +102,9 @@ def get_site_assessment_by_id(site_assessment_id):
         logging.error(f"JWT Error: {e}")
         return jsonify({"error": str(e)}), 401
 
-    site_assessment = SiteAssessment.query.filter_by(id=site_assessment_id, site_id=user.site_id).first()
+    site_assessment = SiteAssessment.query.filter_by(
+        id=site_assessment_id, site_id=user.site_id
+    ).first()
     if not site_assessment:
         return jsonify({"error": "SiteAssessment not found"}), 404
 
@@ -75,8 +112,10 @@ def get_site_assessment_by_id(site_assessment_id):
     return jsonify(response)
 
 
-
-@api_bp.route("/api/site-assessment/<int:site_assessment_id>/site-page/<int:site_page_id>/save", methods=["POST"])
+@api_bp.route(
+    "/api/site-assessment/<int:site_assessment_id>/site-page/<int:site_page_id>/save",
+    methods=["POST"],
+)
 def save_site_page(site_assessment_id, site_page_id):
     """Save a SitePage with validation, but do not require mandatory questions."""
     logging.info(f"Saving SitePage {site_page_id} for assessment {site_assessment_id}")
@@ -118,29 +157,34 @@ def save_site_page(site_assessment_id, site_page_id):
             continue  # skip incomplete response
 
         existing = QuestionResponse.query.filter_by(
-            site_page_id=site_page.id,
-            question_id=question_id
+            site_page_id=site_page.id, question_id=question_id
         ).first()
 
         if existing:
             existing.value = value
         else:
-            db.session.add(QuestionResponse(
-                site_page_id=site_page.id,
-                question_id=question_id,
-                value=value
-            ))
+            db.session.add(
+                QuestionResponse(site_page_id=site_page.id, question_id=question_id, value=value)
+            )
 
         logging.info(f"Saved: Question {question_id} -> {value}")
 
     db.session.commit()
 
-    return jsonify({
-        "message": "SitePage completed successfully" if data.get("confirmed") else "SitePage saved successfully"
-    })
+    return jsonify(
+        {
+            "message": (
+                "SitePage completed successfully"
+                if data.get("confirmed")
+                else "SitePage saved successfully"
+            )
+        }
+    )
 
 
-@api_bp.route("/api/site-assessment/<int:site_assessment_id>/site-page/<int:site_page_id>", methods=["GET"])
+@api_bp.route(
+    "/api/site-assessment/<int:site_assessment_id>/site-page/<int:site_page_id>", methods=["GET"]
+)
 def get_assessment_page(site_assessment_id, site_page_id):
     try:
         user = get_current_user()
@@ -162,13 +206,69 @@ def get_assessment_page(site_assessment_id, site_page_id):
     questions = [serialize_question(q) for q in page.questions]
     site = Site.query.get(user.site_id)
 
-    return jsonify({
-        "title": page.title,
-        "questions": questions,
-        "responses": responses,
-        "isConfirmationPage": page.is_confirmation_page,
-        "site": serialize_site(site),
-    })
+    return jsonify(
+        {
+            "title": page.title,
+            "questions": questions,
+            "responses": responses,
+            "isConfirmationPage": page.is_confirmation_page,
+            "site": serialize_site(site),
+        }
+    )
+
+
+@api_bp.route("/api/register", methods=["POST"])
+def register():
+    data = request.get_json()
+    email = data.get("email")
+    org_name = data.get("orgName")
+    password = data.get("password")
+
+    site = Organization.query.filter_by(name=org_name).first()
+    # there shouldn't be an existing site with the same name
+    if site:
+        return (
+            jsonify(
+                {
+                    "error": "Organization with this name already exists. If you would like to be added, contact the Organization administrator"
+                }
+            ),
+            409,
+        )
+    if not email or not password:
+        return jsonify({"error": "Email and password are required."}), 400
+
+    existing_user = User.query.filter_by(email=email).first()
+    if existing_user:
+        return jsonify({"error": "User with this email already exists."}), 409
+
+    try:
+        org = Organization(name=org_name)
+        db.session.add(org)
+        db.session.commit()
+
+        # Hash the password before storing it
+        hashed_password = bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt())
+        new_user = User(
+            email=email, hashed_password=hashed_password.decode("utf-8"), organization_id=org.id
+        )
+        db.session.add(new_user)
+        db.session.commit()
+
+        # Generate a token for the new user
+        token = generate_jwt_payload(new_user)
+
+        result = {
+            "message": "User registered successfully.",
+            "user": serialize_user(new_user),
+            "accessToken": token,
+        }
+        return jsonify(result), 201
+
+    except Exception as e:
+        logging.error(f"Error registering user: {e}")
+        return jsonify({"error": "Internal server error."}), 500
+
 
 @api_bp.route("/api/site-assessment/<int:site_assessment_id>/summary", methods=["GET"])
 def get_site_assessment_summary(site_assessment_id):
@@ -192,7 +292,7 @@ def get_site_assessment_summary(site_assessment_id):
             question = Question.query.get(response.question_id)
             value = response.value
             str_value = str(response.value)
-            if str_value[-1] == '|':
+            if str_value[-1] == "|":
                 value = value[:-1]
             if str_value == "true":
                 value = "Yes"
@@ -204,31 +304,142 @@ def get_site_assessment_summary(site_assessment_id):
                 if type(value) == list:
                     str_value = ", ".join(value)
 
-                cards.append({
-                    "title": f"{site_assessment.site.name} needs {page.title} items",
-                    "highlight": str_value,
-                    "subtext": question.subtext if question.subtext else "",
-                    "backgroundColor": "#082B76"
-                })
+                cards.append(
+                    {
+                        "title": f"{site_assessment.site.name} needs {page.title} items",
+                        "highlight": str_value,
+                        "subtext": question.subtext if question.subtext else "",
+                        "backgroundColor": "#082B76",
+                    }
+                )
 
-            questions_data.append({
-                "questionId": question.id,
-                "questionText": question.text,
-                "responseValue": value,
-            })
+            questions_data.append(
+                {
+                    "questionId": question.id,
+                    "questionText": question.text,
+                    "responseValue": value,
+                }
+            )
         if questions_data:
-            summary.append({
-                "sitePageId": site_page.id,
-                "sitePageTitle": page.title,
-                "responses": questions_data
-            })
+            summary.append(
+                {
+                    "sitePageId": site_page.id,
+                    "sitePageTitle": page.title,
+                    "responses": questions_data,
+                }
+            )
 
-    return jsonify({
-        "summary": summary,
-        "carousel": {
-            "organizationName": site_assessment.site.name,
-            "peopleServed": site_assessment.site.people_served,
-            "cards": cards
+    return jsonify(
+        {
+            "summary": summary,
+            "carousel": {
+                "organizationName": site_assessment.site.name,
+                "peopleServed": site_assessment.site.people_served,
+                "cards": cards,
+            },
         }
-    })
+    )
 
+
+@api_bp.route("/api/check-email", methods=["POST"])
+def check_email():
+    data = request.get_json() or {}
+    email = data.get("email")
+    exists = bool(User.query.filter_by(email=email).first())
+    return jsonify({"exists": exists}), 200
+
+
+@api_bp.route("/api/me", methods=["GET"])
+def get_current_user_profile():
+    """
+    Returns the currently authenticated user, their organization, and site.
+    Authentication is via the Authorization: Bearer <token> header.
+    """
+    try:
+        user = get_current_user()
+    except JWTError as e:
+        return jsonify({"error": str(e)}), 401
+
+    return jsonify(serialize_user_data(user)), 200
+
+
+@api_bp.route("/api/organization/questions", methods=["GET"])
+def get_org_questions():
+    qs = OrganizationQuestion.query.order_by(OrganizationQuestion.order).all()
+    return jsonify([serialize_question(q) for q in qs]), 200
+
+
+@api_bp.route("/api/organization/responses", methods=["GET"])
+def get_org_responses():
+    user = get_current_user()
+    org_id = user.organization_id
+    resps = OrganizationQuestionResponse.query.filter_by(organization_id=org_id).all()
+    return jsonify([serialize_question_response(r) for r in resps]), 200
+
+
+@api_bp.route("/api/organization/save", methods=["POST"])
+def save_org_responses():
+    user = get_current_user()
+    data = request.get_json() or {}
+    responses_data = data.get("responses", [])
+    org = create_or_update_org_from_responses(user, responses_data)
+
+    for resp in responses_data:
+        qid = resp.get("questionId")
+        val = resp.get("value")
+
+        if qid is None:
+            continue
+
+        existing = OrganizationQuestionResponse.query.filter_by(
+            organization_id=org.id, question_id=qid
+        ).first()
+
+        if existing:
+            existing.value = val
+        else:
+            db.session.add(
+                OrganizationQuestionResponse(organization_id=org.id, question_id=qid, value=val)
+            )
+
+    db.session.commit()
+    return jsonify({"message": "Organization data saved"}), 200
+
+
+@api_bp.route("/api/site/questions", methods=["GET"])
+def get_site_questions():
+    qs = SiteQuestion.query.order_by(SiteQuestion.order).all()
+    return jsonify([serialize_question(q) for q in qs]), 200
+
+
+@api_bp.route("/api/site/responses", methods=["GET"])
+def get_site_responses():
+    user = get_current_user()
+    site_id = user.site_id
+    resps = SiteQuestionResponse.query.filter_by(site_id=site_id).all()
+    return jsonify([serialize_question_response(r) for r in resps]), 200
+
+
+@api_bp.route("/api/site/save", methods=["POST"])
+def save_site_responses():
+    user = get_current_user()
+    data = request.get_json() or {}
+    responses_data = data.get("responses", [])
+    site = create_or_update_site_from_responses(user, responses_data)
+    site_id = site.id
+    for resp in responses_data:
+        qid = resp.get("questionId")
+        val = resp.get("value")
+
+        if qid is None:
+            continue
+
+        existing = SiteQuestionResponse.query.filter_by(site_id=site_id, question_id=qid).first()
+
+        if existing:
+            existing.value = val
+        else:
+            db.session.add(SiteQuestionResponse(site_id=site_id, question_id=qid, value=val))
+
+    db.session.commit()
+    return jsonify({"message": "Organization data saved"}), 200

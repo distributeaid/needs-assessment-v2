@@ -11,7 +11,7 @@ const nextConfig: NextConfig = {
     return [
       {
         source: "/flask-api/:path*",
-        destination: `${apiUrl}/:path*`,
+        destination: `${apiUrl}/api/:path*`,
       },
     ];
   },

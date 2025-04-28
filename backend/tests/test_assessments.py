@@ -1,6 +1,6 @@
-
 from backend.app import app
 from backend.models import Site, SiteAssessment
+
 
 def test_user_login_creates_assessment(client):
     """Ensure a new SiteAssessment is created when a user logs in and none exists for the current season."""

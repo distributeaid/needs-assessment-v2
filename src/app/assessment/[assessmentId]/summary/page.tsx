@@ -45,10 +45,10 @@ export default function SummaryPage() {
       if (status !== "authenticated" || !session?.user?.accessToken) return;
 
       const [summaryRes, pagesRes] = await Promise.all([
-        fetch(`/flask-api/api/site-assessment/${assessmentId}/summary`, {
+        fetch(`/flask-api/site-assessment/${assessmentId}/summary`, {
           headers: { Authorization: `Bearer ${session.user.accessToken}` },
         }),
-        fetch(`/flask-api/api/site-assessment/${assessmentId}`, {
+        fetch(`/flask-api/site-assessment/${assessmentId}`, {
           headers: { Authorization: `Bearer ${session.user.accessToken}` },
         }),
       ]);

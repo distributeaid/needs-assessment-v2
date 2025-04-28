@@ -76,7 +76,7 @@ export default function AssessmentPage() {
 
     const fetchAssessmentAndPages = async () => {
       try {
-        const res = await fetch(`/flask-api/api/site-assessment`, {
+        const res = await fetch(`/flask-api/site-assessment`, {
           headers: { Authorization: `Bearer ${session.user.accessToken}` },
         });
         if (res.status === 401) {
@@ -103,7 +103,7 @@ export default function AssessmentPage() {
     const fetchPageQuestions = async () => {
       try {
         const res = await fetch(
-          `/flask-api/api/site-assessment/${siteAssessment.id}/site-page/${pageId}`,
+          `/flask-api/site-assessment/${siteAssessment.id}/site-page/${pageId}`,
           {
             headers: { Authorization: `Bearer ${session.user.accessToken}` },
           },
@@ -151,7 +151,7 @@ export default function AssessmentPage() {
 
     // First: Save responses
     const res = await fetch(
-      `/flask-api/api/site-assessment/${siteAssessment.id}/site-page/${pageId}/save`,
+      `/flask-api/site-assessment/${siteAssessment.id}/site-page/${pageId}/save`,
       {
         method: "POST",
         headers: {

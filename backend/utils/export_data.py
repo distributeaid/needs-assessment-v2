@@ -2,6 +2,7 @@ import json
 
 from backend.models import Assessment, Page, Question, Site, User
 
+
 def serialize_model(obj):
     """Convert SQLAlchemy model instance to dict with sorted keys and no None values (excluding relationships)."""
     values = {
@@ -12,13 +13,7 @@ def serialize_model(obj):
 
 
 def export_seed_data(path="data/test_seed.json"):
-    data = {
-        "assessments": [],
-        "pages": [],
-        "questions": [],
-        "sites": [],
-        "users": []
-    }
+    data = {"assessments": [], "pages": [], "questions": [], "sites": [], "users": []}
 
     # Export assessments
     assessments = {a.id: serialize_model(a) for a in Assessment.query.all()}

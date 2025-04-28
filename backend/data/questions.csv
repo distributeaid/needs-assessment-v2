@@ -1,41 +1,42 @@
-,Page,ItemID,ParentItemID,ItemText,Subtext,Mandatory in Section,Type,Response Options,Notes,QuestionOrder
-1,Basic Info,,,Organization Name,,Y,Short Response,,,3
-10,Basic Info,,,How many individuals does your organisation support in one month?,,Y,Numeric,,"Adele- this one always confuses people, need some instruction for how to come up with this",12
-2,Basic Info,,,What region do you operate in?,,Y,MultiSelectWithOther,"Existing regions, or 'Other' which will prompt a short response",,4
-3,Basic Info,,,"If applicable, what US state do you operate in?",,N,MultiSelect,<US States>,only show if US related region is selected,5
-4,Basic Info,,,"Specific location (city / state, zip code, etc)",,N,Short Response,,,6
-5,Basic Info,WAREHOUSE,,Do you have a warehouse?,,Y,YesNo,,,7
-6,Basic Info,,WAREHOUSE,What infrastructure do you have?,,,MultiSelect,"forkift, loading bay + pallet jack",,8
-7,Basic Info,,WAREHOUSE,How much space does your warehouse have?,"sqft (if US), m2 (if international)",,Numeric,if warehouse is selected above,,9
-8,Basic Info,,WAREHOUSE,Is your warehouse accessible by truck (18-wheeler)?,,,YesNo,if warehouse is selected above,,10
-9,Basic Info,,,Which of the following areas do you have needs in?,,,MultiSelect,"<Sourced from list of pages marked Supply in Strapi - e.g. food, hygeine, etc>",,11
-14,Demographics,,,What is the age / gender breakown for people that you serve?,,Y,DemoGrid,,,16
-15,Demographics,,,Are there specific vulnerable communities that you support?,,N,MultiSelectWithOther,"trans / non-binary / queer, refugees, folks who are incarcerate / recently incarcerate, unhoused people, disabled people",,17
-12,Demographics,,,How often do you support the same individuals?,,N,DropdownWithOther,"Daily, Weekly, Monthly, Annually",,14
-13,Demographics,,,What % of people are first-time beneficiaries?,,N,Numeric,shown if serve people more than once,,15
-16,Demographics,,,Is there anything else you'd like to tell us about about the population that you support?,,N,Long Response,,,18
-17,Food,,,Which modes of food distribution does your organization use?,,,DisplayText,,,19
-18,Food,,,Hot meals eaten on site,About how many hot meals do you distribute in a week?,N,YesNo With Numeric Entry,,,20
-19,Food,,,Portable food,About how many portable snacks and meals do you distribute a week?,N,YesNo With Numeric Entry,,,21
-20,Food,,,Food baskets for households,How many people are fed by food baskets each week?,N,YesNo With Numeric Entry,,,22
-22,Food,,,Halal,(if selected) About how many meals of 100 must be halal?,N,YesNo With Numeric Entry,,,24
-23,Food,,,Vegetarian,(if selected) About how many meals of 100 must be vegetarian?,N,YesNo With Numeric Entry,,,25
-24,Food,,,Which of the following do you need over the next six months?,,Y,MultiSelect,<Standard items of category from Strapi>,,26
-25,Hygeine,,,Which applications do you need hygeine supplies for?,,,MultiSelect,,,27
-26,Hygeine,,,Facilities provided on site,How many people are using this service per week?,,YesNo With Numeric Entry,,,28
-27,Hygeine,,,Distributed for people to take?,How many people are using this service per week?,,YesNo With Numeric Entry,,,29
-28,Hygeine,,,Which of the following do you need over the next six months?,,Y,MultiSelect,<Standard items of category from Strapi>,,30
-29,Household,,,How many housing units will you be providing household items for in the next six months?,,,Numeric,,,31
-30,Household,,,Which of the following do you need over the next six months?,,Y,MultiSelect,<Standard items of category from Strapi>,Also include 'Cleaning',32
-31,Shelter,,,How many people will you be providing shelter items to over the next six months?,,Y,Numeric,,,33
-32,Shelter,,,Which of the following do you need over the next six months?,,Y,MultiSelect,<Standard items of category from Strapi>,,34
-33,Clothing,,,Please estimate the overall sizing for the population you provide clothing to,,N,SizingGrid,,,35
-34,Clothing,,,How many people total will you be providing clothing to over the next six months?,,Y,Numeric,,,36
-35,Clothing,,,Which of the following do you need over the next six months?,,Y,MultiSelect,<Standard items of category from Strapi>,,37
-36,Infants and Children,,,Which of the following do you need over the next six months?,,Y,MultiSelect,<Standard items of category from Strapi>,Categories: Baby and Education,38
-37,Infrastructure,,,Which of the following do you need over the next six months?,,Y,MultiSelect,<Standard items of category from Strapi>,"Categories: Electronics, Infrastructure, Cleaning",39
-38,Confirmation,,,"Would you like to be publicly credited for participating in this needs assessment, in our report, on our website, and in other places where we use this data?",,,YesNo,,,40
-39,Confirmation,,,"Are you happy for the needs you reported here to be shared privately with Distribute Aid's partners? If you select 'yes', we can highlight your organization's individual needs to relevant collection groups and in-kind donors. If you select 'no', we will only share your responses anonymously in our regional needs assessment summaries.",,,YesNo,,,41
+,Page,ItemID,ParentItemID,ItemText,Subtext,Mandatory in Section,Type,Response Options,Notes,QuestionOrder,Slug
+1,Organization,,,Organization Name,,Y,Short Response,,,3,orgname
+2,Organization,,,What region do you operate in?,,Y,MultiSelectWithOther,"Existing regions, or 'Other' which will prompt a short response",,4,orgregion
+3,Organization,,,"If applicable, what US states do you operate in?",,N,MultiSelect,<US States>,only show if US related region is selected,5,orgstate
+4,Site,,,"What is the name of this site?",,N,Short Response,,,6,sitename
+4,Site,,,How many individuals does this site support in one month?,,Y,Numeric,,"Adele- this one always confuses people, need some instruction for how to come up with this",12,sitenumserved
+3,Site,,,"Specific location (city / state, zip code, etc)",,N,Short Response,,,6,sitelocation
+5,Site,WAREHOUSE,,Do you have a warehouse?,,Y,YesNo,,,7,sitewarehouse
+6,Site,,,What infrastructure do you have?,,,MultiSelect,"forkift, loading bay + pallet jack",,8,siteinfra
+7,Site,,WAREHOUSE,How much space does your warehouse have?,"sqft (if US), m2 (if international)",,Numeric,if warehouse is selected above,,9,sitewarehousespace
+8,Site,,WAREHOUSE,Is your warehouse accessible by truck (18-wheeler)?,,,YesNo,if warehouse is selected above,,10,sitewarehousetruck
+9,Site,,,Which of the following areas do you have needs in?,,,MultiSelect,"<Sourced from list of pages marked Supply in Strapi - e.g. food, hygeine, etc>",,11,siteneeds
+14,Demographics,,,What is the age / gender breakown for people that you serve?,,Y,DemoGrid,,,16,
+15,Demographics,,,Are there specific vulnerable communities that you support?,,N,MultiSelectWithOther,"trans / non-binary / queer, refugees, folks who are incarcerate / recently incarcerate, unhoused people, disabled people",,17,
+12,Demographics,,,How often do you support the same individuals?,,N,DropdownWithOther,"Daily, Weekly, Monthly, Annually",,14,
+13,Demographics,,,What % of people are first-time beneficiaries?,,N,Numeric,shown if serve people more than once,,15,
+16,Demographics,,,Is there anything else you'd like to tell us about about the population that you support?,,N,Long Response,,,18,
+17,Food,,,Which modes of food distribution does your organization use?,,,DisplayText,,,19,
+18,Food,,,Hot meals eaten on site,About how many hot meals do you distribute in a week?,N,YesNo With Numeric Entry,,,20,
+19,Food,,,Portable food,About how many portable snacks and meals do you distribute a week?,N,YesNo With Numeric Entry,,,21,
+20,Food,,,Food baskets for households,How many people are fed by food baskets each week?,N,YesNo With Numeric Entry,,,22,
+22,Food,,,Halal,(if selected) About how many meals of 100 must be halal?,N,YesNo With Numeric Entry,,,24,
+23,Food,,,Vegetarian,(if selected) About how many meals of 100 must be vegetarian?,N,YesNo With Numeric Entry,,,25,
+24,Food,,,Which of the following do you need over the next six months?,,Y,MultiSelect,<Standard items of category from Strapi>,,26,
+25,Hygeine,,,Which applications do you need hygeine supplies for?,,,MultiSelect,,,27,
+26,Hygeine,,,Facilities provided on site,How many people are using this service per week?,,YesNo With Numeric Entry,,,28,
+27,Hygeine,,,Distributed for people to take?,How many people are using this service per week?,,YesNo With Numeric Entry,,,29,
+28,Hygeine,,,Which of the following do you need over the next six months?,,Y,MultiSelect,<Standard items of category from Strapi>,,30,
+29,Household,,,How many housing units will you be providing household items for in the next six months?,,,Numeric,,,31,
+30,Household,,,Which of the following do you need over the next six months?,,Y,MultiSelect,<Standard items of category from Strapi>,Also include 'Cleaning',32,
+31,Shelter,,,How many people will you be providing shelter items to over the next six months?,,Y,Numeric,,,33,
+32,Shelter,,,Which of the following do you need over the next six months?,,Y,MultiSelect,<Standard items of category from Strapi>,,34,
+33,Clothing,,,Please estimate the overall sizing for the population you provide clothing to,,N,SizingGrid,,,35,
+34,Clothing,,,How many people total will you be providing clothing to over the next six months?,,Y,Numeric,,,36,
+35,Clothing,,,Which of the following do you need over the next six months?,,Y,MultiSelect,<Standard items of category from Strapi>,,37,
+36,Infants and Children,,,Which of the following do you need over the next six months?,,Y,MultiSelect,<Standard items of category from Strapi>,Categories: Baby and Education,38,
+37,Infrastructure,,,Which of the following do you need over the next six months?,,Y,MultiSelect,<Standard items of category from Strapi>,"Categories: Electronics, Infrastructure, Cleaning",39,
+38,Confirmation,,,"Would you like to be publicly credited for participating in this needs assessment, in our report, on our website, and in other places where we use this data?",,,YesNo,,,40,
+39,Confirmation,,,"Are you happy for the needs you reported here to be shared privately with Distribute Aid's partners? If you select 'yes', we can highlight your organization's individual needs to relevant collection groups and in-kind donors. If you select 'no', we will only share your responses anonymously in our regional needs assessment summaries.",,,YesNo,,,41,
 40,Confirmation,,,The DA team uses your needs assessment data to provide a variety of support & services. Please check any support / services that you are interested in learning more about and a team member will reach out. ,,,MultiSelect,"Regional Needs Reporting
 Community Collection Campaigns
 In-Kind Donor Outreach
@@ -43,5 +44,5 @@ Joint Procurement Planning
 Aid Matching
 Regional Aid Swaps / Sharing
 Shipment Forecasting
-Shipment Funding Applications",,42
-41,Confirmation,,,Is there anything else you would like to communicate with us at this time?,,,Long Response,,,43
+Shipment Funding Applications",,42,
+41,Confirmation,,,Is there anything else you would like to communicate with us at this time?,,,Long Response,,,43,

@@ -6,6 +6,7 @@ from flask import jsonify
 from backend.models import db, SiteAssessment, SitePage, Page, User, Assessment, Question, Site
 from backend.consts import REQUIRED_PAGES
 
+
 def create_site_assessment(site_id, assessment_id):
     """Create a SiteAssessment and associated SitePages for a given site and assessment."""
     site_assessment = SiteAssessment(site_id=site_id, assessment_id=assessment_id)
@@ -20,7 +21,7 @@ def create_site_assessment(site_id, assessment_id):
             site_assessment_id=site_assessment.id,
             page_id=page.id,
             required=is_required,
-            progress="UNSTARTEDREQUIRED" if page.title == 'Basic Info' else "LOCKED",
+            progress="UNSTARTEDREQUIRED" if is_required else "LOCKED",
             order=page.order,
             is_confirmation_page=page.is_confirmation_page,
             title=page.title,
@@ -30,12 +31,6 @@ def create_site_assessment(site_id, assessment_id):
     db.session.commit()
     return site_assessment
 
-def get_current_user():
-    """Retrieve the current user based on the username provided in the request."""
-    username = request.args.get("username") or request.headers.get("Username")
-    if not username:
-        return None
-    return User.query.filter_by(username=username).first()
 
 def get_current_season():
     """Determine the current season based on the month."""
@@ -55,22 +50,19 @@ def ensure_assessment_exists(site_id):
         return jsonify({"error": "No assessment template found"}), 400
 
     # Find or create a SiteAssessment
-    site_assessment = SiteAssessment.query.filter_by(site_id=site_id, assessment_id=assessment.id).first()
+    site_assessment = SiteAssessment.query.filter_by(
+        site_id=site_id, assessment_id=assessment.id
+    ).first()
     if not site_assessment:
         site_assessment = create_site_assessment(site_id, assessment.id)
 
     return site_assessment
 
+
 def unlock_remaining_pages(site_assessment_id):
     """Unlock non-required SitePages once all required SitePages are complete."""
     site_pages = SitePage.query.filter_by(site_assessment_id=site_assessment_id).all()
     # if Demographics is locked, make it "UNSTARTEDREQUIRED" and return
-    demographics_page = next((sp for sp in site_pages if sp.title == "Demographics"), None)
-    if demographics_page and demographics_page.progress == "LOCKED":
-        demographics_page.progress = "UNSTARTEDREQUIRED"
-        db.session.commit()
-        return
-
 
     original_required_pages = [sp for sp in site_pages if sp.title in REQUIRED_PAGES]
 
@@ -84,6 +76,7 @@ def unlock_remaining_pages(site_assessment_id):
                     sp.progress = "UNSTARTEDOPTIONAL"
                 db.session.add(sp)
         db.session.commit()
+
 
 def update_from_profile_page(page, site_assessment, responses_data):
     """Update requires pages from the services the user has selected."""
@@ -100,7 +93,10 @@ def update_from_profile_page(page, site_assessment, responses_data):
             site = Site.query.filter_by(id=site_assessment.site_id).first()
             site.name = response["value"]
             db.session.add(site)
-        if question and question.text == "How many individuals does your organisation support in one month?":
+        if (
+            question
+            and question.text == "How many individuals does your organisation support in one month?"
+        ):
             site = Site.query.filter_by(id=site_assessment.site_id).first()
             site.people_served = response["value"]
             db.session.add(site)

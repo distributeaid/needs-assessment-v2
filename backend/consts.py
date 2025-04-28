@@ -1,1 +1,1 @@
-REQUIRED_PAGES = {"Basic Info", "Demographics"}
+REQUIRED_PAGES = {"Demographics"}

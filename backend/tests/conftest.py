@@ -5,6 +5,7 @@ from backend.seed import seed_database
 from backend.utils.import_data import load_seed_data
 from backend.utils.jwt_utils import generate_jwt_payload
 
+
 @pytest.fixture
 def client():
     app.config["TESTING"] = True
