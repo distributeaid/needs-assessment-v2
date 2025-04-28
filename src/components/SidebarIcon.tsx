@@ -2,6 +2,7 @@ import Image from "next/image";
 import { SidebarProps } from "@/types/models";
 import { Flex, Box, Text } from "@radix-ui/themes";
 import * as Tooltip from "@radix-ui/react-tooltip";
+import { Lock } from "lucide-react";
 import { progressColors } from "@/lib/progressStyles";
 
 interface SidebarIconProps {
@@ -15,20 +16,35 @@ const SidebarIcon: React.FC<SidebarIconProps> = ({ progress }) => {
     <Flex
       align="center"
       justify="center"
-      style={{ backgroundColor: progressColors[progress], borderRadius: "8px" }}
+      style={{
+        backgroundColor: progressColors[progress],
+        borderRadius: "8px",
+        position: "relative",
+        width: "50px",
+        height: "50px",
+      }}
     >
-      {isLocked ? (
-        <Tooltip.Provider>
-          <Tooltip.Root delayDuration={0}>
-            <Tooltip.Trigger asChild>
+      <Tooltip.Provider>
+        <Tooltip.Root delayDuration={0}>
+          <Tooltip.Trigger asChild>
+            {isLocked ? (
+              <Lock
+                size={40} // Same size as the fingerprint
+                strokeWidth={1.5} // Optional: make it thinner
+                color="gray"
+                style={{ opacity: 0.7 }}
+              />
+            ) : (
               <Image
-                width={40}
-                height={40}
                 src="/images/fingerprint.png"
                 alt="Fingerprint"
-                style={{ opacity: 0.5 }} // 👈 add lower opacity when locked
+                width={40}
+                height={40}
+                style={{ opacity: 1 }}
               />
-            </Tooltip.Trigger>
+            )}
+          </Tooltip.Trigger>
+          {isLocked && (
             <Tooltip.Portal>
               <Tooltip.Content side="right" sideOffset={5}>
                 <Box
@@ -40,17 +56,9 @@ const SidebarIcon: React.FC<SidebarIconProps> = ({ progress }) => {
                 <Tooltip.Arrow />
               </Tooltip.Content>
             </Tooltip.Portal>
-          </Tooltip.Root>
-        </Tooltip.Provider>
-      ) : (
-        <Image
-          width={40}
-          height={40}
-          src="/images/fingerprint.png"
-          alt="Fingerprint"
-          style={{ opacity: 1 }} // 👈 fully visible when not locked
-        />
-      )}
+          )}
+        </Tooltip.Root>
+      </Tooltip.Provider>
     </Flex>
   );
 };
