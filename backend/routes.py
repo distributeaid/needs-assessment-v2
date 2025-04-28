@@ -37,6 +37,7 @@ from backend.utils.jwt_utils import generate_jwt_payload, get_current_user, JWTE
 from backend.logic.manipulate_site_info import (
     create_or_update_site_from_responses,
     create_or_update_org_from_responses,
+    update_org_and_responses,
 )
 
 api_bp = Blueprint("api", __name__)
@@ -224,9 +225,9 @@ def register():
     org_name = data.get("orgName")
     password = data.get("password")
 
-    site = Organization.query.filter_by(name=org_name).first()
+    org = Organization.query.filter_by(name=org_name).first()
     # there shouldn't be an existing site with the same name
-    if site:
+    if org:
         return (
             jsonify(
                 {
@@ -246,6 +247,8 @@ def register():
         org = Organization(name=org_name)
         db.session.add(org)
         db.session.commit()
+        org = Organization.query.filter_by(name=org_name).first()
+        update_org_and_responses(org, org_name)
 
         # Hash the password before storing it
         hashed_password = bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt())

@@ -1,6 +1,33 @@
 import logging
 
-from backend.models import db, Site, SiteQuestion, Organization, OrganizationQuestion
+from backend.models import (
+    db,
+    Site,
+    SiteQuestion,
+    Organization,
+    OrganizationQuestion,
+    OrganizationQuestionResponse,
+)
+from backend.consts import ORG_NAME
+
+
+def update_org_and_responses(organization, name):
+    if name:
+        org_question = OrganizationQuestion.query.filter_by(slug=ORG_NAME).first()
+        existing = OrganizationQuestionResponse.query.filter_by(
+            organization_id=organization.id,
+            question_id=org_question.id,
+        ).first()
+        if existing:
+            existing.value = name
+            db.session.add(existing)
+        else:
+            new_response = OrganizationQuestionResponse(
+                organization_id=organization.id, question_id=org_question.id, value=name
+            )
+            db.session.add(new_response)
+            organization.question_responses.append(new_response)
+    db.session.commit()
 
 
 def create_or_update_site_from_responses(user, responses_data):
