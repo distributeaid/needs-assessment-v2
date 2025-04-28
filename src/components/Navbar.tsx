@@ -1,31 +1,55 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useSession, signIn, signOut } from "next-auth/react";
+import ActionButton from "@/components/ui/ActionButton";
+import { colors } from "@/styles/colors";
 
 const Navbar = () => {
   const { data: session } = useSession();
 
   return (
-    <nav className="w-full bg-blue-600 p-4 flex justify-between items-center">
-      <Link href="/" className="text-white text-lg font-bold">
-        Distribute Aid
-      </Link>
-      <div>
+    <nav
+      className="w-full p-4 flex items-center justify-between"
+      style={{ backgroundColor: colors.primary.base }}
+    >
+      {/* Left: empty spacer to balance layout */}
+      <div className="w-24" />
+
+      {/* Center: logo + title */}
+      <div className="flex items-center gap-2">
+        <div className="relative w-[30px] h-[30px] sm:w-[24px] sm:h-[24px]">
+          <Image
+            src="/images/logo.png"
+            alt="Logo"
+            fill
+            sizes="(max-width: 640px) 24px, 30px"
+            className="object-contain"
+            priority
+          />
+        </div>
+
+        <Link href="/">
+          <span className="text-white text-xl font-light">
+            NEEDS ASSESSMENT
+          </span>
+        </Link>
+      </div>
+      {/* Right: login/logout buttons */}
+      <div className="flex items-center gap-2">
         {session ? (
-          <button
+          <ActionButton
+            variant="secondary"
+            label="Logout"
             onClick={() => signOut({ callbackUrl: "/about" })}
-            className="bg-red-500 text-white px-4 py-2 rounded"
-          >
-            Logout
-          </button>
+          />
         ) : (
-          <button
+          <ActionButton
+            variant="success"
+            label="Login"
             onClick={() => signIn()}
-            className="bg-green-500 text-white px-4 py-2 rounded"
-          >
-            Login
-          </button>
+          />
         )}
       </div>
     </nav>
