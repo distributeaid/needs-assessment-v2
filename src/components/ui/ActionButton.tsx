@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import { colors } from "@/styles/colors";
 import { statusColors } from "@/styles/statusColors";
 
 export interface ActionButtonProps
@@ -15,17 +16,36 @@ const ActionButton: React.FC<ActionButtonProps> = ({
   variant = "primary",
   error = false,
   disabled,
+  style,
   ...props
 }) => {
   const baseClasses = statusColors.action;
-  const variantClasses = statusColors.variants[variant];
+  const textColor = variant === "secondary" ? "text-blue-900" : "text-white"; // 👈 dynamic text color
   const errorClasses = error ? statusColors.error : "";
   const disabledClasses = disabled ? statusColors.disabled : "";
+
+  const backgroundColor = colors[variant]?.base ?? colors.primary.base;
+  const hoverColor = colors[variant]?.hover ?? colors.primary.hover;
 
   return (
     <button
       disabled={disabled}
-      className={`${baseClasses} ${variantClasses} ${disabledClasses} ${errorClasses}`}
+      className={`${baseClasses} ${textColor} ${disabledClasses} ${errorClasses}`}
+      style={{
+        backgroundColor,
+        transition: "background-color 0.2s ease-in-out",
+        ...style,
+      }}
+      onMouseEnter={(e) => {
+        if (!disabled) {
+          e.currentTarget.style.backgroundColor = hoverColor;
+        }
+      }}
+      onMouseLeave={(e) => {
+        if (!disabled) {
+          e.currentTarget.style.backgroundColor = backgroundColor;
+        }
+      }}
       {...props}
     >
       {label}
